@@ -26,10 +26,10 @@ export function TeacherAdvisorDesk({ onApplyPrompt }: TeacherAdvisorDeskProps) {
       id: 'm-1',
       sender: 'teacher',
       text: isEn
-        ? "Hello! I'm your Project Mentor. Tell me what kind of app or interest you have, and I'll help you shape a hands-on project!"
-        : "Merhaba! Ben Proje Rehberinizim. Aklındaki hayali veya ilgi duyduğun alanı anlat, senin için en doğru projeyi ve öğrenme rotasını birlikte çıkaralım! 🎓",
+        ? "Hello! I'm your Project Mentor. Tell me your idea, and I'll help you craft the perfect learning roadmap! 🎓"
+        : "Merhaba! Ben Proje Rehberinizim. Aklındaki fikri anlat, senin için en doğru projeyi ve öğrenme rotasını birlikte çıkaralım! 🎓",
       suggestionPrompt: isEn
-        ? 'I want to build an online marketplace where people can sell goods smoothly.'
+        ? 'I want to build an online boutique store to sell handmade items.'
         : 'Kendi ürünlerimi sergileyip satabileceğim şık bir online mağaza açmak istiyorum.',
     },
   ])
@@ -38,12 +38,10 @@ export function TeacherAdvisorDesk({ onApplyPrompt }: TeacherAdvisorDeskProps) {
     ? [
         { label: '💡 Need ideas?', q: 'I have no project ideas, what can I build?' },
         { label: '🎯 Where to begin?', q: 'I am a beginner, how do I start learning?' },
-        { label: '⏱️ How long does it take?', q: 'How long does a typical project roadmap take?' },
       ]
     : [
         { label: '💡 Fikir bulamıyorum', q: 'Aklımda henüz bir proje yok, ne önerirsin?' },
         { label: '🎯 Nereden başlamalıyım?', q: 'Daha önce hiç proje yapmadım, nereden başlamalıyım?' },
-        { label: '⏱️ Ne kadar sürer?', q: 'Bir projeyi bitirmek ortalama ne kadar sürer?' },
       ]
 
   const handleSend = (userText: string) => {
@@ -65,7 +63,7 @@ export function TeacherAdvisorDesk({ onApplyPrompt }: TeacherAdvisorDeskProps) {
 
       if (userText.includes('fikir') || userText.includes('öner') || userText.includes('idea')) {
         reply = isEn
-          ? 'An interactive Fitness Coach or an Online Boutique Store is a fantastic starter project! It teaches you state, user interfaces, and data flow step by step.'
+          ? 'An interactive Fitness Coach or an Online Store is a fantastic starter project! It teaches you state, user interfaces, and data flow step by step.'
           : 'Kullanıcıların egzersizlerini takip eden bir "Akıllı Fitness Koçu" veya "Online Alışveriş Mağazası" harika bir başlangıçtır! Hem görsel tasarım hem de veri yönetimini adım adım öğretir.'
         promptToSuggest = isEn
           ? 'I want to build an AI workout coach that tracks exercises and nutrition.'
@@ -79,7 +77,7 @@ export function TeacherAdvisorDesk({ onApplyPrompt }: TeacherAdvisorDeskProps) {
           : 'Arkadaşların grup oluşturup anlık mesajlaşabildiği güvenli bir sohbet uygulaması yapmak istiyorum.'
       } else {
         reply = isEn
-          ? `Great question! "${userText.slice(0, 35)}..." is a worthy challenge. You can formulate this into your project idea box to begin your journey!`
+          ? `Great direction! "${userText.slice(0, 35)}..." is an exciting challenge. You can paste this directly into your project idea box!`
           : `Çok güzel bir soru! "${userText.slice(0, 35)}..." konusuyla ilgili bir projeyi sol taraftaki kutucuğa yazıp hemen yol haritanı oluşturabilirsin!`
         promptToSuggest = userText
       }
@@ -94,45 +92,45 @@ export function TeacherAdvisorDesk({ onApplyPrompt }: TeacherAdvisorDeskProps) {
           suggestionPrompt: promptToSuggest,
         },
       ])
-    }, 500)
+    }, 450)
   }
 
   return (
-    <div className="relative w-full flex flex-col items-center lg:items-end justify-end">
-      {/* Container holding the Chat Panel + Enlarged Teacher Character side by side */}
-      <div className="w-full max-w-lg flex flex-col items-center">
-        
-        {/* The Live Advisor Consultation Chat Panel ("etrafına koy o chat kısmının") */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.2 }}
-          className="w-full rounded-3xl border-2 border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF]/95 dark:bg-[#171A20]/95 backdrop-blur-md shadow-2xl overflow-hidden flex flex-col text-left mb-2"
-        >
-          {/* Header */}
-          <div className="px-4 py-3 border-b border-[#E3E7EC] dark:border-[#2A3038] bg-[#F7F8FA] dark:bg-[#111318] flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-[#2B660E]/15 dark:bg-[#B7F36B]/20 text-[#2B660E] dark:text-[#B7F36B] flex items-center justify-center font-bold">
-                <Bot className="w-4 h-4" />
-              </div>
-              <div>
-                <h4 className="text-xs font-bold text-[#111318] dark:text-[#E9EDF3] flex items-center gap-1.5">
-                  <span>{isEn ? 'Mentor Consultation Desk' : 'Önlüklü Danışman Masası'}</span>
-                </h4>
-                <div className="text-[10px] text-[#68717D] dark:text-[#9CA3AF] flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#2B660E] dark:bg-[#B7F36B] animate-pulse" />
-                  <span>{isEn ? 'Live Advisor · Ask anything' : 'Canlı Rehber · Sorunu yanıtlar'}</span>
-                </div>
-              </div>
-            </div>
-
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#2B660E]/10 dark:bg-[#B7F36B]/15 text-[#2B660E] dark:text-[#B7F36B] font-semibold">
-              AI Guide
-            </span>
+    <div className="w-full flex flex-col justify-between">
+      {/* Symmetrical Top Header (Matches left column height) */}
+      <div className="h-14 sm:h-16 flex items-center justify-between mb-3 px-1">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-[#2B660E]/10 dark:bg-[#B7F36B]/15 border-2 border-[#2B660E]/20 dark:border-[#B7F36B]/25 flex items-center justify-center font-bold shrink-0">
+            <Bot className="w-6 h-6 text-[#2B660E] dark:text-[#B7F36B]" />
           </div>
+          <div className="text-left">
+            <h3 className="text-base sm:text-lg font-bold text-[#111318] dark:text-[#E9EDF3] leading-tight">
+              {isEn ? 'Mentor Consultation Desk' : 'Önlüklü Danışman Masası'}
+            </h3>
+            <p className="text-xs text-[#68717D] dark:text-[#9CA3AF] flex items-center gap-1.5 mt-0.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2B660E] dark:bg-[#B7F36B] animate-pulse" />
+              <span>{isEn ? 'Live Advisor · Instant guidance' : 'Canlı Rehber · Sorunu yanıtlar, fikrini netleştirir'}</span>
+            </p>
+          </div>
+        </div>
 
-          {/* Quick Question Chips */}
-          <div className="px-3 py-2 border-b border-[#E3E7EC]/60 dark:border-[#2A3038]/60 bg-[#FFFFFF] dark:bg-[#171A20] flex flex-wrap gap-1.5">
+        <span className="px-2.5 py-1 rounded-full text-[10px] font-mono bg-[#2B660E]/10 dark:bg-[#B7F36B]/15 text-[#2B660E] dark:text-[#B7F36B] font-semibold hidden sm:inline">
+          AI Guide
+        </span>
+      </div>
+
+      {/* Main Symmetrical Area: Chat Card + Teacher Character Standing Side-by-Side */}
+      <div className="w-full flex flex-col sm:flex-row items-end gap-3 h-[340px]">
+        
+        {/* 1. The Interactive Consultation Chat Box */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
+          className="flex-1 w-full h-full rounded-3xl border-2 border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF] dark:bg-[#171A20] shadow-xl p-3.5 flex flex-col justify-between overflow-hidden text-left"
+        >
+          {/* Quick Questions Header */}
+          <div className="flex flex-wrap gap-1.5 pb-2 border-b border-[#E3E7EC]/60 dark:border-[#2A3038]/60">
             {quickQuestions.map((item, idx) => (
               <button
                 key={idx}
@@ -146,7 +144,7 @@ export function TeacherAdvisorDesk({ onApplyPrompt }: TeacherAdvisorDeskProps) {
           </div>
 
           {/* Chat Messages Log */}
-          <div className="p-3.5 space-y-2.5 max-h-[190px] overflow-y-auto text-xs">
+          <div className="flex-1 py-2 overflow-y-auto space-y-2 text-xs">
             {messages.map(msg => (
               <div
                 key={msg.id}
@@ -155,7 +153,7 @@ export function TeacherAdvisorDesk({ onApplyPrompt }: TeacherAdvisorDeskProps) {
                 }`}
               >
                 <div
-                  className={`p-2.5 rounded-2xl max-w-[90%] leading-relaxed ${
+                  className={`p-2.5 rounded-2xl max-w-[92%] leading-relaxed ${
                     msg.sender === 'user'
                       ? 'bg-[#111318] dark:bg-[#E9EDF3] text-white dark:text-[#0B0D10] font-medium'
                       : 'border border-[#E3E7EC] dark:border-[#2A3038] bg-[#F7F8FA] dark:bg-[#111318] text-[#111318] dark:text-[#E9EDF3]'
@@ -164,7 +162,7 @@ export function TeacherAdvisorDesk({ onApplyPrompt }: TeacherAdvisorDeskProps) {
                   {msg.text}
                 </div>
 
-                {/* Direct Action: Transfer idea to main text area */}
+                {/* Transfer suggestion to main idea textarea */}
                 {msg.suggestionPrompt && (
                   <button
                     type="button"
@@ -179,35 +177,44 @@ export function TeacherAdvisorDesk({ onApplyPrompt }: TeacherAdvisorDeskProps) {
             ))}
           </div>
 
-          {/* Message Input Footer */}
+          {/* Input Footer */}
           <form
             onSubmit={e => {
               e.preventDefault()
               handleSend(inputVal)
             }}
-            className="p-2 border-t border-[#E3E7EC] dark:border-[#2A3038] bg-[#F7F8FA] dark:bg-[#111318] flex items-center gap-1.5"
+            className="pt-2 border-t border-[#E3E7EC] dark:border-[#2A3038] flex items-center gap-1.5"
           >
             <input
               type="text"
               value={inputVal}
               onChange={e => setInputVal(e.target.value)}
               placeholder={isEn ? 'Ask mentor a question...' : 'Öğretmene bir soru sor...'}
-              className="flex-1 bg-transparent px-3 py-1.5 text-xs text-[#111318] dark:text-[#E9EDF3] placeholder:text-[#9CA3AF] dark:placeholder:text-[#64748B] outline-none"
+              className="flex-1 bg-transparent px-2.5 py-1 text-xs text-[#111318] dark:text-[#E9EDF3] placeholder:text-[#9CA3AF] dark:placeholder:text-[#64748B] outline-none font-normal"
             />
             <button
               type="submit"
               disabled={!inputVal.trim()}
-              className="p-1.5 rounded-xl bg-[#2B660E] dark:bg-[#B7F36B] text-white dark:text-[#0B0D10] disabled:opacity-40 transition-all cursor-pointer"
+              className="p-1.5 rounded-xl bg-[#2B660E] dark:bg-[#B7F36B] text-white dark:text-[#0B0D10] disabled:opacity-40 transition-all cursor-pointer shrink-0 shadow-xs"
             >
               <Send className="w-3.5 h-3.5" />
             </button>
           </form>
         </motion.div>
 
-        {/* The Enlarged Teacher Advisor Character standing flush on the bottom line! */}
-        <div className="relative translate-y-[2px] mt-1">
-          <TeacherAdvisorFigure size="lg" />
+        {/* 2. The Enlarged Teacher Advisor Character (Standing side-by-side with feet on bottom line!) */}
+        <div className="shrink-0 flex items-end justify-center translate-y-[2px]">
+          <TeacherAdvisorFigure size="md" showBubble={false} showCaption={false} />
         </div>
+      </div>
+
+      {/* Symmetrical Bottom Label (Matches height of left side inspiration chips) */}
+      <div className="mt-4 pt-1 flex items-center justify-between text-xs font-mono text-[#9CA3AF] dark:text-[#64748B] px-1">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-[#2B660E] dark:bg-[#B7F36B]" />
+          <span>{isEn ? 'Lab-Coat Mentor · Always online' : 'Önlüklü Rehber Öğretmen · Her zaman danışabilirsin'}</span>
+        </div>
+        <span className="text-[10px] opacity-70">ProjectPath AI</span>
       </div>
     </div>
   )
