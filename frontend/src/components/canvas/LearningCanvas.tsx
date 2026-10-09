@@ -2,7 +2,6 @@ import '@xyflow/react/dist/style.css'
 import {
   Background,
   BackgroundVariant,
-  MiniMap,
   ReactFlow,
   type EdgeTypes,
   type NodeTypes,
@@ -218,16 +217,6 @@ function CanvasFlowInner() {
           className="opacity-60"
         />
 
-        <MiniMap
-          nodeColor={node => {
-            if (node.data?.status === 'completed') return '#B7F36B'
-            if (node.data?.status === 'in_progress') return '#B7F36B'
-            if (node.data?.isRemedial) return '#F59E0B'
-            return isDark ? '#222730' : '#CBD5E1'
-          }}
-          maskColor={isDark ? 'rgba(11, 13, 16, 0.8)' : 'rgba(247, 248, 250, 0.8)'}
-          className="!bottom-6 !right-36 rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] !bg-[#FFFFFF]/90 dark:!bg-[#171A20]/90 !shadow-lg hidden md:block"
-        />
 
         <CanvasControls />
       </ReactFlow>

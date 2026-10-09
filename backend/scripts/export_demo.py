@@ -80,7 +80,12 @@ async def run():
                             f"/api/v1/projects/{project_id}/discovery/answers",
                             json={
                                 "answers": [
-                                    {"questionId": q["id"], "value": defaults[q["targetField"]]}
+                                    {
+                                        "questionId": q["id"],
+                                        "value": defaults.get(
+                                            q["targetField"], "MVP için başlangıç kapsamı ve hazır veri seti."
+                                        ),
+                                    }
                                     for q in discovery["questions"]
                                     if not q["completed"]
                                 ]
@@ -117,7 +122,7 @@ async def run():
                     )
                 )
                 assert not result["passed"] and result["weakSkills"] == ["python.functions"]
-                remedial = next(n for n in result["map"]["nodes"] if n["type"] == "remedial")
+                remedial = result["adaptiveMap"]["nodes"][0]
                 checked(await client.get(f"/api/v1/nodes/{remedial['id']}"))
                 checked(await client.get(f"/api/v1/nodes/{remedial['id']}/assessment"))
                 advisor = checked(
@@ -125,7 +130,7 @@ async def run():
                         "/api/v1/advisor/chat",
                         json={
                             "projectId": project_id,
-                            "currentMapId": child["id"],
+                            "currentMapId": result["adaptiveMap"]["id"],
                             "currentNodeId": remedial["id"],
                             "message": "Bu ek görev neden eklendi?",
                         },

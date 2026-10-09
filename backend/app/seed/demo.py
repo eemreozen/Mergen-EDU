@@ -20,10 +20,43 @@ def fixture(operation, payload):
             projectType="mvp",
             requiredSkills=["programming.basics"],
             uncertainDecisions=["stack"],
+            discoveryQuestions=[
+                dict(text=text, type="short_text", options=[], targetField=field)
+                for text, field in [
+                    ("Bu uygulamanın ilk kullanıcıları kimler olacak?", "projectDetailAudience"),
+                    ("İlk sürümde mutlaka çalışması gereken üç özellik nedir?", "projectDetailFeatures"),
+                    ("Hangi verileri kullanacaksın ve bu veriler hazır mı?", "projectDetailData"),
+                    ("Projenin başarılı olduğunu nasıl anlayacaksın?", "projectDetailSuccess"),
+                ]
+            ],
             mvpSuggestions=["Küçük çalışan prototip"],
         )
     if operation == "discovery":
         return {"questions": []}
+    if operation == "adaptive_roadmap":
+        skills = payload["weakSkills"]
+        nodes = []
+        for index, skill in enumerate(skills):
+            for suffix, label in [("learn", "Temeller"), ("practice", "Uygulama")]:
+                nodes.append(
+                    dict(
+                        key=f"skill-{index}-{suffix}",
+                        title=f"{skill} — {label}",
+                        type="learning",
+                        summary=f"{skill} becerisini projen içinde uygulayarak öğren.",
+                        skills=[skill],
+                        estimatedHours=1,
+                    )
+                )
+        return dict(
+            title=payload["node"]["title"] + " — Öğrenme Dalı",
+            description="Eksik becerilere özel kalıcı öğrenme haritası.",
+            nodes=nodes,
+            edges=[
+                dict(source=nodes[i]["key"], target=nodes[i + 1]["key"], kind="requires")
+                for i in range(len(nodes) - 1)
+            ],
+        )
     if operation in {"roadmap", "submap"}:
         if operation == "roadmap":
             entries = [
@@ -35,6 +68,18 @@ def fixture(operation, payload):
                 ("testing", "Test ve Yayınlama", "learning", ["testing.basics"]),
                 ("mvp", "MVP Tamamlama", "milestone", ["project.mvp"]),
             ]
+            entries.extend(
+                [
+                    ("requirements", "Kullanıcı Senaryoları", "learning", ["product.requirements"]),
+                    ("architecture", "Uygulama Mimarisi", "learning", ["architecture.basics"]),
+                    ("data_model", "Veri Modeli", "learning", ["data.modeling"]),
+                    ("auth", "Kimlik ve Yetkilendirme", "learning", ["auth.basics"]),
+                    ("features", "Temel Özellikler", "development_task", ["feature.implementation"]),
+                    ("validation", "Veri Doğrulama", "learning", ["validation.basics"]),
+                    ("monitoring", "Hata İzleme", "learning", ["monitoring.basics"]),
+                    ("delivery", "Dağıtım Hazırlığı", "development_task", ["deployment.basics"]),
+                ]
+            )
             if payload["project"]["primary_domain"] != "mobile":
                 entries[1] = (
                     "domain",
@@ -49,7 +94,16 @@ def fixture(operation, payload):
                 (entries[1][0], "integration"),
                 ("backend", "integration"),
                 ("integration", "testing"),
-                ("testing", "mvp"),
+                ("basics", "requirements"),
+                ("requirements", "architecture"),
+                ("architecture", "data_model"),
+                ("data_model", "auth"),
+                ("auth", "features"),
+                ("features", "validation"),
+                ("validation", "integration"),
+                ("testing", "monitoring"),
+                ("monitoring", "delivery"),
+                ("delivery", "mvp"),
             ]
         else:
             entries = [
@@ -80,6 +134,7 @@ def fixture(operation, payload):
     if operation == "node_content":
         title = payload["node"]["title"]
         return dict(
+            lesson="Bu örnek derste konuyu küçük ve doğrulanabilir adımlara ayırırız. Önce girdiyi, yapılacak işlemi ve beklenen çıktıyı belirle. Örneğin bir kullanıcı verisini işlerken boş girdiyi ayrı ele al, geçerli girdiyi dönüştür ve sonucu doğrula. Küçük bir fonksiyon yazıp normal girdi ve sınır durumlarıyla dene. Sık yapılan hata tüm işi tek adımda yazmaktır; her adımın çıktısını kontrol ederek ilerle. Şimdi kendi projen için bir girdi seç ve beklenen sonucu önceden yaz.",
             whyNeeded=f"{payload['project']['goal']} hedefi için {title} gerekiyor.",
             learningObjectives=[f"{s} becerisini bir örnekle uygula." for s in payload["node"]["skills"]],
             subtopics=payload["node"]["skills"],

@@ -16,6 +16,7 @@ def settings(**kwargs):
     return Settings(
         llm_provider="openai",
         llm_api_key="test-secret-not-real",
+        llm_model_project_analysis="",
         llm_model_fast="configured-fast",
         llm_model_strong="configured-strong",
         demo_fixtures=False,

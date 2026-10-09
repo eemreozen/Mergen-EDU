@@ -7,7 +7,7 @@ from app.graph.progression import recalculate, require_access
 from app.models.assessment import Assessment, AssessmentAttempt
 from app.models.roadmap import RoadmapNode
 from app.schemas.assessment import AssessmentDraft, AssessmentResult, AssessmentView, DemoAssessmentView
-from app.services.remediation_service import add_remediation
+from app.services.remediation_service import active_branch, add_remediation
 from app.services.roadmap_service import map_view, owned_map, owned_node
 from app.services.skill_service import update_assessed
 
@@ -35,7 +35,7 @@ def assessment_view(assessment, demo=False):
 async def get_assessment(db, node_id, user_id, gateway):
     node = await owned_node(db, node_id, user_id, lock=True)
     await require_access(db, node)
-    if node.type not in {"learning", "remedial"}:
+    if node.type not in {"learning", "remedial", "submap", "development_task"}:
         raise AppError("ASSESSMENT_NOT_APPLICABLE", "Bu düğüm testle tamamlanmaz.", 409)
     assessment = await db.scalar(select(Assessment).where(Assessment.node_id == node.id))
     if not assessment:
@@ -43,10 +43,6 @@ async def get_assessment(db, node_id, user_id, gateway):
 
         roadmap = await owned_map(db, node.map_id, user_id)
         ensure_ai_source(await owned_project(db, roadmap.project_id, user_id), gateway)
-        if node.content is None:
-            from app.services.node_service import get_node
-
-            await get_node(db, node.id, user_id, gateway)
         from app.ai.context_builder import build_context
 
         draft = await gateway.generate_structured(
@@ -58,7 +54,7 @@ async def get_assessment(db, node_id, user_id, gateway):
             raise AppError("AI_INVALID_OUTPUT", "Test düğümün tüm becerilerini kapsamıyor.", 502, True)
         # LLM soru kimlikleri yalnızca taslakta geçerlidir; kalıcı kimlikler backend tarafından verilir.
         questions = [{**q.model_dump(), "id": new_id()} for q in draft.questions]
-        assessment = Assessment(node_id=node.id, title=draft.title, questions=questions, passing_score=70)
+        assessment = Assessment(node_id=node.id, title=draft.title, questions=questions, passing_score=100)
         db.add(assessment)
         await db.flush()
     return assessment_view(assessment)
@@ -82,7 +78,7 @@ def evaluate(questions, answers, passing_score):
     return score, score >= passing_score, sorted(weak)
 
 
-async def submit_assessment(db, node_id, user_id, body):
+async def submit_assessment(db, node_id, user_id, body, gateway):
     node = await owned_node(db, node_id, user_id, lock=True)
     assessment = await db.scalar(
         select(Assessment).where(Assessment.id == body.assessment_id, Assessment.node_id == node.id)
@@ -114,13 +110,28 @@ async def submit_assessment(db, node_id, user_id, body):
             )
         )
     )
-    if active_remedies:
+    if active_remedies or await active_branch(db, node):
         raise AppError(
             "REMEDIATION_REQUIRED", "Ana testi tekrar denemeden önce telafi düğümlerini tamamlayın.", 409
         )
     score, passed, weak = evaluate(assessment.questions, body.answers, assessment.passing_score)
-    node.status = "completed" if passed else "needs_review"
-    created = False if passed else await add_remediation(db, node, weak)
+    passed = passed and not weak
+    node.status = (
+        ("in_progress" if node.type == "development_task" else "completed") if passed else "needs_review"
+    )
+    branch, created = None, False
+    if not passed:
+        selected = {a.question_id: a.selected_index for a in body.answers}
+        failed_questions = [
+            {
+                "prompt": q["prompt"],
+                "targetSkill": q["target_skill"],
+                "selectedOption": q["options"][selected[q["id"]]],
+            }
+            for q in assessment.questions
+            if selected[q["id"]] != q["correct_index"]
+        ]
+        branch, created = await add_remediation(db, node, weak, gateway, failed_questions=failed_questions)
     await update_assessed(db, user_id, [q["target_skill"] for q in assessment.questions], weak, score)
     await recalculate(db, node.map_id)
     roadmap = await map_view(db, await owned_map(db, node.map_id, user_id))
@@ -131,6 +142,7 @@ async def submit_assessment(db, node_id, user_id, body):
         score=score,
         weak_skills=weak,
         remediation_created=created,
+        adaptive_map=await map_view(db, branch) if branch else None,
         map=roadmap,
     )
     db.add(

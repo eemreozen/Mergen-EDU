@@ -4,7 +4,8 @@ from test_assessment import answer_test, prepare_ml
 async def test_advisor_uses_real_failure_context(client, app, project_id, monkeypatch):
     root, child, python = await prepare_ml(client, project_id)
     failed, _ = await answer_test(client, project_id, python["id"], "python.functions")
-    remedial = next(n for n in failed.json()["map"]["nodes"] if n["type"] == "remedial")
+    branch = failed.json()["adaptiveMap"]
+    remedial = branch["nodes"][0]
     original = app.state.gateway.generate_structured
     captured = {}
 
@@ -18,7 +19,7 @@ async def test_advisor_uses_real_failure_context(client, app, project_id, monkey
         "/api/v1/advisor/chat",
         json={
             "projectId": project_id,
-            "currentMapId": child["id"],
+            "currentMapId": branch["id"],
             "currentNodeId": remedial["id"],
             "message": "Bu ek görev neden eklendi?",
         },

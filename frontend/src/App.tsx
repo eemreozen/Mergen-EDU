@@ -7,13 +7,14 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { CanvasPage } from '@/pages/CanvasPage'
 import { LandingPage } from '@/pages/LandingPage'
 import { RoadmapPage } from '@/pages/RoadmapPage'
+import { LearningWorkspace } from '@/features/learning/LearningWorkspace'
 import '@/i18n/i18n'
 
 const SESSION_INTRO_KEY = 'projectpath_intro_seen'
 
 function AppContent() {
   const location = useLocation()
-  const isCanvasView = location.pathname === '/canvas'
+  const isCanvasView = ['/canvas', '/learn'].includes(location.pathname)
   const isLandingPage = location.pathname === '/' || location.pathname === '/dashboard'
 
   return (
@@ -24,6 +25,7 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/dashboard" element={<LandingPage />} />
+          <Route path="/learn" element={<LearningWorkspace />} />
           <Route path="/canvas" element={<CanvasPage />} />
           <Route path="/roadmap" element={<RoadmapPage />} />
           <Route path="*" element={<LandingPage />} />

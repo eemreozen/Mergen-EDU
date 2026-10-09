@@ -3,6 +3,7 @@ from typing import Literal
 from pydantic import Field
 
 from app.schemas.common import Metadata, Schema
+from app.schemas.discovery import ProjectDiscoveryQuestion
 
 Domain = Literal["core", "web", "mobile", "ai_ml", "game_dev"]
 ProjectStatus = Literal["discovery", "ready_for_roadmap", "generating", "active", "failed"]
@@ -21,6 +22,7 @@ class ProjectAnalysis(Schema):
     project_type: str
     required_skills: list[str]
     uncertain_decisions: list[str]
+    discovery_questions: list[ProjectDiscoveryQuestion] = Field(default_factory=list, max_length=6)
     mvp_suggestions: list[str]
 
 

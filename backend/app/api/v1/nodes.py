@@ -25,3 +25,10 @@ async def resources(node_id: str, db: Db, user: UserId):
     node = await owned_node(db, node_id, user)
     await require_access(db, node)
     return node_resources(node)
+
+
+@router.post("/nodes/{node_id}/learn", response_model=MapView)
+async def learn(node_id: str, db: Db, user: UserId, ai: Gateway):
+    from app.services.remediation_service import start_learning
+
+    return await start_learning(db, node_id, user, ai)

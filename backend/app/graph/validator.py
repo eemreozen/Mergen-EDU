@@ -63,10 +63,22 @@ def validate_bundle(bundle):
             invalid("Harita yanlış projeye bağlı.")
         if m.parent_map_id:
             parent = maps.get(m.parent_map_id)
-            if not parent or m.parent_node_id not in {n.id for n in parent.nodes}:
-                invalid("Alt harita ebeveyn ilişkisi geçersiz.")
-            if nodes[m.parent_node_id].child_map_id != m.id:
-                invalid("Üst düğüm alt haritayı göstermiyor.")
+            if m.kind == "adaptive":
+                if (
+                    not parent
+                    or m.target_node_id not in {n.id for n in parent.nodes}
+                    or m.parent_node_id is not None
+                ):
+                    invalid("Öğrenme dalının hedef düğümü geçersiz.")
+                if nodes[m.target_node_id].adaptive_map_id != m.id:
+                    invalid("Hedef düğüm öğrenme dalını göstermiyor.")
+                if not set(m.weak_skills) <= set(nodes[m.target_node_id].skills):
+                    invalid("Öğrenme dalı hedef dışı beceri içeriyor.")
+            else:
+                if not parent or m.parent_node_id not in {n.id for n in parent.nodes}:
+                    invalid("Alt harita ebeveyn ilişkisi geçersiz.")
+                if nodes[m.parent_node_id].child_map_id != m.id:
+                    invalid("Üst düğüm alt haritayı göstermiyor.")
         elif m.parent_node_id:
             invalid("Kök harita ebeveyn düğüme sahip olamaz.")
         visited = {m.id}
@@ -85,6 +97,15 @@ def validate_bundle(bundle):
                 child = maps.get(n.child_map_id)
                 if not child or child.parent_node_id != n.id or child.parent_map_id != m.id:
                     invalid("Alt harita referansı geçersiz.")
+            if n.adaptive_map_id:
+                branch = maps.get(n.adaptive_map_id)
+                if (
+                    not branch
+                    or branch.kind != "adaptive"
+                    or branch.target_node_id != n.id
+                    or branch.parent_map_id != m.id
+                ):
+                    invalid("Öğrenme dalı referansı geçersiz.")
             if n.assessment_id:
                 assessment = assessments.get(n.assessment_id)
                 if not assessment or assessment.node_id != n.id:

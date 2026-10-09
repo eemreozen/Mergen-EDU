@@ -9,6 +9,7 @@ export default defineConfig({
     tailwindcss(),
     react(),
   ],
+  server: { proxy: { '/api': { target: process.env.MERGEN_API_TARGET || 'http://127.0.0.1:8000', changeOrigin: true } } },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

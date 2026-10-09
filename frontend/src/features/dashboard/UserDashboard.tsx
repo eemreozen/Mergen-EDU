@@ -11,17 +11,16 @@ import {
   Search,
   Sparkles,
   Target,
-  Trash2,
   Trophy,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { LanguageSelector } from '@/components/shared/LanguageSelector'
 import { ThemeToggle } from '@/components/shared/ThemeToggle'
 import { TeacherAdvisorFigure } from '@/components/landing/TeacherAdvisorFigure'
 import { useAuthStore, type UserRoadmap } from '@/store/useAuthStore'
-import { useRoadmapStore } from '@/store/useRoadmapStore'
+import { api } from '@/api/client'
 
 export function UserDashboard() {
   const { i18n } = useTranslation()
@@ -29,18 +28,35 @@ export function UserDashboard() {
   const navigate = useNavigate()
 
   const user = useAuthStore(s => s.user)
-  const roadmaps = useAuthStore(s => s.roadmaps)
   const logout = useAuthStore(s => s.logout)
-  const deleteRoadmap = useAuthStore(s => s.deleteRoadmap)
-  const createRoadmapFromIdea = useAuthStore(s => s.createRoadmapFromIdea)
-  const resetRoadmapsToDefault = useAuthStore(s => s.resetRoadmapsToDefault)
-
-  const setProjectName = useRoadmapStore(s => s.setProjectName)
+  const [roadmaps, setRoadmaps] = useState<UserRoadmap[]>([])
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  const loadProjects = async () => {
+    try {
+      const projects = await api.projects()
+      const bundles = await Promise.all(projects.map(project => api.exportProject(project.id)))
+      setRoadmaps(bundles.map(bundle => {
+        const nodes = bundle.maps?.find(map => !map.parentMapId)?.nodes || []
+        const completed = nodes.filter(node => node.status === 'completed').length
+        const title = bundle.project.title
+        return { id: bundle.project.id, title, titleEn: title, description: bundle.project.originalIdea,
+          descriptionEn: bundle.project.originalIdea, progress: nodes.length ? Math.round(completed / nodes.length * 100) : 0,
+          completedMilestones: completed, totalMilestones: nodes.length, tags: [bundle.project.primaryDomain],
+          lastActive: nodes.length ? 'Öğrenmeye devam et' : 'Proje keşfine devam et',
+          lastActiveEn: nodes.length ? 'Continue learning' : 'Continue discovery',
+          difficulty: 'Başlangıç', difficultyEn: 'Beginner', status: nodes.length > 0 && completed === nodes.length ? 'completed' : 'in_progress' }
+      }))
+    } catch (err) { setError(err instanceof Error ? err.message : 'Projeler yüklenemedi.') }
+  }
+  // Fetch persisted projects on mount; state updates happen after the API resolves.
+  // oxlint-disable-next-line react/set-state-in-effect
+  useEffect(() => { void loadProjects() }, [])
+  const refreshProjects = () => { setError(''); void loadProjects() }
 
   const [newIdeaText, setNewIdeaText] = useState('')
   const [filterTab, setFilterTab] = useState<'all' | 'in_progress' | 'completed'>('all')
   const [searchQuery, setSearchQuery] = useState('')
-  const [deletedId, setDeletedId] = useState<string | null>(null)
 
   // Calculations
   const filteredRoadmaps = roadmaps.filter(r => {
@@ -59,32 +75,23 @@ export function UserDashboard() {
   const totalCompletedMilestones = roadmaps.reduce((acc, r) => acc + r.completedMilestones, 0)
   const totalMilestones = roadmaps.reduce((acc, r) => acc + r.totalMilestones, 0)
 
-  const handleOpenRoadmap = (roadmap: UserRoadmap) => {
-    setProjectName(isEn ? roadmap.titleEn : roadmap.title)
-    navigate('/canvas')
-  }
-
-  const handleDelete = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation()
-    setDeletedId(id)
-    setTimeout(() => {
-      deleteRoadmap(id)
-      setDeletedId(null)
-    }, 250)
-  }
-
-  const handleCreateNew = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!newIdeaText.trim()) return
-    const created = createRoadmapFromIdea(newIdeaText)
-    setNewIdeaText('')
-    setProjectName(isEn ? created.titleEn : created.title)
-    navigate('/canvas')
+  const handleOpenRoadmap = (roadmap: UserRoadmap) => navigate(`/learn?project=${roadmap.id}`)
+  const handleCreateNew = async (event: React.FormEvent) => {
+    event.preventDefault()
+    if (busy || newIdeaText.trim().length < 10) return
+    setBusy(true); setError('')
+    try {
+      const project = await api.createProject(newIdeaText.trim(), isEn ? 'en' : 'tr')
+      navigate(`/learn?project=${project.id}`)
+    } catch (err) { setError(err instanceof Error ? err.message : 'Proje oluşturulamadı.') }
+    finally { setBusy(false) }
   }
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-8 select-none">
       
+      {busy && <p role="status" className="text-sm font-mono text-[#2B660E] dark:text-[#B7F36B]">Projen analiz ediliyor, sorular hazırlanıyor…</p>}
+      {error && <p role="alert" className="rounded-xl border border-rose-500/30 p-4 text-sm text-rose-500">{error}</p>}
       {/* 1. TOP PROFILE & WELCOME BANNER (Hero Aesthetic) */}
       <motion.div
         initial={{ opacity: 0, y: -12 }}
@@ -108,7 +115,7 @@ export function UserDashboard() {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl sm:text-2xl font-extrabold text-[#111318] dark:text-[#E9EDF3] tracking-tight">
-                  {isEn ? `Welcome back, ${user?.name || 'Emre'}!` : `Hoş geldin, ${user?.name || 'Emre'}!`} 👋
+                  {isEn ? `Welcome back, ${user?.name || 'Öğrenici'}!` : `Hoş geldin, ${user?.name || 'Öğrenici'}!`} 👋
                 </h1>
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#2B660E]/10 dark:bg-[#B7F36B]/15 text-[#2B660E] dark:text-[#B7F36B]">
                   {isEn ? 'Pro Learner' : 'Pro Öğrenici'}
@@ -165,10 +172,10 @@ export function UserDashboard() {
           </div>
           <div>
             <div className="text-lg sm:text-xl font-bold font-mono text-[#111318] dark:text-[#E9EDF3]">
-              {user?.totalXp || 1420} XP
+              {user?.totalXp || 0} XP
             </div>
             <div className="text-[11px] font-mono text-[#68717D] dark:text-[#9CA3AF]">
-              {isEn ? `Level ${user?.level || 4}` : `Seviye ${user?.level || 4}`}
+              {isEn ? `Level ${user?.level || 1}` : `Seviye ${user?.level || 1}`}
             </div>
           </div>
         </div>
@@ -195,7 +202,7 @@ export function UserDashboard() {
           </div>
           <div>
             <div className="text-lg sm:text-xl font-bold font-mono text-[#111318] dark:text-[#E9EDF3]">
-              {user?.streakDays || 5} {isEn ? 'Days' : 'Gün'}
+              {user?.streakDays || 0} {isEn ? 'Days' : 'Gün'}
             </div>
             <div className="text-[11px] font-mono text-[#68717D] dark:text-[#9CA3AF]">
               {isEn ? 'Learning Streak 🔥' : 'Öğrenme Serisi 🔥'}
@@ -227,7 +234,7 @@ export function UserDashboard() {
           />
           <button
             type="submit"
-            disabled={!newIdeaText.trim()}
+            disabled={busy || newIdeaText.trim().length < 10}
             className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0 flex items-center gap-2 ${
               newIdeaText.trim()
                 ? 'bg-[#2B660E] dark:bg-[#B7F36B] text-white dark:text-[#0B0D10] hover:bg-[#22520B] dark:hover:bg-[#C5F785] cursor-pointer shadow-md shadow-[#2B660E]/15'
@@ -295,9 +302,9 @@ export function UserDashboard() {
             {/* Restore Default Roadmaps */}
             <button
               type="button"
-              onClick={resetRoadmapsToDefault}
+              onClick={refreshProjects}
               className="p-1.5 rounded-xl border border-[#E3E7EC] dark:border-[#2A3038] text-[#68717D] dark:text-[#9CA3AF] hover:text-[#2B660E] dark:hover:text-[#B7F36B] transition-colors cursor-pointer"
-              title={isEn ? 'Reset to 3 Mock Roadmaps' : 'Varsayılan 3 Mock Rotayı Geri Yükle'}
+              title={isEn ? 'Refresh Projects' : 'Projeleri Yenile'}
             >
               <RefreshCw className="w-3.5 h-3.5" />
             </button>
@@ -315,29 +322,28 @@ export function UserDashboard() {
             </h4>
             <p className="text-xs text-[#68717D] dark:text-[#9CA3AF] max-w-sm">
               {isEn
-                ? 'You deleted all roadmaps or none match your search filter. Click below to restore default mock roadmaps.'
-                : 'Mevcut rotaları sildiniz veya aramanızla eşleşen sonuç yok. Varsayılan rotaları geri yükleyebilirsiniz.'}
+                ? 'No saved projects match your search yet. Start a project above.'
+                : 'Henüz aramana uygun kayıtlı bir proje yok. Yukarıdan yeni bir proje başlatabilirsin.'}
             </p>
             <button
               type="button"
-              onClick={resetRoadmapsToDefault}
+              onClick={refreshProjects}
               className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#2B660E] dark:bg-[#B7F36B] text-white dark:text-[#0B0D10] hover:opacity-90 transition-opacity cursor-pointer flex items-center gap-1.5"
             >
               <RefreshCw className="w-3.5 h-3.5" />
-              <span>{isEn ? 'Restore 3 Mock Roadmaps' : '3 Mock Rotayı Geri Yükle'}</span>
+              <span>{isEn ? 'Refresh Projects' : 'Projeleri Yenile'}</span>
             </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             <AnimatePresence>
               {filteredRoadmaps.map(roadmap => {
-                const isDeleting = deletedId === roadmap.id
                 return (
                   <motion.div
                     key={roadmap.id}
                     layout
                     initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: isDeleting ? 0 : 1, scale: isDeleting ? 0.9 : 1 }}
+                    animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ duration: 0.2 }}
                     onClick={() => handleOpenRoadmap(roadmap)}
@@ -355,15 +361,7 @@ export function UserDashboard() {
                           </span>
                         </div>
 
-                        {/* Delete Button */}
-                        <button
-                          type="button"
-                          onClick={e => handleDelete(roadmap.id, e)}
-                          className="p-1.5 rounded-lg text-[#9CA3AF] hover:text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
-                          title={isEn ? 'Delete Roadmap' : 'Yol Haritasını Sil'}
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+
                       </div>
 
                       {/* Title */}
@@ -432,7 +430,7 @@ export function UserDashboard() {
               size="sm"
               showBubble={false}
               showCaption={false}
-              onClick={() => navigate('/canvas')}
+              onClick={() => navigate(roadmaps[0] ? `/learn?project=${roadmaps[0].id}` : '/learn')}
             />
           </div>
           <div>
@@ -442,15 +440,15 @@ export function UserDashboard() {
             </div>
             <p className="text-xs sm:text-sm font-medium text-[#111318] dark:text-[#E9EDF3] mt-1 leading-relaxed">
               {isEn
-                ? 'Great progress on your journeys! We recommend diving into the Computer Vision milestones on the AI Fitness canvas to test live pose tracking.'
-                : 'Harika bir tempo yakaladın! "AI Fitness" rotasında bir sonraki adım Computer Vision modellerini canlı videoya bağlamak. Kanvasa geçip keşfetmeye hazır mısın?'}
+                ? 'Choose a project and follow its highlighted milestone. Test your knowledge or learn a topic with your mentor.'
+                : 'Projeni seç ve haritada vurgulanan duraktan devam et. Bildiklerini test edebilir, bilmediğin konuları rehberinle öğrenebilirsin.'}
             </p>
           </div>
         </div>
 
         <button
           type="button"
-          onClick={() => navigate('/canvas')}
+          onClick={() => navigate(roadmaps[0] ? `/learn?project=${roadmaps[0].id}` : '/learn')}
           className="px-4 py-2 rounded-xl text-xs font-bold bg-[#111318] dark:bg-[#E9EDF3] text-white dark:text-[#0B0D10] hover:bg-[#2B660E] dark:hover:bg-[#B7F36B] transition-all shrink-0 cursor-pointer shadow-sm active:scale-95 flex items-center gap-1.5"
         >
           <span>{isEn ? 'Go to Canvas →' : 'Kanvasa Geç →'}</span>

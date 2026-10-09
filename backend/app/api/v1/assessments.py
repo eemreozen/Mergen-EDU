@@ -13,5 +13,5 @@ async def read_assessment(node_id: str, db: Db, user: UserId, ai: Gateway):
 
 
 @router.post("/nodes/{node_id}/assessment/submit", response_model=AssessmentResult)
-async def submit(node_id: str, body: AssessmentSubmit, db: Db, user: UserId):
-    return await submit_assessment(db, node_id, user, body)
+async def submit(node_id: str, body: AssessmentSubmit, db: Db, user: UserId, ai: Gateway):
+    return await submit_assessment(db, node_id, user, body, ai)

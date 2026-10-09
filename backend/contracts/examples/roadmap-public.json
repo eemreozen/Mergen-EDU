@@ -1,8 +1,8 @@
 {
   "schemaVersion": "mergen/v1",
   "project": {
-    "id": "0431386f-f4b5-4c15-96b9-41b7ea4ddc40",
-    "projectId": "0431386f-f4b5-4c15-96b9-41b7ea4ddc40",
+    "id": "f9e92bee-28d8-4ab0-bf3a-defa8a6429a5",
+    "projectId": "f9e92bee-28d8-4ab0-bf3a-defa8a6429a5",
     "title": "AI Fitness App",
     "originalIdea": "Yapay zekâ destekli fitness uygulaması geliştirmek istiyorum.",
     "primaryDomain": "mobile",
@@ -134,6 +134,50 @@
         "completed": true
       },
       {
+        "id": "project-detail-0",
+        "questionId": "project-detail-0",
+        "text": "Bu uygulamanın ilk kullanıcıları kimler olacak?",
+        "type": "short_text",
+        "options": [],
+        "targetField": "projectDetailAudience",
+        "required": true,
+        "parentQuestionId": null,
+        "completed": true
+      },
+      {
+        "id": "project-detail-1",
+        "questionId": "project-detail-1",
+        "text": "İlk sürümde mutlaka çalışması gereken üç özellik nedir?",
+        "type": "short_text",
+        "options": [],
+        "targetField": "projectDetailFeatures",
+        "required": true,
+        "parentQuestionId": null,
+        "completed": true
+      },
+      {
+        "id": "project-detail-2",
+        "questionId": "project-detail-2",
+        "text": "Hangi verileri kullanacaksın ve bu veriler hazır mı?",
+        "type": "short_text",
+        "options": [],
+        "targetField": "projectDetailData",
+        "required": true,
+        "parentQuestionId": null,
+        "completed": true
+      },
+      {
+        "id": "project-detail-3",
+        "questionId": "project-detail-3",
+        "text": "Projenin başarılı olduğunu nasıl anlayacaksın?",
+        "type": "short_text",
+        "options": [],
+        "targetField": "projectDetailSuccess",
+        "required": true,
+        "parentQuestionId": null,
+        "completed": true
+      },
+      {
         "id": "followup-python",
         "questionId": "followup-python",
         "text": "Python ve veri seti hazırlama deneyimin var mı?",
@@ -175,6 +219,22 @@
         "value": "train_model"
       },
       {
+        "questionId": "project-detail-0",
+        "value": "MVP için başlangıç kapsamı ve hazır veri seti."
+      },
+      {
+        "questionId": "project-detail-1",
+        "value": "MVP için başlangıç kapsamı ve hazır veri seti."
+      },
+      {
+        "questionId": "project-detail-2",
+        "value": "MVP için başlangıç kapsamı ve hazır veri seti."
+      },
+      {
+        "questionId": "project-detail-3",
+        "value": "MVP için başlangıç kapsamı ve hazır veri seti."
+      },
+      {
         "questionId": "followup-python",
         "value": "Başlangıç seviyesindeyim."
       }
@@ -185,18 +245,22 @@
   },
   "maps": [
     {
-      "id": "8bd5ef3a-6e77-4c59-9f95-33b1b2d7b57c",
-      "projectId": "0431386f-f4b5-4c15-96b9-41b7ea4ddc40",
+      "id": "823e8ba6-205c-488c-8024-12344bac2ace",
+      "projectId": "f9e92bee-28d8-4ab0-bf3a-defa8a6429a5",
       "title": "Öğrenme Haritası",
       "description": "Deterministik örnek harita; gerçek AI üretimi değildir.",
       "parentMapId": null,
       "parentNodeId": null,
+      "kind": "root",
+      "trigger": null,
+      "targetNodeId": null,
+      "weakSkills": [],
       "generationStatus": "ready",
       "version": 3,
       "nodes": [
         {
-          "id": "3f51433f-34e0-4c90-abdf-f268c0a10d75",
-          "mapId": "8bd5ef3a-6e77-4c59-9f95-33b1b2d7b57c",
+          "id": "3c5d3863-7f60-456f-98f3-12fce3359df8",
+          "mapId": "823e8ba6-205c-488c-8024-12344bac2ace",
           "title": "Programlama Temelleri",
           "summary": "Programlama Temelleri ile proje hedefin için pratik yap.",
           "type": "learning",
@@ -206,14 +270,15 @@
           ],
           "estimatedHours": 3.0,
           "prerequisites": [],
+          "lesson": "",
           "whyNeeded": "",
           "learningObjectives": [],
           "subtopics": [],
           "practicalTask": null,
           "resources": [
             {
-              "id": "3f51433f-34e0-4c90-abdf-f268c0a10d75:javascript",
-              "nodeId": "3f51433f-34e0-4c90-abdf-f268c0a10d75",
+              "id": "3c5d3863-7f60-456f-98f3-12fce3359df8:javascript",
+              "nodeId": "3c5d3863-7f60-456f-98f3-12fce3359df8",
               "title": "JavaScript Guide",
               "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide",
               "type": "documentation",
@@ -224,91 +289,13 @@
           ],
           "assessmentId": null,
           "childMapId": null,
+          "adaptiveMapId": null,
           "remediationForNodeId": null,
           "taskCompleted": false
         },
         {
-          "id": "787731e2-10e9-46fb-981e-59b4129ddbea",
-          "mapId": "8bd5ef3a-6e77-4c59-9f95-33b1b2d7b57c",
-          "title": "Mobil Geliştirme",
-          "summary": "Mobil Geliştirme ile proje hedefin için pratik yap.",
-          "type": "learning",
-          "status": "locked",
-          "skills": [
-            "mobile.basics"
-          ],
-          "estimatedHours": 3.0,
-          "prerequisites": [
-            "3f51433f-34e0-4c90-abdf-f268c0a10d75"
-          ],
-          "whyNeeded": "",
-          "learningObjectives": [],
-          "subtopics": [],
-          "practicalTask": null,
-          "resources": [
-            {
-              "id": "787731e2-10e9-46fb-981e-59b4129ddbea:react-native",
-              "nodeId": "787731e2-10e9-46fb-981e-59b4129ddbea",
-              "title": "React Native Documentation",
-              "url": "https://reactnative.dev/docs/getting-started",
-              "type": "documentation",
-              "provider": "React Native",
-              "language": "en",
-              "verified": true
-            }
-          ],
-          "assessmentId": null,
-          "childMapId": null,
-          "remediationForNodeId": null,
-          "taskCompleted": false
-        },
-        {
-          "id": "cf98c369-e2be-4912-9cc3-11d90dad0085",
-          "mapId": "8bd5ef3a-6e77-4c59-9f95-33b1b2d7b57c",
-          "title": "Machine Learning",
-          "summary": "Machine Learning ile proje hedefin için pratik yap.",
-          "type": "submap",
-          "status": "in_progress",
-          "skills": [
-            "python.basics",
-            "ml.basics"
-          ],
-          "estimatedHours": 3.0,
-          "prerequisites": [],
-          "whyNeeded": "",
-          "learningObjectives": [],
-          "subtopics": [],
-          "practicalTask": null,
-          "resources": [
-            {
-              "id": "cf98c369-e2be-4912-9cc3-11d90dad0085:python-tutorial",
-              "nodeId": "cf98c369-e2be-4912-9cc3-11d90dad0085",
-              "title": "Python Tutorial",
-              "url": "https://docs.python.org/3/tutorial/",
-              "type": "documentation",
-              "provider": "Python Software Foundation",
-              "language": "en",
-              "verified": true
-            },
-            {
-              "id": "cf98c369-e2be-4912-9cc3-11d90dad0085:sklearn",
-              "nodeId": "cf98c369-e2be-4912-9cc3-11d90dad0085",
-              "title": "Scikit-learn User Guide",
-              "url": "https://scikit-learn.org/stable/user_guide.html",
-              "type": "documentation",
-              "provider": "Scikit-learn",
-              "language": "en",
-              "verified": true
-            }
-          ],
-          "assessmentId": null,
-          "childMapId": "917a2f10-3f21-4868-9d95-168d690b9fb4",
-          "remediationForNodeId": null,
-          "taskCompleted": false
-        },
-        {
-          "id": "ffc5ebc8-d8b3-47d4-9764-5aab7abdd35f",
-          "mapId": "8bd5ef3a-6e77-4c59-9f95-33b1b2d7b57c",
+          "id": "739e3ff9-ef68-4592-804c-1fe4e5d84557",
+          "mapId": "823e8ba6-205c-488c-8024-12344bac2ace",
           "title": "Backend",
           "summary": "Backend ile proje hedefin için pratik yap.",
           "type": "learning",
@@ -318,16 +305,17 @@
           ],
           "estimatedHours": 3.0,
           "prerequisites": [
-            "3f51433f-34e0-4c90-abdf-f268c0a10d75"
+            "3c5d3863-7f60-456f-98f3-12fce3359df8"
           ],
+          "lesson": "",
           "whyNeeded": "",
           "learningObjectives": [],
           "subtopics": [],
           "practicalTask": null,
           "resources": [
             {
-              "id": "ffc5ebc8-d8b3-47d4-9764-5aab7abdd35f:fastapi",
-              "nodeId": "ffc5ebc8-d8b3-47d4-9764-5aab7abdd35f",
+              "id": "739e3ff9-ef68-4592-804c-1fe4e5d84557:fastapi",
+              "nodeId": "739e3ff9-ef68-4592-804c-1fe4e5d84557",
               "title": "FastAPI Tutorial",
               "url": "https://fastapi.tiangolo.com/tutorial/",
               "type": "documentation",
@@ -338,36 +326,96 @@
           ],
           "assessmentId": null,
           "childMapId": null,
+          "adaptiveMapId": null,
           "remediationForNodeId": null,
           "taskCompleted": false
         },
         {
-          "id": "6fc9e0ce-1b12-468e-ba9d-634360908742",
-          "mapId": "8bd5ef3a-6e77-4c59-9f95-33b1b2d7b57c",
-          "title": "Test ve Yayınlama",
-          "summary": "Test ve Yayınlama ile proje hedefin için pratik yap.",
+          "id": "a59e8e47-ee57-4e70-8fef-d041baf9ed4f",
+          "mapId": "823e8ba6-205c-488c-8024-12344bac2ace",
+          "title": "Mobil Geliştirme",
+          "summary": "Mobil Geliştirme ile proje hedefin için pratik yap.",
           "type": "learning",
           "status": "locked",
           "skills": [
-            "testing.basics"
+            "mobile.basics"
           ],
           "estimatedHours": 3.0,
           "prerequisites": [
-            "fdcb6fe3-1e0a-442a-a812-8c1e9b14f97f"
+            "3c5d3863-7f60-456f-98f3-12fce3359df8"
           ],
+          "lesson": "",
           "whyNeeded": "",
           "learningObjectives": [],
           "subtopics": [],
           "practicalTask": null,
-          "resources": [],
+          "resources": [
+            {
+              "id": "a59e8e47-ee57-4e70-8fef-d041baf9ed4f:react-native",
+              "nodeId": "a59e8e47-ee57-4e70-8fef-d041baf9ed4f",
+              "title": "React Native Documentation",
+              "url": "https://reactnative.dev/docs/getting-started",
+              "type": "documentation",
+              "provider": "React Native",
+              "language": "en",
+              "verified": true
+            }
+          ],
           "assessmentId": null,
           "childMapId": null,
+          "adaptiveMapId": null,
           "remediationForNodeId": null,
           "taskCompleted": false
         },
         {
-          "id": "fdcb6fe3-1e0a-442a-a812-8c1e9b14f97f",
-          "mapId": "8bd5ef3a-6e77-4c59-9f95-33b1b2d7b57c",
+          "id": "084b8d0a-acb9-4777-8713-797bd1eb278a",
+          "mapId": "823e8ba6-205c-488c-8024-12344bac2ace",
+          "title": "Machine Learning",
+          "summary": "Machine Learning ile proje hedefin için pratik yap.",
+          "type": "submap",
+          "status": "in_progress",
+          "skills": [
+            "python.basics",
+            "ml.basics"
+          ],
+          "estimatedHours": 3.0,
+          "prerequisites": [],
+          "lesson": "",
+          "whyNeeded": "",
+          "learningObjectives": [],
+          "subtopics": [],
+          "practicalTask": null,
+          "resources": [
+            {
+              "id": "084b8d0a-acb9-4777-8713-797bd1eb278a:python-tutorial",
+              "nodeId": "084b8d0a-acb9-4777-8713-797bd1eb278a",
+              "title": "Python Tutorial",
+              "url": "https://docs.python.org/3/tutorial/",
+              "type": "documentation",
+              "provider": "Python Software Foundation",
+              "language": "en",
+              "verified": true
+            },
+            {
+              "id": "084b8d0a-acb9-4777-8713-797bd1eb278a:sklearn",
+              "nodeId": "084b8d0a-acb9-4777-8713-797bd1eb278a",
+              "title": "Scikit-learn User Guide",
+              "url": "https://scikit-learn.org/stable/user_guide.html",
+              "type": "documentation",
+              "provider": "Scikit-learn",
+              "language": "en",
+              "verified": true
+            }
+          ],
+          "assessmentId": null,
+          "childMapId": "9b8578b4-2f8e-496e-8d08-d80399b55048",
+          "adaptiveMapId": null,
+          "remediationForNodeId": null,
+          "taskCompleted": false
+        },
+        {
+          "id": "7f084d48-78b0-4f2d-b141-2fcadfea814a",
+          "mapId": "823e8ba6-205c-488c-8024-12344bac2ace",
           "title": "AI Entegrasyonu",
           "summary": "AI Entegrasyonu ile proje hedefin için pratik yap.",
           "type": "development_task",
@@ -377,10 +425,12 @@
           ],
           "estimatedHours": 3.0,
           "prerequisites": [
-            "cf98c369-e2be-4912-9cc3-11d90dad0085",
-            "787731e2-10e9-46fb-981e-59b4129ddbea",
-            "ffc5ebc8-d8b3-47d4-9764-5aab7abdd35f"
+            "084b8d0a-acb9-4777-8713-797bd1eb278a",
+            "a59e8e47-ee57-4e70-8fef-d041baf9ed4f",
+            "739e3ff9-ef68-4592-804c-1fe4e5d84557",
+            "2a4f2237-1d84-418d-ae7d-807f384d3e5c"
           ],
+          "lesson": "",
           "whyNeeded": "",
           "learningObjectives": [],
           "subtopics": [],
@@ -388,12 +438,39 @@
           "resources": [],
           "assessmentId": null,
           "childMapId": null,
+          "adaptiveMapId": null,
           "remediationForNodeId": null,
           "taskCompleted": false
         },
         {
-          "id": "a2f711b8-c754-4633-904b-2a10c395d4f3",
-          "mapId": "8bd5ef3a-6e77-4c59-9f95-33b1b2d7b57c",
+          "id": "1a1545e9-396d-4358-ac76-af08b1cc9fc4",
+          "mapId": "823e8ba6-205c-488c-8024-12344bac2ace",
+          "title": "Test ve Yayınlama",
+          "summary": "Test ve Yayınlama ile proje hedefin için pratik yap.",
+          "type": "learning",
+          "status": "locked",
+          "skills": [
+            "testing.basics"
+          ],
+          "estimatedHours": 3.0,
+          "prerequisites": [
+            "7f084d48-78b0-4f2d-b141-2fcadfea814a"
+          ],
+          "lesson": "",
+          "whyNeeded": "",
+          "learningObjectives": [],
+          "subtopics": [],
+          "practicalTask": null,
+          "resources": [],
+          "assessmentId": null,
+          "childMapId": null,
+          "adaptiveMapId": null,
+          "remediationForNodeId": null,
+          "taskCompleted": false
+        },
+        {
+          "id": "785f1b89-34cf-44e1-8c47-630ba9241270",
+          "mapId": "823e8ba6-205c-488c-8024-12344bac2ace",
           "title": "MVP Tamamlama",
           "summary": "MVP Tamamlama ile proje hedefin için pratik yap.",
           "type": "milestone",
@@ -403,8 +480,9 @@
           ],
           "estimatedHours": 3.0,
           "prerequisites": [
-            "6fc9e0ce-1b12-468e-ba9d-634360908742"
+            "fd9cd922-58ba-4ed6-8afc-af7ab160af6a"
           ],
+          "lesson": "",
           "whyNeeded": "",
           "learningObjectives": [],
           "subtopics": [],
@@ -412,51 +490,325 @@
           "resources": [],
           "assessmentId": null,
           "childMapId": null,
+          "adaptiveMapId": null,
+          "remediationForNodeId": null,
+          "taskCompleted": false
+        },
+        {
+          "id": "bedeb7c5-3fcf-421d-b8cc-3e96c0c4fa9f",
+          "mapId": "823e8ba6-205c-488c-8024-12344bac2ace",
+          "title": "Kullanıcı Senaryoları",
+          "summary": "Kullanıcı Senaryoları ile proje hedefin için pratik yap.",
+          "type": "learning",
+          "status": "locked",
+          "skills": [
+            "product.requirements"
+          ],
+          "estimatedHours": 3.0,
+          "prerequisites": [
+            "3c5d3863-7f60-456f-98f3-12fce3359df8"
+          ],
+          "lesson": "",
+          "whyNeeded": "",
+          "learningObjectives": [],
+          "subtopics": [],
+          "practicalTask": null,
+          "resources": [],
+          "assessmentId": null,
+          "childMapId": null,
+          "adaptiveMapId": null,
+          "remediationForNodeId": null,
+          "taskCompleted": false
+        },
+        {
+          "id": "02b62d04-326f-4e26-8ee1-b03b0654c1b8",
+          "mapId": "823e8ba6-205c-488c-8024-12344bac2ace",
+          "title": "Veri Modeli",
+          "summary": "Veri Modeli ile proje hedefin için pratik yap.",
+          "type": "learning",
+          "status": "locked",
+          "skills": [
+            "data.modeling"
+          ],
+          "estimatedHours": 3.0,
+          "prerequisites": [
+            "227074f3-d6c5-4137-8565-86cafbb0a7a3"
+          ],
+          "lesson": "",
+          "whyNeeded": "",
+          "learningObjectives": [],
+          "subtopics": [],
+          "practicalTask": null,
+          "resources": [
+            {
+              "id": "02b62d04-326f-4e26-8ee1-b03b0654c1b8:pandas",
+              "nodeId": "02b62d04-326f-4e26-8ee1-b03b0654c1b8",
+              "title": "Pandas Getting Started",
+              "url": "https://pandas.pydata.org/docs/getting_started/index.html",
+              "type": "documentation",
+              "provider": "Pandas",
+              "language": "en",
+              "verified": true
+            }
+          ],
+          "assessmentId": null,
+          "childMapId": null,
+          "adaptiveMapId": null,
+          "remediationForNodeId": null,
+          "taskCompleted": false
+        },
+        {
+          "id": "227074f3-d6c5-4137-8565-86cafbb0a7a3",
+          "mapId": "823e8ba6-205c-488c-8024-12344bac2ace",
+          "title": "Uygulama Mimarisi",
+          "summary": "Uygulama Mimarisi ile proje hedefin için pratik yap.",
+          "type": "learning",
+          "status": "locked",
+          "skills": [
+            "architecture.basics"
+          ],
+          "estimatedHours": 3.0,
+          "prerequisites": [
+            "bedeb7c5-3fcf-421d-b8cc-3e96c0c4fa9f"
+          ],
+          "lesson": "",
+          "whyNeeded": "",
+          "learningObjectives": [],
+          "subtopics": [],
+          "practicalTask": null,
+          "resources": [],
+          "assessmentId": null,
+          "childMapId": null,
+          "adaptiveMapId": null,
+          "remediationForNodeId": null,
+          "taskCompleted": false
+        },
+        {
+          "id": "2a4f2237-1d84-418d-ae7d-807f384d3e5c",
+          "mapId": "823e8ba6-205c-488c-8024-12344bac2ace",
+          "title": "Veri Doğrulama",
+          "summary": "Veri Doğrulama ile proje hedefin için pratik yap.",
+          "type": "learning",
+          "status": "locked",
+          "skills": [
+            "validation.basics"
+          ],
+          "estimatedHours": 3.0,
+          "prerequisites": [
+            "ca6ffb1c-bf3d-4620-a5b3-1e08f5aa81c1"
+          ],
+          "lesson": "",
+          "whyNeeded": "",
+          "learningObjectives": [],
+          "subtopics": [],
+          "practicalTask": null,
+          "resources": [],
+          "assessmentId": null,
+          "childMapId": null,
+          "adaptiveMapId": null,
+          "remediationForNodeId": null,
+          "taskCompleted": false
+        },
+        {
+          "id": "ca6ffb1c-bf3d-4620-a5b3-1e08f5aa81c1",
+          "mapId": "823e8ba6-205c-488c-8024-12344bac2ace",
+          "title": "Temel Özellikler",
+          "summary": "Temel Özellikler ile proje hedefin için pratik yap.",
+          "type": "development_task",
+          "status": "locked",
+          "skills": [
+            "feature.implementation"
+          ],
+          "estimatedHours": 3.0,
+          "prerequisites": [
+            "cc7eaf17-42d7-4bf7-9271-3f40e1171050"
+          ],
+          "lesson": "",
+          "whyNeeded": "",
+          "learningObjectives": [],
+          "subtopics": [],
+          "practicalTask": null,
+          "resources": [],
+          "assessmentId": null,
+          "childMapId": null,
+          "adaptiveMapId": null,
+          "remediationForNodeId": null,
+          "taskCompleted": false
+        },
+        {
+          "id": "cc7eaf17-42d7-4bf7-9271-3f40e1171050",
+          "mapId": "823e8ba6-205c-488c-8024-12344bac2ace",
+          "title": "Kimlik ve Yetkilendirme",
+          "summary": "Kimlik ve Yetkilendirme ile proje hedefin için pratik yap.",
+          "type": "learning",
+          "status": "locked",
+          "skills": [
+            "auth.basics"
+          ],
+          "estimatedHours": 3.0,
+          "prerequisites": [
+            "02b62d04-326f-4e26-8ee1-b03b0654c1b8"
+          ],
+          "lesson": "",
+          "whyNeeded": "",
+          "learningObjectives": [],
+          "subtopics": [],
+          "practicalTask": null,
+          "resources": [],
+          "assessmentId": null,
+          "childMapId": null,
+          "adaptiveMapId": null,
+          "remediationForNodeId": null,
+          "taskCompleted": false
+        },
+        {
+          "id": "f734d286-6022-4c60-ab2c-928e7692bcc8",
+          "mapId": "823e8ba6-205c-488c-8024-12344bac2ace",
+          "title": "Hata İzleme",
+          "summary": "Hata İzleme ile proje hedefin için pratik yap.",
+          "type": "learning",
+          "status": "locked",
+          "skills": [
+            "monitoring.basics"
+          ],
+          "estimatedHours": 3.0,
+          "prerequisites": [
+            "1a1545e9-396d-4358-ac76-af08b1cc9fc4"
+          ],
+          "lesson": "",
+          "whyNeeded": "",
+          "learningObjectives": [],
+          "subtopics": [],
+          "practicalTask": null,
+          "resources": [],
+          "assessmentId": null,
+          "childMapId": null,
+          "adaptiveMapId": null,
+          "remediationForNodeId": null,
+          "taskCompleted": false
+        },
+        {
+          "id": "fd9cd922-58ba-4ed6-8afc-af7ab160af6a",
+          "mapId": "823e8ba6-205c-488c-8024-12344bac2ace",
+          "title": "Dağıtım Hazırlığı",
+          "summary": "Dağıtım Hazırlığı ile proje hedefin için pratik yap.",
+          "type": "development_task",
+          "status": "locked",
+          "skills": [
+            "deployment.basics"
+          ],
+          "estimatedHours": 3.0,
+          "prerequisites": [
+            "f734d286-6022-4c60-ab2c-928e7692bcc8"
+          ],
+          "lesson": "",
+          "whyNeeded": "",
+          "learningObjectives": [],
+          "subtopics": [],
+          "practicalTask": null,
+          "resources": [],
+          "assessmentId": null,
+          "childMapId": null,
+          "adaptiveMapId": null,
           "remediationForNodeId": null,
           "taskCompleted": false
         }
       ],
       "edges": [
         {
-          "id": "c959c17c-0852-4b91-85c6-1bf80e8f9ab3",
-          "source": "3f51433f-34e0-4c90-abdf-f268c0a10d75",
-          "target": "787731e2-10e9-46fb-981e-59b4129ddbea",
+          "id": "f33e8725-97ab-4897-a096-e397c7c06961",
+          "source": "3c5d3863-7f60-456f-98f3-12fce3359df8",
+          "target": "a59e8e47-ee57-4e70-8fef-d041baf9ed4f",
           "kind": "requires"
         },
         {
-          "id": "58d7073b-7df9-49a4-8886-5494c65342c7",
-          "source": "3f51433f-34e0-4c90-abdf-f268c0a10d75",
-          "target": "ffc5ebc8-d8b3-47d4-9764-5aab7abdd35f",
+          "id": "90629b99-3225-419d-8283-868faf043f09",
+          "source": "3c5d3863-7f60-456f-98f3-12fce3359df8",
+          "target": "739e3ff9-ef68-4592-804c-1fe4e5d84557",
           "kind": "requires"
         },
         {
-          "id": "55305dd2-aa23-465f-afa2-7dafba2aa777",
-          "source": "cf98c369-e2be-4912-9cc3-11d90dad0085",
-          "target": "fdcb6fe3-1e0a-442a-a812-8c1e9b14f97f",
+          "id": "3666e63a-e319-462c-9b6c-fa401809e4d9",
+          "source": "084b8d0a-acb9-4777-8713-797bd1eb278a",
+          "target": "7f084d48-78b0-4f2d-b141-2fcadfea814a",
           "kind": "requires"
         },
         {
-          "id": "a3bad469-95c9-409d-9a42-7beb7a990f59",
-          "source": "787731e2-10e9-46fb-981e-59b4129ddbea",
-          "target": "fdcb6fe3-1e0a-442a-a812-8c1e9b14f97f",
+          "id": "eedc66d5-e501-46fc-b15c-c8d287f228ac",
+          "source": "a59e8e47-ee57-4e70-8fef-d041baf9ed4f",
+          "target": "7f084d48-78b0-4f2d-b141-2fcadfea814a",
           "kind": "requires"
         },
         {
-          "id": "68e07ced-af0c-4d5a-8d91-b6f77e2b1996",
-          "source": "ffc5ebc8-d8b3-47d4-9764-5aab7abdd35f",
-          "target": "fdcb6fe3-1e0a-442a-a812-8c1e9b14f97f",
+          "id": "2f520c13-f591-4601-a60a-25044d0ca059",
+          "source": "739e3ff9-ef68-4592-804c-1fe4e5d84557",
+          "target": "7f084d48-78b0-4f2d-b141-2fcadfea814a",
           "kind": "requires"
         },
         {
-          "id": "df9661b6-12ad-4dfc-83bc-022fb1145dc7",
-          "source": "fdcb6fe3-1e0a-442a-a812-8c1e9b14f97f",
-          "target": "6fc9e0ce-1b12-468e-ba9d-634360908742",
+          "id": "643d19f5-35a2-47ae-9dad-4c06472e1b86",
+          "source": "7f084d48-78b0-4f2d-b141-2fcadfea814a",
+          "target": "1a1545e9-396d-4358-ac76-af08b1cc9fc4",
           "kind": "requires"
         },
         {
-          "id": "6846cfde-eb78-4510-a487-77b00253b0a5",
-          "source": "6fc9e0ce-1b12-468e-ba9d-634360908742",
-          "target": "a2f711b8-c754-4633-904b-2a10c395d4f3",
+          "id": "296f7320-b008-46ee-b2f2-ce9b7b5d07e0",
+          "source": "3c5d3863-7f60-456f-98f3-12fce3359df8",
+          "target": "bedeb7c5-3fcf-421d-b8cc-3e96c0c4fa9f",
+          "kind": "requires"
+        },
+        {
+          "id": "8f13df8d-f7e9-4c5d-9e2d-5bcac591fb17",
+          "source": "bedeb7c5-3fcf-421d-b8cc-3e96c0c4fa9f",
+          "target": "227074f3-d6c5-4137-8565-86cafbb0a7a3",
+          "kind": "requires"
+        },
+        {
+          "id": "b6f67be9-2879-4c39-a104-4a346964c8aa",
+          "source": "227074f3-d6c5-4137-8565-86cafbb0a7a3",
+          "target": "02b62d04-326f-4e26-8ee1-b03b0654c1b8",
+          "kind": "requires"
+        },
+        {
+          "id": "68743938-c7cc-4ead-bc9d-4b265a4c4713",
+          "source": "02b62d04-326f-4e26-8ee1-b03b0654c1b8",
+          "target": "cc7eaf17-42d7-4bf7-9271-3f40e1171050",
+          "kind": "requires"
+        },
+        {
+          "id": "29c1b28c-fc71-46ea-abae-683aae87a681",
+          "source": "cc7eaf17-42d7-4bf7-9271-3f40e1171050",
+          "target": "ca6ffb1c-bf3d-4620-a5b3-1e08f5aa81c1",
+          "kind": "requires"
+        },
+        {
+          "id": "36eb7374-cda9-4304-91b0-21780dfb4af3",
+          "source": "ca6ffb1c-bf3d-4620-a5b3-1e08f5aa81c1",
+          "target": "2a4f2237-1d84-418d-ae7d-807f384d3e5c",
+          "kind": "requires"
+        },
+        {
+          "id": "947c431a-604c-4c16-9c5e-51e143e0decc",
+          "source": "2a4f2237-1d84-418d-ae7d-807f384d3e5c",
+          "target": "7f084d48-78b0-4f2d-b141-2fcadfea814a",
+          "kind": "requires"
+        },
+        {
+          "id": "5c613c49-7ab3-4342-9a4d-f650b26e1049",
+          "source": "1a1545e9-396d-4358-ac76-af08b1cc9fc4",
+          "target": "f734d286-6022-4c60-ab2c-928e7692bcc8",
+          "kind": "requires"
+        },
+        {
+          "id": "61ab1351-3f8b-40c7-afdf-c5302b03e0c0",
+          "source": "f734d286-6022-4c60-ab2c-928e7692bcc8",
+          "target": "fd9cd922-58ba-4ed6-8afc-af7ab160af6a",
+          "kind": "requires"
+        },
+        {
+          "id": "a456d46c-b513-46fc-aa53-4a13f3fb466f",
+          "source": "fd9cd922-58ba-4ed6-8afc-af7ab160af6a",
+          "target": "785f1b89-34cf-44e1-8c47-630ba9241270",
           "kind": "requires"
         }
       ],
@@ -466,18 +818,22 @@
       }
     },
     {
-      "id": "917a2f10-3f21-4868-9d95-168d690b9fb4",
-      "projectId": "0431386f-f4b5-4c15-96b9-41b7ea4ddc40",
+      "id": "9b8578b4-2f8e-496e-8d08-d80399b55048",
+      "projectId": "f9e92bee-28d8-4ab0-bf3a-defa8a6429a5",
       "title": "Machine Learning",
       "description": "Deterministik örnek harita; gerçek AI üretimi değildir.",
-      "parentMapId": "8bd5ef3a-6e77-4c59-9f95-33b1b2d7b57c",
-      "parentNodeId": "cf98c369-e2be-4912-9cc3-11d90dad0085",
+      "parentMapId": "823e8ba6-205c-488c-8024-12344bac2ace",
+      "parentNodeId": "084b8d0a-acb9-4777-8713-797bd1eb278a",
+      "kind": "submap",
+      "trigger": null,
+      "targetNodeId": null,
+      "weakSkills": [],
       "generationStatus": "ready",
-      "version": 2,
+      "version": 3,
       "nodes": [
         {
-          "id": "38cc3605-4522-4868-a5da-6a92fdf7490c",
-          "mapId": "917a2f10-3f21-4868-9d95-168d690b9fb4",
+          "id": "a9f9d126-af6c-4a62-83b1-a41098988174",
+          "mapId": "9b8578b4-2f8e-496e-8d08-d80399b55048",
           "title": "Python",
           "summary": "Python ile proje hedefin için pratik yap.",
           "type": "learning",
@@ -487,9 +843,8 @@
             "python.functions"
           ],
           "estimatedHours": 3.0,
-          "prerequisites": [
-            "0710be46-b042-4a61-b063-49f1a058a041"
-          ],
+          "prerequisites": [],
+          "lesson": "Bu örnek derste konuyu küçük ve doğrulanabilir adımlara ayırırız. Önce girdiyi, yapılacak işlemi ve beklenen çıktıyı belirle. Örneğin bir kullanıcı verisini işlerken boş girdiyi ayrı ele al, geçerli girdiyi dönüştür ve sonucu doğrula. Küçük bir fonksiyon yazıp normal girdi ve sınır durumlarıyla dene. Sık yapılan hata tüm işi tek adımda yazmaktır; her adımın çıktısını kontrol ederek ilerle. Şimdi kendi projen için bir girdi seç ve beklenen sonucu önceden yaz.",
           "whyNeeded": "Yapay zekâ destekli fitness uygulaması geliştirmek istiyorum. hedefi için Python gerekiyor.",
           "learningObjectives": [
             "python.basics becerisini bir örnekle uygula.",
@@ -505,8 +860,8 @@
           },
           "resources": [
             {
-              "id": "38cc3605-4522-4868-a5da-6a92fdf7490c:python-tutorial",
-              "nodeId": "38cc3605-4522-4868-a5da-6a92fdf7490c",
+              "id": "a9f9d126-af6c-4a62-83b1-a41098988174:python-tutorial",
+              "nodeId": "a9f9d126-af6c-4a62-83b1-a41098988174",
               "title": "Python Tutorial",
               "url": "https://docs.python.org/3/tutorial/",
               "type": "documentation",
@@ -515,14 +870,15 @@
               "verified": true
             }
           ],
-          "assessmentId": "90190356-13b2-407b-be39-1bc9b5f8d9dd",
+          "assessmentId": "e5ba9fe4-0025-4792-af34-6fb52dc27bd0",
           "childMapId": null,
+          "adaptiveMapId": "530bfd7e-61c2-4b35-9ed2-6e4a1ba5d0f9",
           "remediationForNodeId": null,
           "taskCompleted": false
         },
         {
-          "id": "9434ed79-a335-4528-a101-7ab4e9c80b2c",
-          "mapId": "917a2f10-3f21-4868-9d95-168d690b9fb4",
+          "id": "df420706-6dba-4006-a628-2655ef6acad6",
+          "mapId": "9b8578b4-2f8e-496e-8d08-d80399b55048",
           "title": "Fonksiyonlar",
           "summary": "Fonksiyonlar ile proje hedefin için pratik yap.",
           "type": "learning",
@@ -532,16 +888,17 @@
           ],
           "estimatedHours": 3.0,
           "prerequisites": [
-            "38cc3605-4522-4868-a5da-6a92fdf7490c"
+            "a9f9d126-af6c-4a62-83b1-a41098988174"
           ],
+          "lesson": "",
           "whyNeeded": "",
           "learningObjectives": [],
           "subtopics": [],
           "practicalTask": null,
           "resources": [
             {
-              "id": "9434ed79-a335-4528-a101-7ab4e9c80b2c:python-tutorial",
-              "nodeId": "9434ed79-a335-4528-a101-7ab4e9c80b2c",
+              "id": "df420706-6dba-4006-a628-2655ef6acad6:python-tutorial",
+              "nodeId": "df420706-6dba-4006-a628-2655ef6acad6",
               "title": "Python Tutorial",
               "url": "https://docs.python.org/3/tutorial/",
               "type": "documentation",
@@ -552,12 +909,50 @@
           ],
           "assessmentId": null,
           "childMapId": null,
+          "adaptiveMapId": null,
           "remediationForNodeId": null,
           "taskCompleted": false
         },
         {
-          "id": "987251b2-abe9-4b23-bb8c-ff844846c990",
-          "mapId": "917a2f10-3f21-4868-9d95-168d690b9fb4",
+          "id": "1309b39d-7fcf-4ef9-90b9-97b798590b8e",
+          "mapId": "9b8578b4-2f8e-496e-8d08-d80399b55048",
+          "title": "ML Temelleri",
+          "summary": "ML Temelleri ile proje hedefin için pratik yap.",
+          "type": "learning",
+          "status": "locked",
+          "skills": [
+            "ml.basics"
+          ],
+          "estimatedHours": 3.0,
+          "prerequisites": [
+            "893acf82-5ae4-42f4-ba5c-21bfd1e3daec"
+          ],
+          "lesson": "",
+          "whyNeeded": "",
+          "learningObjectives": [],
+          "subtopics": [],
+          "practicalTask": null,
+          "resources": [
+            {
+              "id": "1309b39d-7fcf-4ef9-90b9-97b798590b8e:sklearn",
+              "nodeId": "1309b39d-7fcf-4ef9-90b9-97b798590b8e",
+              "title": "Scikit-learn User Guide",
+              "url": "https://scikit-learn.org/stable/user_guide.html",
+              "type": "documentation",
+              "provider": "Scikit-learn",
+              "language": "en",
+              "verified": true
+            }
+          ],
+          "assessmentId": null,
+          "childMapId": null,
+          "adaptiveMapId": null,
+          "remediationForNodeId": null,
+          "taskCompleted": false
+        },
+        {
+          "id": "893acf82-5ae4-42f4-ba5c-21bfd1e3daec",
+          "mapId": "9b8578b4-2f8e-496e-8d08-d80399b55048",
           "title": "NumPy/Pandas ve Veri Hazırlama",
           "summary": "NumPy/Pandas ve Veri Hazırlama ile proje hedefin için pratik yap.",
           "type": "learning",
@@ -567,16 +962,17 @@
           ],
           "estimatedHours": 3.0,
           "prerequisites": [
-            "9434ed79-a335-4528-a101-7ab4e9c80b2c"
+            "df420706-6dba-4006-a628-2655ef6acad6"
           ],
+          "lesson": "",
           "whyNeeded": "",
           "learningObjectives": [],
           "subtopics": [],
           "practicalTask": null,
           "resources": [
             {
-              "id": "987251b2-abe9-4b23-bb8c-ff844846c990:pandas",
-              "nodeId": "987251b2-abe9-4b23-bb8c-ff844846c990",
+              "id": "893acf82-5ae4-42f4-ba5c-21bfd1e3daec:pandas",
+              "nodeId": "893acf82-5ae4-42f4-ba5c-21bfd1e3daec",
               "title": "Pandas Getting Started",
               "url": "https://pandas.pydata.org/docs/getting_started/index.html",
               "type": "documentation",
@@ -587,47 +983,13 @@
           ],
           "assessmentId": null,
           "childMapId": null,
+          "adaptiveMapId": null,
           "remediationForNodeId": null,
           "taskCompleted": false
         },
         {
-          "id": "56133f4f-4dd9-43b3-929b-4eb65fee91c6",
-          "mapId": "917a2f10-3f21-4868-9d95-168d690b9fb4",
-          "title": "ML Temelleri",
-          "summary": "ML Temelleri ile proje hedefin için pratik yap.",
-          "type": "learning",
-          "status": "locked",
-          "skills": [
-            "ml.basics"
-          ],
-          "estimatedHours": 3.0,
-          "prerequisites": [
-            "987251b2-abe9-4b23-bb8c-ff844846c990"
-          ],
-          "whyNeeded": "",
-          "learningObjectives": [],
-          "subtopics": [],
-          "practicalTask": null,
-          "resources": [
-            {
-              "id": "56133f4f-4dd9-43b3-929b-4eb65fee91c6:sklearn",
-              "nodeId": "56133f4f-4dd9-43b3-929b-4eb65fee91c6",
-              "title": "Scikit-learn User Guide",
-              "url": "https://scikit-learn.org/stable/user_guide.html",
-              "type": "documentation",
-              "provider": "Scikit-learn",
-              "language": "en",
-              "verified": true
-            }
-          ],
-          "assessmentId": null,
-          "childMapId": null,
-          "remediationForNodeId": null,
-          "taskCompleted": false
-        },
-        {
-          "id": "efd5272d-f215-4ebf-9bb4-97b188db7bdc",
-          "mapId": "917a2f10-3f21-4868-9d95-168d690b9fb4",
+          "id": "9b2db6e4-5d85-474d-acab-41f1c1643da9",
+          "mapId": "9b8578b4-2f8e-496e-8d08-d80399b55048",
           "title": "Model Eğitimi",
           "summary": "Model Eğitimi ile proje hedefin için pratik yap.",
           "type": "development_task",
@@ -637,16 +999,17 @@
           ],
           "estimatedHours": 3.0,
           "prerequisites": [
-            "56133f4f-4dd9-43b3-929b-4eb65fee91c6"
+            "1309b39d-7fcf-4ef9-90b9-97b798590b8e"
           ],
+          "lesson": "",
           "whyNeeded": "",
           "learningObjectives": [],
           "subtopics": [],
           "practicalTask": null,
           "resources": [
             {
-              "id": "efd5272d-f215-4ebf-9bb4-97b188db7bdc:sklearn",
-              "nodeId": "efd5272d-f215-4ebf-9bb4-97b188db7bdc",
+              "id": "9b2db6e4-5d85-474d-acab-41f1c1643da9:sklearn",
+              "nodeId": "9b2db6e4-5d85-474d-acab-41f1c1643da9",
               "title": "Scikit-learn User Guide",
               "url": "https://scikit-learn.org/stable/user_guide.html",
               "type": "documentation",
@@ -657,12 +1020,13 @@
           ],
           "assessmentId": null,
           "childMapId": null,
+          "adaptiveMapId": null,
           "remediationForNodeId": null,
           "taskCompleted": false
         },
         {
-          "id": "f202b465-36c8-4613-be99-7d13f4121f9e",
-          "mapId": "917a2f10-3f21-4868-9d95-168d690b9fb4",
+          "id": "1cc965ae-1662-48eb-a5c7-d4f8de60e39c",
+          "mapId": "9b8578b4-2f8e-496e-8d08-d80399b55048",
           "title": "Model Değerlendirme",
           "summary": "Model Değerlendirme ile proje hedefin için pratik yap.",
           "type": "milestone",
@@ -672,16 +1036,17 @@
           ],
           "estimatedHours": 3.0,
           "prerequisites": [
-            "efd5272d-f215-4ebf-9bb4-97b188db7bdc"
+            "9b2db6e4-5d85-474d-acab-41f1c1643da9"
           ],
+          "lesson": "",
           "whyNeeded": "",
           "learningObjectives": [],
           "subtopics": [],
           "practicalTask": null,
           "resources": [
             {
-              "id": "f202b465-36c8-4613-be99-7d13f4121f9e:sklearn",
-              "nodeId": "f202b465-36c8-4613-be99-7d13f4121f9e",
+              "id": "1cc965ae-1662-48eb-a5c7-d4f8de60e39c:sklearn",
+              "nodeId": "1cc965ae-1662-48eb-a5c7-d4f8de60e39c",
               "title": "Scikit-learn User Guide",
               "url": "https://scikit-learn.org/stable/user_guide.html",
               "type": "documentation",
@@ -692,22 +1057,78 @@
           ],
           "assessmentId": null,
           "childMapId": null,
+          "adaptiveMapId": null,
           "remediationForNodeId": null,
           "taskCompleted": false
+        }
+      ],
+      "edges": [
+        {
+          "id": "8b3ac095-e265-417f-a2f5-68f033080463",
+          "source": "a9f9d126-af6c-4a62-83b1-a41098988174",
+          "target": "df420706-6dba-4006-a628-2655ef6acad6",
+          "kind": "requires"
         },
         {
-          "id": "0710be46-b042-4a61-b063-49f1a058a041",
-          "mapId": "917a2f10-3f21-4868-9d95-168d690b9fb4",
-          "title": "Python Fonksiyonları — Ek Pratik",
-          "summary": "python.functions değerlendirmesinde eksik kalan beceri için kısa pratik.",
-          "type": "remedial",
+          "id": "7b33f685-e075-4159-a0d5-1f755b2159ba",
+          "source": "df420706-6dba-4006-a628-2655ef6acad6",
+          "target": "893acf82-5ae4-42f4-ba5c-21bfd1e3daec",
+          "kind": "requires"
+        },
+        {
+          "id": "b1d9b89b-f3fd-43f1-8bfa-cf186adfcbc4",
+          "source": "893acf82-5ae4-42f4-ba5c-21bfd1e3daec",
+          "target": "1309b39d-7fcf-4ef9-90b9-97b798590b8e",
+          "kind": "requires"
+        },
+        {
+          "id": "af465e3f-992a-45e4-a796-b6ed28673ab0",
+          "source": "1309b39d-7fcf-4ef9-90b9-97b798590b8e",
+          "target": "9b2db6e4-5d85-474d-acab-41f1c1643da9",
+          "kind": "requires"
+        },
+        {
+          "id": "a5b7936e-14dc-48fd-beea-2440ca1d9999",
+          "source": "9b2db6e4-5d85-474d-acab-41f1c1643da9",
+          "target": "1cc965ae-1662-48eb-a5c7-d4f8de60e39c",
+          "kind": "requires"
+        }
+      ],
+      "metadata": {
+        "source": "deterministic_fixture",
+        "demo": true
+      }
+    },
+    {
+      "id": "530bfd7e-61c2-4b35-9ed2-6e4a1ba5d0f9",
+      "projectId": "f9e92bee-28d8-4ab0-bf3a-defa8a6429a5",
+      "title": "Python — Öğrenme Dalı",
+      "description": "Eksik becerilere özel kalıcı öğrenme haritası.",
+      "parentMapId": "9b8578b4-2f8e-496e-8d08-d80399b55048",
+      "parentNodeId": null,
+      "kind": "adaptive",
+      "trigger": "knowledge_gap",
+      "targetNodeId": "a9f9d126-af6c-4a62-83b1-a41098988174",
+      "weakSkills": [
+        "python.functions"
+      ],
+      "generationStatus": "ready",
+      "version": 2,
+      "nodes": [
+        {
+          "id": "04887495-ec46-425a-9b27-44d998fd5c7a",
+          "mapId": "530bfd7e-61c2-4b35-9ed2-6e4a1ba5d0f9",
+          "title": "python.functions — Temeller",
+          "summary": "python.functions becerisini projen içinde uygulayarak öğren.",
+          "type": "learning",
           "status": "available",
           "skills": [
             "python.functions"
           ],
           "estimatedHours": 1.0,
           "prerequisites": [],
-          "whyNeeded": "Yapay zekâ destekli fitness uygulaması geliştirmek istiyorum. hedefi için Python Fonksiyonları — Ek Pratik gerekiyor.",
+          "lesson": "Bu örnek derste konuyu küçük ve doğrulanabilir adımlara ayırırız. Önce girdiyi, yapılacak işlemi ve beklenen çıktıyı belirle. Örneğin bir kullanıcı verisini işlerken boş girdiyi ayrı ele al, geçerli girdiyi dönüştür ve sonucu doğrula. Küçük bir fonksiyon yazıp normal girdi ve sınır durumlarıyla dene. Sık yapılan hata tüm işi tek adımda yazmaktır; her adımın çıktısını kontrol ederek ilerle. Şimdi kendi projen için bir girdi seç ve beklenen sonucu önceden yaz.",
+          "whyNeeded": "Yapay zekâ destekli fitness uygulaması geliştirmek istiyorum. hedefi için python.functions — Temeller gerekiyor.",
           "learningObjectives": [
             "python.functions becerisini bir örnekle uygula."
           ],
@@ -715,13 +1136,13 @@
             "python.functions"
           ],
           "practicalTask": {
-            "description": "Python Fonksiyonları — Ek Pratik için proje bağlamında küçük bir prototip yaz.",
+            "description": "python.functions — Temeller için proje bağlamında küçük bir prototip yaz.",
             "expectedOutput": "Çalışan kod ve en az bir doğrulama örneği."
           },
           "resources": [
             {
-              "id": "0710be46-b042-4a61-b063-49f1a058a041:python-tutorial",
-              "nodeId": "0710be46-b042-4a61-b063-49f1a058a041",
+              "id": "04887495-ec46-425a-9b27-44d998fd5c7a:python-tutorial",
+              "nodeId": "04887495-ec46-425a-9b27-44d998fd5c7a",
               "title": "Python Tutorial",
               "url": "https://docs.python.org/3/tutorial/",
               "type": "documentation",
@@ -730,47 +1151,55 @@
               "verified": true
             }
           ],
-          "assessmentId": "edc3d989-2910-4cfe-9f48-2649796ea52a",
+          "assessmentId": "c5b980f5-29ca-4b84-931d-ec240ec77a15",
           "childMapId": null,
-          "remediationForNodeId": "38cc3605-4522-4868-a5da-6a92fdf7490c",
+          "adaptiveMapId": null,
+          "remediationForNodeId": null,
+          "taskCompleted": false
+        },
+        {
+          "id": "c3827f49-028a-4ddd-a987-932e1f655660",
+          "mapId": "530bfd7e-61c2-4b35-9ed2-6e4a1ba5d0f9",
+          "title": "python.functions — Uygulama",
+          "summary": "python.functions becerisini projen içinde uygulayarak öğren.",
+          "type": "learning",
+          "status": "locked",
+          "skills": [
+            "python.functions"
+          ],
+          "estimatedHours": 1.0,
+          "prerequisites": [
+            "04887495-ec46-425a-9b27-44d998fd5c7a"
+          ],
+          "lesson": "",
+          "whyNeeded": "",
+          "learningObjectives": [],
+          "subtopics": [],
+          "practicalTask": null,
+          "resources": [
+            {
+              "id": "c3827f49-028a-4ddd-a987-932e1f655660:python-tutorial",
+              "nodeId": "c3827f49-028a-4ddd-a987-932e1f655660",
+              "title": "Python Tutorial",
+              "url": "https://docs.python.org/3/tutorial/",
+              "type": "documentation",
+              "provider": "Python Software Foundation",
+              "language": "en",
+              "verified": true
+            }
+          ],
+          "assessmentId": null,
+          "childMapId": null,
+          "adaptiveMapId": null,
+          "remediationForNodeId": null,
           "taskCompleted": false
         }
       ],
       "edges": [
         {
-          "id": "58afc8e8-2b38-40d2-86a7-4267e51874e4",
-          "source": "38cc3605-4522-4868-a5da-6a92fdf7490c",
-          "target": "9434ed79-a335-4528-a101-7ab4e9c80b2c",
-          "kind": "requires"
-        },
-        {
-          "id": "6368e606-c585-45c2-b7a3-010e72fc1423",
-          "source": "9434ed79-a335-4528-a101-7ab4e9c80b2c",
-          "target": "987251b2-abe9-4b23-bb8c-ff844846c990",
-          "kind": "requires"
-        },
-        {
-          "id": "b24b99b0-6a6e-4793-9b6c-3aa2acda736b",
-          "source": "987251b2-abe9-4b23-bb8c-ff844846c990",
-          "target": "56133f4f-4dd9-43b3-929b-4eb65fee91c6",
-          "kind": "requires"
-        },
-        {
-          "id": "c98638ec-917b-4f38-b369-5af3d59502e8",
-          "source": "56133f4f-4dd9-43b3-929b-4eb65fee91c6",
-          "target": "efd5272d-f215-4ebf-9bb4-97b188db7bdc",
-          "kind": "requires"
-        },
-        {
-          "id": "4d226850-d1ea-4eee-8707-15f0f1d93bf2",
-          "source": "efd5272d-f215-4ebf-9bb4-97b188db7bdc",
-          "target": "f202b465-36c8-4613-be99-7d13f4121f9e",
-          "kind": "requires"
-        },
-        {
-          "id": "7599fd92-f97f-4bee-95e2-b79af12c458f",
-          "source": "0710be46-b042-4a61-b063-49f1a058a041",
-          "target": "38cc3605-4522-4868-a5da-6a92fdf7490c",
+          "id": "f3c10f0d-2b29-4555-8a16-1343a7fcbc7b",
+          "source": "04887495-ec46-425a-9b27-44d998fd5c7a",
+          "target": "c3827f49-028a-4ddd-a987-932e1f655660",
           "kind": "requires"
         }
       ],
@@ -782,14 +1211,14 @@
   ],
   "assessments": [
     {
-      "id": "edc3d989-2910-4cfe-9f48-2649796ea52a",
-      "nodeId": "0710be46-b042-4a61-b063-49f1a058a041",
-      "title": "Python Fonksiyonları — Ek Pratik Değerlendirmesi",
-      "passingScore": 70.0,
+      "id": "c5b980f5-29ca-4b84-931d-ec240ec77a15",
+      "nodeId": "04887495-ec46-425a-9b27-44d998fd5c7a",
+      "title": "python.functions — Temeller Değerlendirmesi",
+      "passingScore": 100.0,
       "version": 1,
       "questions": [
         {
-          "id": "0ef5a53f-71ef-4915-82a4-41d24c70ee0e",
+          "id": "10e08f71-4b22-4334-879e-e9d68be169f2",
           "prompt": "Python'da fonksiyon tanımlamak için hangi anahtar kelime kullanılır?",
           "options": [
             "func",
@@ -802,7 +1231,7 @@
           "difficulty": "beginner"
         },
         {
-          "id": "ba9fee7f-54e0-4f7f-a9e0-39681d47abd3",
+          "id": "fa5964ce-d0d6-4fcd-81cc-20402ba54f28",
           "prompt": "Python'da fonksiyon tanımlamak için hangi anahtar kelime kullanılır?",
           "options": [
             "func",
@@ -815,7 +1244,7 @@
           "difficulty": "beginner"
         },
         {
-          "id": "1ab37729-3af3-4d52-a641-48b3c6dd2068",
+          "id": "d06c1ce4-7778-497c-8d45-fb3aa32c790a",
           "prompt": "Python'da fonksiyon tanımlamak için hangi anahtar kelime kullanılır?",
           "options": [
             "func",
@@ -830,14 +1259,14 @@
       ]
     },
     {
-      "id": "90190356-13b2-407b-be39-1bc9b5f8d9dd",
-      "nodeId": "38cc3605-4522-4868-a5da-6a92fdf7490c",
+      "id": "e5ba9fe4-0025-4792-af34-6fb52dc27bd0",
+      "nodeId": "a9f9d126-af6c-4a62-83b1-a41098988174",
       "title": "Python Değerlendirmesi",
-      "passingScore": 70.0,
+      "passingScore": 100.0,
       "version": 1,
       "questions": [
         {
-          "id": "12674ac1-4887-4e55-9642-1a65b2c240b9",
+          "id": "1b7583d2-ccd3-4a82-b79c-814f485ac0fc",
           "prompt": "Python listeleri hangi parantezle gösterilir?",
           "options": [
             "[]",
@@ -850,7 +1279,7 @@
           "difficulty": "beginner"
         },
         {
-          "id": "5f0a37c3-3011-4205-8b98-09e23ab7a97f",
+          "id": "122d8a6b-e2f7-4661-821a-3c061567dae2",
           "prompt": "Python'da fonksiyon tanımlamak için hangi anahtar kelime kullanılır?",
           "options": [
             "func",
@@ -863,7 +1292,7 @@
           "difficulty": "beginner"
         },
         {
-          "id": "0e25e811-8ceb-41a3-9c23-9e957772e632",
+          "id": "4804b14e-0881-4ea6-b020-4e5c9e19a312",
           "prompt": "Python listeleri hangi parantezle gösterilir?",
           "options": [
             "[]",
@@ -880,8 +1309,8 @@
   ],
   "resources": [
     {
-      "id": "3f51433f-34e0-4c90-abdf-f268c0a10d75:javascript",
-      "nodeId": "3f51433f-34e0-4c90-abdf-f268c0a10d75",
+      "id": "3c5d3863-7f60-456f-98f3-12fce3359df8:javascript",
+      "nodeId": "3c5d3863-7f60-456f-98f3-12fce3359df8",
       "title": "JavaScript Guide",
       "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide",
       "type": "documentation",
@@ -890,38 +1319,8 @@
       "verified": true
     },
     {
-      "id": "787731e2-10e9-46fb-981e-59b4129ddbea:react-native",
-      "nodeId": "787731e2-10e9-46fb-981e-59b4129ddbea",
-      "title": "React Native Documentation",
-      "url": "https://reactnative.dev/docs/getting-started",
-      "type": "documentation",
-      "provider": "React Native",
-      "language": "en",
-      "verified": true
-    },
-    {
-      "id": "cf98c369-e2be-4912-9cc3-11d90dad0085:python-tutorial",
-      "nodeId": "cf98c369-e2be-4912-9cc3-11d90dad0085",
-      "title": "Python Tutorial",
-      "url": "https://docs.python.org/3/tutorial/",
-      "type": "documentation",
-      "provider": "Python Software Foundation",
-      "language": "en",
-      "verified": true
-    },
-    {
-      "id": "cf98c369-e2be-4912-9cc3-11d90dad0085:sklearn",
-      "nodeId": "cf98c369-e2be-4912-9cc3-11d90dad0085",
-      "title": "Scikit-learn User Guide",
-      "url": "https://scikit-learn.org/stable/user_guide.html",
-      "type": "documentation",
-      "provider": "Scikit-learn",
-      "language": "en",
-      "verified": true
-    },
-    {
-      "id": "ffc5ebc8-d8b3-47d4-9764-5aab7abdd35f:fastapi",
-      "nodeId": "ffc5ebc8-d8b3-47d4-9764-5aab7abdd35f",
+      "id": "739e3ff9-ef68-4592-804c-1fe4e5d84557:fastapi",
+      "nodeId": "739e3ff9-ef68-4592-804c-1fe4e5d84557",
       "title": "FastAPI Tutorial",
       "url": "https://fastapi.tiangolo.com/tutorial/",
       "type": "documentation",
@@ -930,8 +1329,18 @@
       "verified": true
     },
     {
-      "id": "38cc3605-4522-4868-a5da-6a92fdf7490c:python-tutorial",
-      "nodeId": "38cc3605-4522-4868-a5da-6a92fdf7490c",
+      "id": "a59e8e47-ee57-4e70-8fef-d041baf9ed4f:react-native",
+      "nodeId": "a59e8e47-ee57-4e70-8fef-d041baf9ed4f",
+      "title": "React Native Documentation",
+      "url": "https://reactnative.dev/docs/getting-started",
+      "type": "documentation",
+      "provider": "React Native",
+      "language": "en",
+      "verified": true
+    },
+    {
+      "id": "084b8d0a-acb9-4777-8713-797bd1eb278a:python-tutorial",
+      "nodeId": "084b8d0a-acb9-4777-8713-797bd1eb278a",
       "title": "Python Tutorial",
       "url": "https://docs.python.org/3/tutorial/",
       "type": "documentation",
@@ -940,18 +1349,18 @@
       "verified": true
     },
     {
-      "id": "9434ed79-a335-4528-a101-7ab4e9c80b2c:python-tutorial",
-      "nodeId": "9434ed79-a335-4528-a101-7ab4e9c80b2c",
-      "title": "Python Tutorial",
-      "url": "https://docs.python.org/3/tutorial/",
+      "id": "084b8d0a-acb9-4777-8713-797bd1eb278a:sklearn",
+      "nodeId": "084b8d0a-acb9-4777-8713-797bd1eb278a",
+      "title": "Scikit-learn User Guide",
+      "url": "https://scikit-learn.org/stable/user_guide.html",
       "type": "documentation",
-      "provider": "Python Software Foundation",
+      "provider": "Scikit-learn",
       "language": "en",
       "verified": true
     },
     {
-      "id": "987251b2-abe9-4b23-bb8c-ff844846c990:pandas",
-      "nodeId": "987251b2-abe9-4b23-bb8c-ff844846c990",
+      "id": "02b62d04-326f-4e26-8ee1-b03b0654c1b8:pandas",
+      "nodeId": "02b62d04-326f-4e26-8ee1-b03b0654c1b8",
       "title": "Pandas Getting Started",
       "url": "https://pandas.pydata.org/docs/getting_started/index.html",
       "type": "documentation",
@@ -960,8 +1369,28 @@
       "verified": true
     },
     {
-      "id": "56133f4f-4dd9-43b3-929b-4eb65fee91c6:sklearn",
-      "nodeId": "56133f4f-4dd9-43b3-929b-4eb65fee91c6",
+      "id": "a9f9d126-af6c-4a62-83b1-a41098988174:python-tutorial",
+      "nodeId": "a9f9d126-af6c-4a62-83b1-a41098988174",
+      "title": "Python Tutorial",
+      "url": "https://docs.python.org/3/tutorial/",
+      "type": "documentation",
+      "provider": "Python Software Foundation",
+      "language": "en",
+      "verified": true
+    },
+    {
+      "id": "df420706-6dba-4006-a628-2655ef6acad6:python-tutorial",
+      "nodeId": "df420706-6dba-4006-a628-2655ef6acad6",
+      "title": "Python Tutorial",
+      "url": "https://docs.python.org/3/tutorial/",
+      "type": "documentation",
+      "provider": "Python Software Foundation",
+      "language": "en",
+      "verified": true
+    },
+    {
+      "id": "1309b39d-7fcf-4ef9-90b9-97b798590b8e:sklearn",
+      "nodeId": "1309b39d-7fcf-4ef9-90b9-97b798590b8e",
       "title": "Scikit-learn User Guide",
       "url": "https://scikit-learn.org/stable/user_guide.html",
       "type": "documentation",
@@ -970,8 +1399,18 @@
       "verified": true
     },
     {
-      "id": "efd5272d-f215-4ebf-9bb4-97b188db7bdc:sklearn",
-      "nodeId": "efd5272d-f215-4ebf-9bb4-97b188db7bdc",
+      "id": "893acf82-5ae4-42f4-ba5c-21bfd1e3daec:pandas",
+      "nodeId": "893acf82-5ae4-42f4-ba5c-21bfd1e3daec",
+      "title": "Pandas Getting Started",
+      "url": "https://pandas.pydata.org/docs/getting_started/index.html",
+      "type": "documentation",
+      "provider": "Pandas",
+      "language": "en",
+      "verified": true
+    },
+    {
+      "id": "9b2db6e4-5d85-474d-acab-41f1c1643da9:sklearn",
+      "nodeId": "9b2db6e4-5d85-474d-acab-41f1c1643da9",
       "title": "Scikit-learn User Guide",
       "url": "https://scikit-learn.org/stable/user_guide.html",
       "type": "documentation",
@@ -980,8 +1419,8 @@
       "verified": true
     },
     {
-      "id": "f202b465-36c8-4613-be99-7d13f4121f9e:sklearn",
-      "nodeId": "f202b465-36c8-4613-be99-7d13f4121f9e",
+      "id": "1cc965ae-1662-48eb-a5c7-d4f8de60e39c:sklearn",
+      "nodeId": "1cc965ae-1662-48eb-a5c7-d4f8de60e39c",
       "title": "Scikit-learn User Guide",
       "url": "https://scikit-learn.org/stable/user_guide.html",
       "type": "documentation",
@@ -990,8 +1429,18 @@
       "verified": true
     },
     {
-      "id": "0710be46-b042-4a61-b063-49f1a058a041:python-tutorial",
-      "nodeId": "0710be46-b042-4a61-b063-49f1a058a041",
+      "id": "04887495-ec46-425a-9b27-44d998fd5c7a:python-tutorial",
+      "nodeId": "04887495-ec46-425a-9b27-44d998fd5c7a",
+      "title": "Python Tutorial",
+      "url": "https://docs.python.org/3/tutorial/",
+      "type": "documentation",
+      "provider": "Python Software Foundation",
+      "language": "en",
+      "verified": true
+    },
+    {
+      "id": "c3827f49-028a-4ddd-a987-932e1f655660:python-tutorial",
+      "nodeId": "c3827f49-028a-4ddd-a987-932e1f655660",
       "title": "Python Tutorial",
       "url": "https://docs.python.org/3/tutorial/",
       "type": "documentation",

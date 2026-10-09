@@ -1,8 +1,8 @@
 {
   "schemaVersion": "mergen/v1",
   "project": {
-    "id": "0431386f-f4b5-4c15-96b9-41b7ea4ddc40",
-    "projectId": "0431386f-f4b5-4c15-96b9-41b7ea4ddc40",
+    "id": "f9e92bee-28d8-4ab0-bf3a-defa8a6429a5",
+    "projectId": "f9e92bee-28d8-4ab0-bf3a-defa8a6429a5",
     "title": "AI Fitness App",
     "originalIdea": "Yapay zekâ destekli fitness uygulaması geliştirmek istiyorum.",
     "primaryDomain": "mobile",
@@ -123,6 +123,50 @@
           "undecided"
         ],
         "targetField": "aiStrategy",
+        "required": true,
+        "parentQuestionId": null,
+        "completed": false
+      },
+      {
+        "id": "project-detail-0",
+        "questionId": "project-detail-0",
+        "text": "Bu uygulamanın ilk kullanıcıları kimler olacak?",
+        "type": "short_text",
+        "options": [],
+        "targetField": "projectDetailAudience",
+        "required": true,
+        "parentQuestionId": null,
+        "completed": false
+      },
+      {
+        "id": "project-detail-1",
+        "questionId": "project-detail-1",
+        "text": "İlk sürümde mutlaka çalışması gereken üç özellik nedir?",
+        "type": "short_text",
+        "options": [],
+        "targetField": "projectDetailFeatures",
+        "required": true,
+        "parentQuestionId": null,
+        "completed": false
+      },
+      {
+        "id": "project-detail-2",
+        "questionId": "project-detail-2",
+        "text": "Hangi verileri kullanacaksın ve bu veriler hazır mı?",
+        "type": "short_text",
+        "options": [],
+        "targetField": "projectDetailData",
+        "required": true,
+        "parentQuestionId": null,
+        "completed": false
+      },
+      {
+        "id": "project-detail-3",
+        "questionId": "project-detail-3",
+        "text": "Projenin başarılı olduğunu nasıl anlayacaksın?",
+        "type": "short_text",
+        "options": [],
+        "targetField": "projectDetailSuccess",
         "required": true,
         "parentQuestionId": null,
         "completed": false

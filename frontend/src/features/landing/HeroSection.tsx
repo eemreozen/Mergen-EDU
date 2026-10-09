@@ -2,11 +2,11 @@ import { motion } from 'motion/react'
 import { ArrowRight, Compass, Sparkles, Wand2 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { AuthModal } from '@/components/shared/AuthModal'
 import { LanguageSelector } from '@/components/shared/LanguageSelector'
 import { ThemeToggle } from '@/components/shared/ThemeToggle'
-import { OnboardingModal } from '@/components/assessment/OnboardingModal'
+import { api } from '@/api/client'
 import { GuidedTourWizard } from '@/components/landing/GuidedTourWizard'
 
 interface HeroSectionProps {
@@ -23,7 +23,9 @@ export function HeroSection({
 
   const [localIdea, setLocalIdea] = useState('')
   const [isAuthOpen, setIsAuthOpen] = useState(false)
-  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false)
+  const navigate = useNavigate()
+  const [creating, setCreating] = useState(false)
+  const [error, setError] = useState('')
   const [isTourOpen, setIsTourOpen] = useState(false)
 
   const projectIdea = externalIdea !== undefined ? externalIdea : localIdea
@@ -36,18 +38,18 @@ export function HeroSection({
     }
   }
 
-  const handleStartRoadmap = () => {
-    const trimmed = projectIdea.trim()
-    if (!trimmed) return
-    setIsOnboardingOpen(true)
+  const handleStartRoadmap = async () => {
+    if (creating || projectIdea.trim().length < 10) return
+    setCreating(true); setError('')
+    try {
+      const project = await api.createProject(projectIdea.trim(), isEn ? 'en' : 'tr')
+      navigate(`/learn?project=${project.id}`)
+    } catch (err) { setError(err instanceof Error ? err.message : 'Proje oluşturulamadı.') }
+    finally { setCreating(false) }
   }
 
   const handleStartFitnessDemo = () => {
-    const fitnessPrompt = isEn
-      ? 'I want to build an AI-powered fitness and nutrition recommendation application.'
-      : 'Egzersiz hareketlerimi ve günlük beslenmemi analiz eden akıllı bir fitness asistanı geliştirmek istiyorum.'
-    setIdea(fitnessPrompt)
-    setIsOnboardingOpen(true)
+    setIdea(isEn ? 'I want to build an AI-powered fitness and nutrition recommendation application.' : 'Egzersiz hareketlerimi ve günlük beslenmemi analiz eden akıllı bir fitness asistanı geliştirmek istiyorum.')
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -86,7 +88,7 @@ export function HeroSection({
     },
   ]
 
-  const isValid = projectIdea.trim().length > 0
+  const isValid = projectIdea.trim().length >= 10
 
   return (
     <>
@@ -190,7 +192,7 @@ export function HeroSection({
 
                   <button
                     type="button"
-                    disabled={!isValid}
+                    disabled={!isValid || creating}
                     onClick={handleStartRoadmap}
                     className={`inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-150 select-none ${
                       isValid
@@ -198,7 +200,7 @@ export function HeroSection({
                         : 'bg-[#E3E7EC] dark:bg-[#2A3038] text-[#9CA3AF] dark:text-[#64748B] cursor-not-allowed opacity-60'
                     }`}
                   >
-                    <span>{t('hero.submitButton')}</span>
+                    <span>{creating ? (isEn ? 'Preparing questions…' : 'Sorular hazırlanıyor…') : t('hero.submitButton')}</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -219,15 +221,15 @@ export function HeroSection({
                     onClick={handleStartFitnessDemo}
                     className="hover:text-[#111318] dark:hover:text-[#E9EDF3] transition-colors cursor-pointer hover:underline"
                   >
-                    <span>⚡️ {isEn ? 'Fitness Demo' : 'Fitness Demosu'}</span>
+                    <span>⚡️ {isEn ? 'Use fitness idea' : 'Fitness fikrini kullan'}</span>
                   </button>
                   <span>·</span>
                   <Link
-                    to="/canvas"
+                    to="/canvas?demo=1"
                     className="hover:text-[#111318] dark:hover:text-[#E9EDF3] transition-colors inline-flex items-center gap-0.5 hover:underline"
                   >
                     <Compass className="w-3 h-3" />
-                    <span>{isEn ? 'Canvas →' : 'Kanvas →'}</span>
+                    <span>{isEn ? 'Example canvas →' : 'Örnek kanvas →'}</span>
                   </Link>
                 </div>
               </div>
@@ -303,7 +305,7 @@ export function HeroSection({
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
 
       {/* Onboarding Knowledge Assessment Modal */}
-      <OnboardingModal isOpen={isOnboardingOpen} onClose={() => setIsOnboardingOpen(false)} />
+      {error && <div role="alert" className="fixed bottom-5 left-5 right-5 z-50 rounded-xl bg-rose-100 text-rose-900 p-4">{error}</div>}
 
       {/* Guided Tour Wizard Walkthrough */}
       <GuidedTourWizard isOpen={isTourOpen} onClose={() => setIsTourOpen(false)} />

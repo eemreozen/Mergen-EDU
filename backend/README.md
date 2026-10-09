@@ -2,7 +2,7 @@
 
 FastAPI + Pydantic v2 + SQLAlchemy 2.x ile kişiselleştirilmiş öğrenme haritaları,
 kalıcı alt haritalar, değerlendirme, telafi düğümleri ve bağlama dayalı AI danışman.
-Frontend dosyaları değiştirilmedi. Paket yöneticisi **uv**; bağımlılıklar `uv.lock` ile sabitlendi.
+Frontend `/learn` ekranı gerçek API üzerinden bu akışa bağlıdır. Paket yöneticisi **uv**; bağımlılıklar `uv.lock` ile sabitlendi.
 Python 3.12+ gerekir; yerel doğrulama Python 3.14 üzerinde yapıldı.
 
 ## Kurulum
@@ -33,8 +33,8 @@ Anahtarı frontend ortam değişkenlerine veya sohbete eklemeniz gerekmez. Model
 ```dotenv
 LLM_PROVIDER=gemini
 LLM_API_KEY=...
-LLM_MODEL_FAST=gemini-3.8-flash
-LLM_MODEL_STRONG=gemini-3.8-flash
+LLM_MODEL_FAST=gemini-3.5-flash-lite
+LLM_MODEL_STRONG=gemini-3.5-flash-lite
 DEMO_MODE=true
 DEMO_FIXTURES=false
 ```
@@ -49,9 +49,11 @@ resmî `AsyncOpenAI.responses.parse` kullanılır:
 [OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs?api-mode=responses).
 Sağlayıcı çıktısı doğrudan frontend'e verilmez. OpenAI yanıtları `store=False` ile istenir.
 
-Her deneme için varsayılan 45 saniye timeout, en fazla 1 tekrar (toplam en fazla 2 deneme) vardır.
-Geçersiz JSON ve timeout yeniden denenir; kimlik doğrulama/sağlayıcı hataları açık hata döner.
-Yalnız operasyon adı ve token kullanımı loglanır; anahtar ve kullanıcı mesajı loglanmaz.
+Varsayılan AI bekleme süresi 120 saniyedir; otomatik tekrar kapalıdır (`LLM_RETRIES=0`).
+Böylece yavaş bir yanıt gereksiz ikinci AI isteğine dönüşmez. İstenirse yapılandırmayla en fazla
+2 tekrar açılabilir. Frontend bekleme süresi 150 saniyedir. Kimlik doğrulama, kota ve sağlayıcı
+hataları açık hata döner. Operasyon, model, geçen süre ve token kullanımı loglanır; anahtar
+ve kullanıcı mesajı loglanmaz.
 
 **Bu geliştirme ortamında API anahtarı yoktu. Gerçek AI ile analiz, kök harita ve alt harita
 üretimi doğrulanamadı.** Gemini ve OpenAI SDK protokolleri sahte HTTP transport ile, tüm öğrenme akışı
@@ -124,6 +126,7 @@ Başlangıç seviyesi ve bilinen teknolojiler **öz-beyandır**, tamamlanmış �
 | GET | `/api/v1/nodes/{node_id}` | Hedefe özel, önbellekli öğrenme içeriği |
 | PATCH | `/api/v1/nodes/{node_id}` | Başlatma / geliştirme görevi tamamlama |
 | GET | `/api/v1/nodes/{node_id}/assessment` | Önbellekli, cevap anahtarsız test |
+| POST | `/api/v1/nodes/{node_id}/learn` | Sıfırdan öğrenme dalı oluştur / mevcut dalı getir |
 | POST | `/api/v1/nodes/{node_id}/assessment/submit` | Deterministik puanlama, telafi ve güncel map |
 | GET | `/api/v1/nodes/{node_id}/resources` | Becerilerle eşleşen curated kaynaklar |
 | POST | `/api/v1/advisor/chat` | Sunucudan kurulan ilgili bağlamla danışman |
@@ -158,10 +161,10 @@ Değerlendirme gönderimi:
 Her soruyu tam bir kez cevaplayın. Aynı `submissionId` ve aynı cevaplar aynı sonucu döndürür;
 farklı cevaplarla tekrar kullanım `SUBMISSION_CONFLICT` verir. Farklı bir deneme için yeni UUID kullanın.
 Yanıt `attemptId`, `passed`, `score`, `weakSkills`, `remediationCreated`, `map` içerir.
-`passingScore=70`; puan doğru sayısı / toplam soru sayısıdır. Yanlış soruların `targetSkill`
+`passingScore=100`; puan doğru sayısı / toplam soru sayısıdır. Yanlış soruların `targetSkill`
 alanları telafiyi belirler. Test sürümü ve sorular değerlendirme sırasında değişmez.
 
-Başarısız ana testte her zayıf beceri için aynı asıl düğüme bağlı tek telafi düğümü kullanılır.
+Yanlış cevaplarda yalnız eksik becerileri kapsayan ayrı bir `kind=adaptive` harita oluşturulur. Ana düğümler ve edge listesi korunur. `targetNodeId` asıl hedefe bağlanır.
 Telafi başarısızlığı yeni telafi zinciri üretmez. Ana testi yeniden denemeden önce bütün telafileri
 geçmek gerekir; telafi ana düğümü otomatik tamamlamaz. Ardından ana test geçilince bağımlılıklar açılır.
 `requires` kilit oluşturur; `supports` oluşturmaz. Kilitli düğüm içerik/test/görev işlemleri `409` verir.
@@ -224,7 +227,7 @@ Kilitli harita düğümleri görünür; öğrenme içeriği/test endpoint'lerind
 - `contracts/mergen-v1.ts`: JSON Schema'dan üretilen TypeScript tipleri.
 - `contracts/frontend-client.ts`: fetch, oturum başlığı, standart hata ve typed export örneği.
 
-Frontend geliştiricisi bu iki TypeScript dosyasını kendi veri katmanına alabilir.
+Canlı istemci `frontend/src/api/client.ts`, üretilen tipler `frontend/src/api/types.ts` içindedir.
 Oturumu `crypto.randomUUID()` ile bir kez üretip saklayın. Vite için `http://localhost:5173`
 CORS açıktır; farklı origin'leri `.env` içindeki virgülle ayrılmış `CORS_ORIGINS` alanına ekleyin.
 API base URL `http://localhost:8000/api/v1`; istemci örneğine `http://localhost:8000` verilir.
@@ -317,5 +320,17 @@ Smoke iç değerlendirmeleri geçmek için cevap anahtarını yalnız test DB'si
 
 P2: canlı web/YouTube araması, gelişmiş hafıza/Time Machine, analitik, ek sağlayıcılar,
 arka plan iş kuyruğu ve gelişmiş token optimizasyonu eklenmedi. Gerçek authentication,
-otomatik kod değerlendirmesi ve frontend'in canlı API'ye bağlanması bu backend teslimatının dışında.
+ve otomatik kod değerlendirmesi kapsam dışındadır.
 Gerçek LLM akışının ve canlı PostgreSQL'in doğrulanması ilgili ortam/anahtar sağlandığında yapılmalıdır.
+
+## Etkileşimli öğrenme akışı
+
+Proje analizi aynı AI çağrısında projeye özel 4–6 ayrıntılı soru üretir; profil sorularıyla birlikte keşif tamamlanır. Ana yol haritası 12–24 anlamlı düğüm içerir. `/learn?project=ID` ekranı sıradaki erişilebilir düğümü vurgular. Her durakta tanı testi veya sıfırdan öğrenme seçilir. Tanı testi ders içeriğini ayrıca üretmez. Test, ders ve dal üretimleri önbelleğe alınır.
+
+Yanlış soruların becerileri 2–10 düğümlük ayrı bir öğrenme dalına dönüşür. `learn` bütün hedef becerilerini kapsar. Dal ana kanvasta yana yerleşir; bitince kullanıcı asıl hedefte tekrar test edilir. Dal içinde başarısız test yeni dal zinciri açmaz. Proje görevleri ayrıca çıktı kanıtı ister. Tarayıcı oturum kimliği `X-Demo-Session` ile saklanır; gerçek hesap kimlik doğrulaması değildir.
+
+Gemini `503 UNAVAILABLE` yanıtı `AI_SERVICE_UNAVAILABLE` olarak, zaman aşımından ayrı gösterilir. Bu sağlayıcı yanıtı başarısız olduğu için roadmap veya keşif soruları kaydedilmez. Otomatik tekrar yapılmaz; model değiştirilmez.
+
+İlk proje analizi ve soru üretimi `LLM_PROJECT_ANALYSIS_TIMEOUT_SECONDS=35` ile sınırlıdır; genel 120 saniyelik sınırı aşamaz. Bu sınır yalnız ilk aşamayı etkiler. Roadmap üretiminin süre ve düğüm kapsamı korunur. İlk prompt kompakt analiz ve dört projeye özel soru ister. Bu optimizasyon sağlayıcının 503 hatasını giderme garantisi değildir; kullanıcıyı uzun süre bekletmeden hatayı döndürür.
+
+`LLM_MODEL_PROJECT_ANALYSIS=gemini-3.5-flash-lite` yalnız ilk proje analizi ve projeye özel keşif sorularını üretir. Boş bırakılırsa `LLM_MODEL_FAST` kullanılır. Mevcut yapılandırmada üç model ayarı da `gemini-3.5-flash-lite` kullanır; roadmap, öğrenme dalları, testler, dersler ve danışman dahil tüm AI işlemleri bu modele gider.

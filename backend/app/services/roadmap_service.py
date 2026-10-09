@@ -6,7 +6,7 @@ from app.errors import AppError, not_found
 from app.graph.validator import validate_graph
 from app.models.project import Project
 from app.models.roadmap import RoadmapEdge, RoadmapMap, RoadmapNode
-from app.schemas.roadmap import EdgeView, MapView, NodeView, RoadmapDraft
+from app.schemas.roadmap import EdgeView, MapView, NodeView, RootRoadmapDraft
 from app.services.discovery_service import answer_fields, discovery_view
 from app.services.project_service import owned_project, project_view
 from app.services.skill_service import learner_profile
@@ -55,6 +55,12 @@ async def map_view(db, roadmap):
     assessments = list(
         await db.scalars(select(Assessment).where(Assessment.node_id.in_([n.id for n in nodes])))
     )
+    adaptive_maps = list(
+        await db.scalars(
+            select(RoadmapMap).where(RoadmapMap.parent_map_id == roadmap.id, RoadmapMap.kind == "adaptive")
+        )
+    )
+    adaptive_ids = {m.target_node_id: m.id for m in adaptive_maps}
     assessment_ids = {a.node_id: a.id for a in assessments}
     views = []
     for node in nodes:
@@ -75,6 +81,7 @@ async def map_view(db, roadmap):
                 resources=node_resources(node),
                 assessment_id=assessment_ids.get(node.id),
                 child_map_id=node.child_map_id,
+                adaptive_map_id=adaptive_ids.get(node.id),
                 remediation_for_node_id=node.remediation_for_node_id,
                 task_completed=node.task_completed,
             )
@@ -86,6 +93,10 @@ async def map_view(db, roadmap):
         description=roadmap.description,
         parent_map_id=roadmap.parent_map_id,
         parent_node_id=roadmap.parent_node_id,
+        kind=roadmap.kind,
+        trigger=roadmap.trigger,
+        target_node_id=roadmap.target_node_id,
+        weak_skills=roadmap.weak_skills,
         generation_status=roadmap.generation_status,
         version=roadmap.version,
         nodes=views,
@@ -119,6 +130,7 @@ async def persist_draft(db, project, draft, parent_map=None, parent_node=None):
         id=new_id(),
         project_id=project.id,
         generation_key=parent_node.id if parent_node else "root",
+        kind="submap" if parent_node else "root",
         parent_map_id=parent_map.id if parent_map else None,
         parent_node_id=parent_node.id if parent_node else None,
         title=draft.title,
@@ -174,7 +186,7 @@ async def generate_root(db, project_id, user_id, gateway):
             "learnerProfile": (await learner_profile(db, project)).model_dump(),
             "depth": 0,
         },
-        RoadmapDraft,
+        RootRoadmapDraft,
     )
     roadmap = await persist_draft(db, project, draft)
     project.status = "active"

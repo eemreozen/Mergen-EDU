@@ -73,4 +73,5 @@ class AssessmentResult(Schema):
     score: float
     weak_skills: list[str]
     remediation_created: bool
+    adaptive_map: MapView | None = None
     map: MapView

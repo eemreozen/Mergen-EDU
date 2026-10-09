@@ -53,3 +53,9 @@ npm run build
 # Kod kalitesi kontrolü (Linter)
 npm run lint
 ```
+
+## Canlı öğrenme ekranı
+
+Backend'i `backend/README.md` adımlarıyla 8000 portunda, frontend'i `cd frontend && npm run dev` ile başlatın. `/learn` gerçek kaydedilmiş projeleri listeler. Ana sayfada fikir girişi proje analizi ve keşif sorularına yönlendirir. Vite `/api` isteklerini 8000 portuna iletir. Dağıtımda aynı origin reverse proxy veya `VITE_API_BASE_URL` gerekir. API anahtarı yalnız `backend/.env` içindeki `LLM_API_KEY` alanına yazılır.
+
+`/canvas?demo=1` eski örnek kanvastır. Yeni akış `/learn` üzerindedir: ayrıntılı keşif → uzun roadmap → bilgi testi / ders → eksik becerilere özel yan dal → ana hedefe dönüş. `npm run test:learning` ana koordinatların korunmasını ve sıradaki durağın seçimini doğrular.

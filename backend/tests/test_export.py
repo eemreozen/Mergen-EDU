@@ -36,7 +36,7 @@ def test_bad_export_references_are_rejected(mutation):
     elif mutation == "status":
         next(n for n in bundle.maps[0].nodes if n.status == "locked").status = "available"
     else:
-        next(n for n in bundle.maps[1].nodes if n.type == "remedial").remediation_for_node_id = "missing"
+        next(m for m in bundle.maps if m.kind == "adaptive").target_node_id = "missing"
     with pytest.raises(AppError):
         validate_bundle(bundle)
 

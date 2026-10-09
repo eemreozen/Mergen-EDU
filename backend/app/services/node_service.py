@@ -31,6 +31,10 @@ async def update_node(db, node_id, user_id, body):
         if node.status == "available":
             node.status = "in_progress"
     else:
+        from app.services.remediation_service import active_branch
+
+        if await active_branch(db, node):
+            raise AppError("REMEDIATION_REQUIRED", "Önce öğrenme dalını tamamlayın.", 409)
         if node.type != "development_task":
             raise AppError(
                 "ASSESSMENT_REQUIRED", "Öğrenme düğümleri testle, alt haritalar çocuklarıyla tamamlanır.", 409

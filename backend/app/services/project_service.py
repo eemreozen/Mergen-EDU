@@ -4,6 +4,7 @@ from app.ai.prompts.project_analysis import SYSTEM
 from app.errors import not_found
 from app.models.project import Project
 from app.schemas.common import Metadata
+from app.schemas.discovery import DiscoveryQuestion
 from app.schemas.project import ProjectAnalysis, ProjectView
 from app.templates.registry import select_questions
 
@@ -43,6 +44,23 @@ async def create_project(db, user_id, request, gateway):
         "project_analysis", SYSTEM, request.model_dump(), ProjectAnalysis
     )
     questions = select_questions(analysis.primary_domain, analysis.secondary_domains, request.locale)
+    used_fields = {q.target_field for q in questions}
+    if len(analysis.discovery_questions) < 3:
+        from app.errors import AppError
+
+        raise AppError(
+            "AI_INVALID_OUTPUT", "Proje için yeterli ayrıntılı keşif sorusu üretilemedi.", 502, True
+        )
+    for index, question in enumerate(analysis.discovery_questions):
+        if question.target_field in used_fields or (
+            question.type != "short_text" and len(set(question.options)) < 2
+        ):
+            from app.errors import AppError
+
+            raise AppError("AI_INVALID_OUTPUT", "Proje keşif soruları tutarsız.", 502, True)
+        identifier = f"project-detail-{index}"
+        questions.append(DiscoveryQuestion(id=identifier, question_id=identifier, **question.model_dump()))
+        used_fields.add(question.target_field)
     project = Project(
         user_id=user_id,
         title=analysis.title,

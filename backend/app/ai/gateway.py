@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+from time import monotonic
 
 import httpx
 from google import genai
@@ -9,6 +10,7 @@ from google.genai import types as gemini_types
 from openai import APIError, APITimeoutError, AsyncOpenAI, AuthenticationError, OpenAIError, RateLimitError
 from pydantic import ValidationError
 
+from app.ai.gemini_schema import generation_schema
 from app.errors import AppError
 
 logger = logging.getLogger(__name__)
@@ -51,24 +53,37 @@ class AIGateway:
             return response_model.model_validate(fixture(operation, payload))
         model = (
             self.settings.llm_model_strong
-            if operation in {"roadmap", "submap"}
+            if operation in {"roadmap", "submap", "adaptive_roadmap"}
             else self.settings.llm_model_fast
         )
+        if operation == "project_analysis" and self.settings.llm_model_project_analysis:
+            model = self.settings.llm_model_project_analysis
         if self.settings.llm_provider not in {"openai", "gemini"}:
             raise AppError("LLM_PROVIDER_UNSUPPORTED", "Gemini veya OpenAI sağlayıcısını seçin.", 503)
         if not (self.client or self.gemini_client) or not model:
             raise AppError("AI_NOT_CONFIGURED", "LLM_API_KEY ve model ayarlarını yapılandırın.", 503)
+        max_tokens = (
+            self.settings.llm_max_output_tokens_strong
+            if operation in {"roadmap", "submap", "adaptive_roadmap"}
+            else self.settings.llm_max_output_tokens_fast
+        )
+        timeout_seconds = self.settings.llm_timeout_seconds
+        if operation == "project_analysis":
+            timeout_seconds = min(timeout_seconds, self.settings.llm_project_analysis_timeout_seconds)
         for attempt in range(self.settings.llm_retries + 1):
+            started = monotonic()
             try:
-                async with asyncio.timeout(self.settings.llm_timeout_seconds):
+                async with asyncio.timeout(timeout_seconds):
                     if self.gemini_client:
                         result = await self.gemini_client.aio.models.generate_content(
                             model=model,
                             contents=json.dumps(payload, ensure_ascii=False),
                             config=gemini_types.GenerateContentConfig(
+                                max_output_tokens=max_tokens,
+                                thinking_config=gemini_types.ThinkingConfig(thinking_level="low"),
                                 system_instruction=system_prompt,
                                 response_mime_type="application/json",
-                                response_json_schema=response_model.model_json_schema(by_alias=True),
+                                response_json_schema=generation_schema(response_model),
                             ),
                         )
                         logger.info(
@@ -82,6 +97,7 @@ class AIGateway:
                     result = await self.client.responses.parse(
                         model=model,
                         store=False,
+                        max_output_tokens=max_tokens,
                         input=[
                             {"role": "system", "content": system_prompt},
                             {"role": "user", "content": json.dumps(payload, ensure_ascii=False)},
@@ -99,6 +115,14 @@ class AIGateway:
                     "AI_AUTH_FAILED", "AI sağlayıcısı kimlik doğrulamasını reddetti.", 502
                 ) from None
             except (APITimeoutError, TimeoutError, httpx.TimeoutException):
+                logger.warning(
+                    "ai_provider=%s ai_operation=%s model=%s elapsed_seconds=%.2f failure=timeout attempt=%d",
+                    self.settings.llm_provider,
+                    operation,
+                    model,
+                    monotonic() - started,
+                    attempt + 1,
+                )
                 if attempt == self.settings.llm_retries:
                     raise AppError("AI_TIMEOUT", "AI isteği zaman aşımına uğradı.", 504, True) from None
             except (ValidationError, ValueError):
@@ -109,6 +133,27 @@ class AIGateway:
                     "AI_RATE_LIMITED", "AI sağlayıcısı kullanım sınırına ulaştı.", 503, True
                 ) from None
             except gemini_errors.APIError as exc:
+                logger.warning(
+                    "ai_provider=gemini ai_operation=%s model=%s elapsed_seconds=%.2f provider_status=%s",
+                    operation,
+                    model,
+                    monotonic() - started,
+                    exc.code,
+                )
+                if exc.code == 503:
+                    raise AppError(
+                        "AI_SERVICE_UNAVAILABLE",
+                        "Gemini servisi şu anda geçici olarak kullanılamıyor (503). Bir süre sonra tekrar deneyin.",
+                        503,
+                        True,
+                    ) from None
+                if exc.code in {408, 504}:
+                    raise AppError(
+                        "AI_TIMEOUT",
+                        "AI sağlayıcısı zamanında yanıt vermedi. Tekrar deneyebilirsiniz.",
+                        504,
+                        True,
+                    ) from None
                 if exc.code in {401, 403}:
                     raise AppError(
                         "AI_AUTH_FAILED", "Gemini API anahtarı veya erişim yetkisi geçersiz.", 502
@@ -118,6 +163,12 @@ class AIGateway:
                 if exc.code == 404:
                     raise AppError(
                         "AI_MODEL_NOT_FOUND", "Gemini model adı bulunamadı veya erişime açık değil.", 502
+                    ) from None
+                if exc.code == 400:
+                    raise AppError(
+                        "AI_REQUEST_INVALID",
+                        "Gemini istek biçimini reddetti (400). Sunucu yapılandırması kontrol edilmeli.",
+                        502,
                     ) from None
                 raise AppError("AI_PROVIDER_ERROR", "Gemini isteği tamamlayamadı.", 502, True) from None
             except httpx.TransportError:

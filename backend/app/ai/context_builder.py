@@ -45,12 +45,15 @@ async def build_context(db, user_id, project=None, roadmap=None, node=None):
         context["node"] = {
             "id": node.id,
             "title": node.title,
+            "summary": node.summary,
             "skills": node.skills,
             "status": node.status,
             "type": node.type,
             "content": node.content,
         }
-        target = node.remediation_for_node_id or node.id
+        target = (
+            roadmap.target_node_id if roadmap.kind == "adaptive" else node.remediation_for_node_id or node.id
+        )
         attempt = await db.scalar(
             select(AssessmentAttempt)
             .join(Assessment)
@@ -64,8 +67,8 @@ async def build_context(db, user_id, project=None, roadmap=None, node=None):
                 "passed": attempt.passed,
                 "weakSkills": attempt.weak_skills,
             }
-        if node.remediation_for_node_id:
-            original = await db.get(RoadmapNode, node.remediation_for_node_id)
+        if node.remediation_for_node_id or roadmap.kind == "adaptive":
+            original = await db.get(RoadmapNode, roadmap.target_node_id or node.remediation_for_node_id)
             context["remediationReason"] = {
                 "originalNodeId": original.id,
                 "originalTitle": original.title,

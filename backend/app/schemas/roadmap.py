@@ -14,6 +14,7 @@ class PracticalTask(Schema):
 
 
 class NodeContent(Schema):
+    lesson: str = Field(min_length=100, max_length=10000)
     why_needed: str
     learning_objectives: list[str] = Field(min_length=1)
     subtopics: list[str]
@@ -38,8 +39,16 @@ class EdgeDraft(Schema):
 class RoadmapDraft(Schema):
     title: str
     description: str
-    nodes: list[NodeDraft] = Field(min_length=2, max_length=12)
+    nodes: list[NodeDraft] = Field(min_length=2, max_length=24)
     edges: list[EdgeDraft] = Field(max_length=80)
+
+
+class RootRoadmapDraft(RoadmapDraft):
+    nodes: list[NodeDraft] = Field(min_length=12, max_length=24)
+
+
+class AdaptiveRoadmapDraft(RoadmapDraft):
+    nodes: list[NodeDraft] = Field(min_length=2, max_length=10)
 
 
 class ResourceView(Schema):
@@ -63,6 +72,7 @@ class NodeView(Schema):
     skills: list[str]
     estimated_hours: float
     prerequisites: list[str] = Field(default_factory=list)
+    lesson: str = ""
     why_needed: str = ""
     learning_objectives: list[str] = Field(default_factory=list)
     subtopics: list[str] = Field(default_factory=list)
@@ -70,6 +80,7 @@ class NodeView(Schema):
     resources: list[ResourceView] = Field(default_factory=list)
     assessment_id: str | None = None
     child_map_id: str | None = None
+    adaptive_map_id: str | None = None
     remediation_for_node_id: str | None = None
     task_completed: bool = False
 
@@ -88,6 +99,10 @@ class MapView(Schema):
     description: str
     parent_map_id: str | None
     parent_node_id: str | None
+    kind: Literal["root", "submap", "adaptive"] = "root"
+    trigger: str | None = None
+    target_node_id: str | None = None
+    weak_skills: list[str] = Field(default_factory=list)
     generation_status: str
     version: int
     nodes: list[NodeView]

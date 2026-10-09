@@ -109,6 +109,11 @@
           "title": "Prerequisites",
           "type": "array"
         },
+        "lesson": {
+          "default": "",
+          "title": "Lesson",
+          "type": "string"
+        },
         "whyNeeded": {
           "default": "",
           "title": "Whyneeded",
@@ -169,6 +174,18 @@
           ],
           "default": null,
           "title": "Childmapid"
+        },
+        "adaptiveMapId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Adaptivemapid"
         },
         "remediationForNodeId": {
           "anyOf": [
@@ -316,6 +333,47 @@
         }
       ],
       "title": "Parentnodeid"
+    },
+    "kind": {
+      "default": "root",
+      "enum": [
+        "root",
+        "submap",
+        "adaptive"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "trigger": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Trigger"
+    },
+    "targetNodeId": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Targetnodeid"
+    },
+    "weakSkills": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Weakskills",
+      "type": "array"
     },
     "generationStatus": {
       "title": "Generationstatus",

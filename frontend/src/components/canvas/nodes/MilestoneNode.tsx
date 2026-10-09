@@ -16,7 +16,7 @@ import {
 import { useTranslation } from 'react-i18next'
 import { type NodeData } from '@/types/canvas'
 
-export function MilestoneNode({ data, selected }: NodeProps & { data: NodeData }) {
+export function MilestoneNode({ data, selected, hideHandles = false }: NodeProps & { data: NodeData; hideHandles?: boolean }) {
   const { i18n } = useTranslation()
   const isEn = i18n.language.startsWith('en')
 
@@ -78,7 +78,7 @@ export function MilestoneNode({ data, selected }: NodeProps & { data: NodeData }
       } ${selected ? 'scale-105' : 'hover:scale-105'}`}
     >
       {/* Handles: source at TOP, target at BOTTOM for bottom-to-top route flow */}
-      <Handle
+      {!hideHandles && <><Handle
         type="target"
         position={Position.Bottom}
         className="w-2.5 h-2.5 !bg-transparent !border-0 opacity-0 pointer-events-none"
@@ -98,7 +98,7 @@ export function MilestoneNode({ data, selected }: NodeProps & { data: NodeData }
         type="source"
         position={Position.Right}
         className="w-2 h-2 !bg-transparent !border-0 opacity-0 pointer-events-none"
-      />
+      /></>}
 
       {/* 1. The Compact Circular Milestone Marker */}
       <div

@@ -12,6 +12,12 @@ class RoadmapMap(Base):
     id: Mapped[str] = mapped_column(primary_key=True, default=new_id)
     project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), index=True)
     generation_key: Mapped[str]
+    kind: Mapped[str] = mapped_column(default="root", server_default="root")
+    trigger: Mapped[str | None]
+    target_node_id: Mapped[str | None] = mapped_column(
+        ForeignKey("roadmap_nodes.id", use_alter=True, name="fk_map_target_node"), index=True
+    )
+    weak_skills: Mapped[list] = mapped_column(JsonType, default=list, server_default="[]")
     parent_map_id: Mapped[str | None] = mapped_column(ForeignKey("roadmap_maps.id"))
     parent_node_id: Mapped[str | None] = mapped_column(
         ForeignKey("roadmap_nodes.id", use_alter=True, name="fk_map_parent_node")
