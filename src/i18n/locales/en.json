@@ -10,19 +10,18 @@
     "subtitle": "Preparing your personalized development path..."
   },
   "hero": {
-    "eyebrow": "CRAFT YOUR OWN PATH",
     "titleLine1": "Start with an idea.",
     "titleLine2": "Learn by building.",
-    "description": "Describe the project you want to build. Progress with a tailored roadmap designed for hands-on learning.",
-    "inputPlaceholder": "For example: I want to build a real-time collaborative workspace with Spring Boot and React...",
+    "description": "Describe what you want to create. Progress along a custom expedition roadmap built for hands-on learning.",
+    "inputPlaceholder": "For example: I want to build a simple online store to showcase and sell homemade crafts...",
     "submitButton": "Generate Roadmap",
-    "hintText": "Detail what you want to construct and specify your preferred tech stack in a few sentences.",
+    "hintText": "Detail what you want to make in a few sentences. No technical jargon required.",
     "charCount": "characters",
     "quickSuggestionsTitle": "Inspiration Starter Ideas:",
-    "suggestion1": "E-Commerce Platform with Spring Boot & React",
-    "suggestion2": "Distributed Chat System with Go & WebSockets",
-    "suggestion3": "High-Performance CLI Tool in Rust",
-    "suggestion4": "Modern CI/CD Pipeline with Docker & GitHub Actions"
+    "suggestion1": "Online Store to Sell Products",
+    "suggestion2": "Real-time Messaging & Chat App",
+    "suggestion3": "Monthly Budget & Expense Tracker",
+    "suggestion4": "Smart Workout & Fitness Coach"
   },
   "roadmap": {
     "backButton": "New Idea",

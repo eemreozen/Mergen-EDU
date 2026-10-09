@@ -10,19 +10,18 @@
     "subtitle": "Kişiselleştirilmiş geliştirme rotan hazırlanıyor..."
   },
   "hero": {
-    "eyebrow": "KENDİ YOLUNU OLUŞTUR",
     "titleLine1": "Bir fikirle başla.",
     "titleLine2": "Bir projeyle öğren.",
     "description": "Geliştirmek istediğin projeyi anlat. Sana özel oluşturulan yol haritasıyla öğrenerek ilerle.",
-    "inputPlaceholder": "Örneğin: Spring Boot ve React ile bir e-ticaret uygulaması geliştirmek istiyorum...",
+    "inputPlaceholder": "Örneğin: Kendi kıyafetlerimi satabileceğim şık bir online mağaza açmak istiyorum...",
     "submitButton": "Yol Haritamı Oluştur",
-    "hintText": "Ne inşa etmek istediğini ve ilgilendiğin teknolojileri birkaç cümleyle yaz.",
+    "hintText": "Ne inşa etmek istediğini ve hedefini birkaç cümleyle yaz. Teknik terim bilmene gerek yok.",
     "charCount": "karakter",
     "quickSuggestionsTitle": "İlham Alabileceğin Örnek Fikirler:",
-    "suggestion1": "Spring Boot & React ile E-Ticaret Platformu",
-    "suggestion2": "Go & WebSockets ile Dağıtık Sohbet Sistemi",
-    "suggestion3": "Rust ile Yüksek Performanslı CLI Aracı",
-    "suggestion4": "Docker & GitHub Actions ile Modern CI/CD Pipeline"
+    "suggestion1": "Kendi Online Mağazamı Açıp Ürün Satmak",
+    "suggestion2": "Arkadaşlarla Canlı Sohbet ve Mesajlaşma",
+    "suggestion3": "Aylık Bütçe ve Harcama Takibi",
+    "suggestion4": "Akıllı Fitness ve Egzersiz Koçu"
   },
   "roadmap": {
     "backButton": "Yeni Fikir",
