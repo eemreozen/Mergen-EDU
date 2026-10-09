@@ -217,14 +217,15 @@ export const useRoadmapStore = create<RoadmapState>((set, get) => {
               id: 'e-python-remedial',
               source: 'ml-python',
               target: 'ml-remedial-python',
-              animated: true,
-              style: { stroke: '#F59E0B', strokeDasharray: '4 4' },
+              type: 'expedition',
+              data: { isRemedial: true },
             },
             {
               id: 'e-remedial-numpy',
               source: 'ml-remedial-python',
               target: 'ml-numpy-pandas',
-              style: { stroke: '#2A3038' },
+              type: 'expedition',
+              data: { isRemedial: true },
             },
           ]
           set({
@@ -258,14 +259,15 @@ export const useRoadmapStore = create<RoadmapState>((set, get) => {
           id: 'e-python-remedial',
           source: 'ml-python',
           target: 'ml-remedial-python',
-          animated: true,
-          style: { stroke: '#F59E0B', strokeDasharray: '4 4' },
+          type: 'expedition',
+          data: { isRemedial: true },
         },
         {
           id: 'e-remedial-numpy',
           source: 'ml-remedial-python',
           target: 'ml-numpy-pandas',
-          style: { stroke: '#2A3038' },
+          type: 'expedition',
+          data: { isRemedial: true },
         },
       ]
 

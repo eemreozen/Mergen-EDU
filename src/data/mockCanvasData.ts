@@ -1,88 +1,100 @@
 import { type Edge, type Node } from '@xyflow/react'
 import { type NodeData, type QuizData } from '@/types/canvas'
 
-// 1. Root Roadmap Nodes (Parent Project Level)
+// 1. Root Expedition Map Nodes (Bottom-to-Top Mountain Climbing Route)
 export const initialRootNodes: Node<NodeData>[] = [
+  // Basecamp: Database & Core Infrastructure (y: 720)
   {
-    id: 'root-project',
-    type: 'projectRoot',
-    position: { x: 480, y: 60 },
+    id: 'domain-db',
+    type: 'milestone',
+    position: { x: 380, y: 720 },
     data: {
-      id: 'root-project',
-      titleTr: 'AI Fitness App',
-      titleEn: 'AI Fitness App',
-      category: 'root',
-      status: 'in_progress',
-      estimatedHours: 120,
-      whyNeededTr: 'Kullanıcının fitness hedeflerine göre uyarlanabilir egzersiz ve beslenme önerisi sunan tam teşekküllü mobil ve yapay zekâ uygulaması.',
-      whyNeededEn: 'Full-stack mobile and AI application delivering personalized workout and nutrition recommendations.',
-      learningObjectivesTr: [
-        'Uçtan uca ürün mimarisini tasarlama',
-        'Mobil ön yüz, API servisleri ve ML modelini entegre etme',
-        'Kullanıcı veri gizliliği ve bulut ölçeklenebilirliği',
-      ],
-      learningObjectivesEn: [
-        'Design end-to-end product architecture',
-        'Integrate mobile client, REST APIs, and ML inference model',
-        'Ensure user data privacy and cloud scalability',
-      ],
-      practicalTaskTr: 'Projeyi tamamlayarak çalışan mobil ve backend sistemini canlıya alın.',
-      practicalTaskEn: 'Complete the project and deploy live mobile and backend services.',
-    },
-  },
-  {
-    id: 'domain-mobile',
-    type: 'domain',
-    position: { x: 80, y: 280 },
-    data: {
-      id: 'domain-mobile',
-      titleTr: 'Mobil Geliştirme (React Native)',
-      titleEn: 'Mobile Development (React Native)',
+      id: 'domain-db',
+      titleTr: 'Veritabanı & Veri Depolama',
+      titleEn: 'Database & Storage Layer',
       category: 'domain',
       status: 'available',
+      stepNumber: '01',
+      domain: 'Database',
+      milestoneScale: 'md',
+      labelPosition: 'right',
+      estimatedHours: 15,
+      whyNeededTr: 'Egzersiz katalogları ve kullanıcı antrenman geçmişinin PostgreSQL ve Redis ile saklanması.',
+      whyNeededEn: 'Persisting workout catalogs and telemetry logs with PostgreSQL and fast Redis caching.',
+      learningObjectivesTr: ['PostgreSQL Tablo Şeması', 'İlişkisel İndeksleme', 'Redis Önbellek Yönetimi'],
+      learningObjectivesEn: ['PostgreSQL Schema Design', 'Relational Indexing', 'Redis Cache Invalidation'],
+      practicalTaskTr: 'Egzersiz şeması tablolarını ve kullanıcı profili indekslerini oluşturun.',
+      practicalTaskEn: 'Author workout tables and user profile indexing strategy.',
+    },
+  },
+
+  // Branch Left: Mobile Development (y: 530, x: 190)
+  {
+    id: 'domain-mobile',
+    type: 'milestone',
+    position: { x: 190, y: 530 },
+    data: {
+      id: 'domain-mobile',
+      titleTr: 'Mobil Arayüz (React Native)',
+      titleEn: 'Mobile App (React Native)',
+      category: 'domain',
+      status: 'available',
+      stepNumber: '02',
       domain: 'Mobile',
+      milestoneScale: 'md',
+      labelPosition: 'left',
       estimatedHours: 35,
-      whyNeededTr: 'Kullanıcıların antrenman takibi yapacağı modern, akıcı ve duyarlı iOS/Android mobil kullanıcı deneyimi.',
-      whyNeededEn: 'Fluid and responsive cross-platform iOS/Android UI for interactive workout tracking.',
-      learningObjectivesTr: ['React Native & Expo', 'Navigation & State', 'Offline Caching'],
-      learningObjectivesEn: ['React Native & Expo', 'Navigation & State', 'Offline Caching'],
-      practicalTaskTr: 'Kullanıcı profili ve günlük egzersiz kartları ekranlarını tasarlayın.',
+      whyNeededTr: 'Kullanıcıların antrenman takibi yapacağı modern, akıcı ve duyarlı iOS/Android mobil deneyimi.',
+      whyNeededEn: 'Fluid cross-platform iOS/Android UI for interactive workout tracking and telemetry.',
+      learningObjectivesTr: ['React Native & Expo', 'Navigation & Yerel Durum', 'Çevrimdışı Önbellekleme'],
+      learningObjectivesEn: ['React Native & Expo', 'Navigation & Local State', 'Offline Caching'],
+      practicalTaskTr: 'Kullanıcı profili ve günlük egzersiz kartları ekranlarını kodlayın.',
       practicalTaskEn: 'Build user profile and daily workout cards screens.',
     },
   },
+
+  // Branch Right: Backend & Core APIs (y: 530, x: 570)
   {
     id: 'domain-backend',
-    type: 'domain',
-    position: { x: 480, y: 280 },
+    type: 'milestone',
+    position: { x: 570, y: 530 },
     data: {
       id: 'domain-backend',
       titleTr: 'Backend ve API Mimarisi',
       titleEn: 'Backend & API Architecture',
       category: 'domain',
       status: 'in_progress',
+      stepNumber: '03',
       domain: 'Backend',
+      milestoneScale: 'md',
+      labelPosition: 'right',
       estimatedHours: 30,
-      whyNeededTr: 'Kullanıcı kimlik doğrulaması, egzersiz kayıtları ve yapay zekâ çıkarım modellerine güvenli erişim sağlayan servis.',
-      whyNeededEn: 'Secure services providing user authentication, workout logs, and ML model inference access.',
-      learningObjectivesTr: ['RESTful API', 'JWT Authentication', 'Async Request Handling'],
-      learningObjectivesEn: ['RESTful API', 'JWT Authentication', 'Async Request Handling'],
+      whyNeededTr: 'Kullanıcı yetkilendirmesi, egzersiz kayıtları ve ML model çıkarımlarına güvenli erişim katmanı.',
+      whyNeededEn: 'Secure services providing auth, workout logs, and ML model inference access.',
+      learningObjectivesTr: ['RESTful API Tasarımı', 'JWT Kimlik Doğrulama', 'Asenkron İstek Yönetimi'],
+      learningObjectivesEn: ['RESTful API Design', 'JWT Authentication', 'Async Request Handling'],
       practicalTaskTr: 'Kullanıcı oturum ve egzersiz kaydetme API uç noktalarını kodlayın.',
       practicalTaskEn: 'Develop user auth and workout logging endpoints.',
     },
   },
+
+  // Middle Convergence: Machine Learning Engine (y: 340, x: 380) [Contains Nested Submap]
   {
     id: 'domain-ml',
-    type: 'domain',
-    position: { x: 880, y: 280 },
+    type: 'milestone',
+    position: { x: 380, y: 340 },
     data: {
       id: 'domain-ml',
       titleTr: 'Machine Learning (Öneri Motoru)',
-      titleEn: 'Machine Learning (Recommendation Engine)',
+      titleEn: 'Machine Learning (Engine)',
       category: 'domain',
       status: 'available',
+      stepNumber: '04',
       domain: 'AI/ML',
       hasSubmap: true,
       submapId: 'ml-submap',
+      milestoneScale: 'lg',
+      labelPosition: 'right',
       estimatedHours: 40,
       whyNeededTr: 'Kullanıcının geçmiş antrenmanları, nabız verileri ve hedeflerine göre en uygun egzersizleri tahmin eden akıllı model.',
       whyNeededEn: 'Intelligent engine predicting tailored exercises based on user logs and physiological fitness metrics.',
@@ -100,74 +112,98 @@ export const initialRootNodes: Node<NodeData>[] = [
       practicalTaskEn: 'Open the submap to construct the recommendation model step-by-step.',
     },
   },
-  {
-    id: 'domain-db',
-    type: 'domain',
-    position: { x: 280, y: 500 },
-    data: {
-      id: 'domain-db',
-      titleTr: 'Veritabanı ve Önbellek',
-      titleEn: 'Database & Caching Layer',
-      category: 'domain',
-      status: 'locked',
-      domain: 'Database',
-      estimatedHours: 15,
-      whyNeededTr: 'Egzersiz katalogları ve kullanıcı ilerleme geçmişinin ilişkisel saklanması ve hızlı erişim.',
-      whyNeededEn: 'Relational storage and high-speed memory caching for workout catalogs and user progress history.',
-      learningObjectivesTr: ['PostgreSQL Schema', 'Redis Caching', 'Query Optimization'],
-      learningObjectivesEn: ['PostgreSQL Schema', 'Redis Caching', 'Query Optimization'],
-      practicalTaskTr: 'Egzersiz şeması ve indekslerini oluşturun.',
-      practicalTaskEn: 'Author workout tables and indexing strategy.',
-    },
-  },
+
+  // High Elevation: Testing & Cloud Deployment (y: 180, x: 380)
   {
     id: 'domain-deploy',
-    type: 'domain',
-    position: { x: 680, y: 500 },
+    type: 'milestone',
+    position: { x: 380, y: 180 },
     data: {
       id: 'domain-deploy',
       titleTr: 'Test, CI/CD ve Yayınlama',
-      titleEn: 'Testing, CI/CD & Deployment',
+      titleEn: 'Testing, CI/CD & Cloud',
       category: 'domain',
       status: 'locked',
+      stepNumber: '05',
       domain: 'DevOps',
+      milestoneScale: 'md',
+      labelPosition: 'right',
       estimatedHours: 15,
       whyNeededTr: 'Sistemin kararlı çalışması için otomatik testler ve bulut ortamında container dağıtımı.',
       whyNeededEn: 'Automated test suite and cloud containerization for production reliability.',
-      learningObjectivesTr: ['Docker Containers', 'GitHub Actions CI', 'Cloud Deployment'],
+      learningObjectivesTr: ['Docker Konteynerleri', 'GitHub Actions CI', 'Bulut Dağıtımı'],
       learningObjectivesEn: ['Docker Containers', 'GitHub Actions CI', 'Cloud Deployment'],
       practicalTaskTr: 'Docker compose yapılandırması ve CI test pipeline hazırlayın.',
       practicalTaskEn: 'Create Docker compose environment and CI pipeline.',
     },
   },
+
+  // The Summit: AI Fitness App (y: 40, x: 380)
+  {
+    id: 'root-project',
+    type: 'milestone',
+    position: { x: 380, y: 40 },
+    data: {
+      id: 'root-project',
+      titleTr: 'AI Fitness App (MVP Lansmanı)',
+      titleEn: 'AI Fitness App (Summit Goal)',
+      category: 'root',
+      status: 'in_progress',
+      milestoneScale: 'lg',
+      labelPosition: 'bottom',
+      estimatedHours: 120,
+      whyNeededTr: 'Kullanıcının fitness hedeflerine göre uyarlanabilir egzersiz ve beslenme önerisi sunan tam teşekküllü mobil ve yapay zekâ uygulaması.',
+      whyNeededEn: 'Full-stack mobile and AI application delivering personalized workout and nutrition recommendations.',
+      learningObjectivesTr: [
+        'Uçtan uca ürün mimarisini tamamlama',
+        'Mobil ön yüz, API servisleri ve ML modelini birleştirme',
+        'Canlı kullanıcı testi ve lansman',
+      ],
+      learningObjectivesEn: [
+        'Complete end-to-end product architecture',
+        'Integrate mobile client, REST APIs, and ML inference model',
+        'Live pilot testing and launch',
+      ],
+      practicalTaskTr: 'Tüm aşamaları birleştirerek çalışan uygulamayı yayına alın.',
+      practicalTaskEn: 'Assemble all components into a running production release.',
+    },
+  },
 ]
 
-// Root Edges
+// Root Expedition Route Edges (Curved Bezier Paths Climbing Upward)
 export const initialRootEdges: Edge[] = [
-  { id: 'e-root-mobile', source: 'root-project', target: 'domain-mobile', animated: true, type: 'smoothstep' },
-  { id: 'e-root-backend', source: 'root-project', target: 'domain-backend', animated: true, type: 'smoothstep' },
-  { id: 'e-root-ml', source: 'root-project', target: 'domain-ml', animated: true, type: 'smoothstep' },
-  { id: 'e-mobile-backend', source: 'domain-mobile', target: 'domain-backend', type: 'smoothstep' },
-  { id: 'e-backend-db', source: 'domain-backend', target: 'domain-db', type: 'smoothstep' },
-  { id: 'e-backend-ml', source: 'domain-backend', target: 'domain-ml', type: 'smoothstep' },
-  { id: 'e-backend-deploy', source: 'domain-backend', target: 'domain-deploy', type: 'smoothstep' },
-  { id: 'e-ml-deploy', source: 'domain-ml', target: 'domain-deploy', type: 'smoothstep' },
+  // From Basecamp (DB) to Mobile and Backend
+  { id: 'e-db-mobile', source: 'domain-db', target: 'domain-mobile', type: 'expedition', data: { isCompleted: true } },
+  { id: 'e-db-backend', source: 'domain-db', target: 'domain-backend', type: 'expedition', data: { isActive: true } },
+
+  // From Mobile and Backend to ML Convergence
+  { id: 'e-mobile-ml', source: 'domain-mobile', target: 'domain-ml', type: 'expedition' },
+  { id: 'e-backend-ml', source: 'domain-backend', target: 'domain-ml', type: 'expedition', data: { isActive: true } },
+
+  // From ML to Deployment
+  { id: 'e-ml-deploy', source: 'domain-ml', target: 'domain-deploy', type: 'expedition' },
+
+  // From Deployment to Summit Goal
+  { id: 'e-deploy-summit', source: 'domain-deploy', target: 'root-project', type: 'expedition' },
 ]
 
-// 2. Machine Learning Nested Submap Nodes
+// 2. Machine Learning Expedition Submap (Bottom-to-Top Progression)
 export const initialMlSubmapNodes: Node<NodeData>[] = [
-  // Branch A: Data Engineering Path
+  // Basecamp: Python Fundamentals (y: 840, x: 360)
   {
     id: 'ml-python',
-    type: 'learning',
-    position: { x: 80, y: 120 },
+    type: 'milestone',
+    position: { x: 360, y: 840 },
     data: {
       id: 'ml-python',
       titleTr: 'Python Temelleri',
       titleEn: 'Python Fundamentals',
       category: 'learning',
       status: 'available',
+      stepNumber: '01',
       domain: 'AI/ML',
+      milestoneScale: 'md',
+      labelPosition: 'right',
       estimatedHours: 8,
       quizId: 'quiz-python',
       whyNeededTr: 'Veri analizi, modelleme ve API entegrasyonlarının temel programlama dili.',
@@ -192,20 +228,25 @@ export const initialMlSubmapNodes: Node<NodeData>[] = [
       ],
     },
   },
+
+  // Branch Left (Data Route): NumPy & Pandas (y: 660, x: 190)
   {
     id: 'ml-numpy-pandas',
-    type: 'learning',
-    position: { x: 440, y: 120 },
+    type: 'milestone',
+    position: { x: 190, y: 660 },
     data: {
       id: 'ml-numpy-pandas',
       titleTr: 'NumPy ve Pandas',
       titleEn: 'NumPy & Pandas',
       category: 'learning',
       status: 'locked',
+      stepNumber: '02',
       domain: 'AI/ML',
+      milestoneScale: 'sm',
+      labelPosition: 'left',
       estimatedHours: 6,
-      whyNeededTr: 'Egzersiz tablolarını, kullanıcı ağırlıklarını ve set tekrarlarını matris formatında hızlıca işlemek için.',
-      whyNeededEn: 'High-speed matrix operations and dataframe filtering for user fitness records and workout tables.',
+      whyNeededTr: 'Egzersiz tablolarını ve kullanıcı verilerini matris formatında hızlıca işlemek için.',
+      whyNeededEn: 'High-speed matrix operations and dataframe filtering for user fitness records.',
       prerequisitesTr: ['Python Temelleri'],
       prerequisitesEn: ['Python Fundamentals'],
       learningObjectivesTr: ['NumPy Dizileri ve Vektörizasyon', 'Pandas DataFrame İşlemleri', 'Eksik Veri Yönetimi'],
@@ -214,43 +255,51 @@ export const initialMlSubmapNodes: Node<NodeData>[] = [
       practicalTaskEn: 'Load a sample workout CSV dataset and compute average duration grouped by exercise type.',
     },
   },
+
+  // Branch Left (Data Route): Data Prep & Feature Engineering (y: 500, x: 190)
   {
     id: 'ml-data-prep',
-    type: 'learning',
-    position: { x: 800, y: 120 },
+    type: 'milestone',
+    position: { x: 190, y: 500 },
     data: {
       id: 'ml-data-prep',
       titleTr: 'Veri Hazırlama & Özellik Çıkarımı',
       titleEn: 'Data Prep & Feature Engineering',
       category: 'learning',
       status: 'locked',
+      stepNumber: '03',
       domain: 'AI/ML',
+      milestoneScale: 'sm',
+      labelPosition: 'left',
       estimatedHours: 8,
-      whyNeededTr: 'Ham kullanıcı verilerini (yaş, boy, haftalık antrenman sıklığı) modelin anlayabileceği sayısal özelliklere dönüştürmek.',
-      whyNeededEn: 'Transforming raw telemetry (age, BMI, frequency) into normalized numerical features for training.',
+      whyNeededTr: 'Ham kullanıcı verilerini modelin anlayabileceği normalize edilmiş özelliklere dönüştürmek.',
+      whyNeededEn: 'Transforming raw telemetry into normalized numerical features for training.',
       prerequisitesTr: ['NumPy ve Pandas'],
       prerequisitesEn: ['NumPy & Pandas'],
-      learningObjectivesTr: ['Normalizasyon ve Min-Max Scaling', 'One-Hot Encoding', 'Train/Test Veri Ayrımı'],
+      learningObjectivesTr: ['Min-Max Normalizasyon', 'Kategorik Veri Kodlama (One-Hot)', 'Eğitim/Test Veri Ayrımı'],
       learningObjectivesEn: ['Min-Max Feature Scaling', 'One-Hot Categorical Encoding', 'Train/Validation Splitting'],
       practicalTaskTr: 'Fitness veri setini %80 eğitim ve %20 test olacak şekilde ölçekleyip ayırın.',
       practicalTaskEn: 'Scale fitness features and partition into 80% train and 20% test splits.',
     },
   },
 
-  // Branch B: Machine Learning Algorithms Path
+  // Branch Right (Algorithm Route): Machine Learning Foundations (y: 660, x: 530)
   {
     id: 'ml-basics',
-    type: 'learning',
-    position: { x: 80, y: 380 },
+    type: 'milestone',
+    position: { x: 530, y: 660 },
     data: {
       id: 'ml-basics',
-      titleTr: 'Machine Learning Temelleri',
-      titleEn: 'Machine Learning Foundations',
+      titleTr: 'ML Temel Kavramları',
+      titleEn: 'ML Foundations',
       category: 'learning',
       status: 'available',
+      stepNumber: '04',
       domain: 'AI/ML',
+      milestoneScale: 'sm',
+      labelPosition: 'right',
       estimatedHours: 6,
-      whyNeededTr: 'Denetimli ve denetimsiz öğrenme kavramlarını, model ağırlıklarını ve tahmin mantığını kavramak.',
+      whyNeededTr: 'Denetimli ve denetimsiz öğrenme kavramlarını, kayıp fonksiyonlarını ve tahmin mantığını kavramak.',
       whyNeededEn: 'Understanding supervised vs unsupervised paradigm, loss functions, and inference logic.',
       prerequisitesTr: ['Temel matematiksel kavramlar'],
       prerequisitesEn: ['Basic mathematical foundations'],
@@ -260,68 +309,81 @@ export const initialMlSubmapNodes: Node<NodeData>[] = [
       practicalTaskEn: 'Predict caloric burn using simple linear regression principles.',
     },
   },
+
+  // Branch Right (Algorithm Route): Supervised Learning (y: 500, x: 530)
   {
     id: 'ml-supervised',
-    type: 'learning',
-    position: { x: 440, y: 380 },
+    type: 'milestone',
+    position: { x: 530, y: 500 },
     data: {
       id: 'ml-supervised',
       titleTr: 'Supervised Learning & Sınıflandırma',
-      titleEn: 'Supervised Learning & Classification',
+      titleEn: 'Supervised Learning',
       category: 'learning',
       status: 'locked',
+      stepNumber: '05',
       domain: 'AI/ML',
+      milestoneScale: 'sm',
+      labelPosition: 'right',
       estimatedHours: 8,
-      whyNeededTr: 'Kullanıcının fitness seviyesine (Başlangıç, Orta, İleri) göre doğru egzersiz kategorisini sınıflandırmak.',
-      whyNeededEn: 'Classifying appropriate workout difficulty tier (Beginner, Intermediate, Advanced) based on user state.',
-      prerequisitesTr: ['Machine Learning Temelleri'],
-      prerequisitesEn: ['Machine Learning Foundations'],
+      whyNeededTr: 'Kullanıcının fitness seviyesine göre doğru egzersiz kategorisini sınıflandırmak.',
+      whyNeededEn: 'Classifying appropriate workout difficulty tier based on user state.',
+      prerequisitesTr: ['ML Temel Kavramları'],
+      prerequisitesEn: ['ML Foundations'],
       learningObjectivesTr: ['Lojistik Regresyon & Karar Ağaçları', 'K-Nearest Neighbors (KNN)', 'Scikit-Learn Kütüphanesi'],
       learningObjectivesEn: ['Logistic Regression & Decision Trees', 'K-Nearest Neighbors (KNN)', 'Scikit-Learn Library'],
       practicalTaskTr: 'Scikit-Learn ile kullanıcının seviyesini tahmin eden bir sınıflandırıcı eğitin.',
       practicalTaskEn: 'Train a Scikit-Learn classifier to categorize user fitness difficulty tier.',
     },
   },
+
+  // Ridge Convergence: Model Training & Tuning (y: 340, x: 360)
   {
     id: 'ml-training',
-    type: 'learning',
-    position: { x: 800, y: 380 },
+    type: 'milestone',
+    position: { x: 360, y: 340 },
     data: {
       id: 'ml-training',
-      titleTr: 'Model Eğitimi ve Hiperparametreler',
-      titleEn: 'Model Training & Hyperparameters',
+      titleTr: 'Model Eğitimi ve Optimizasyon',
+      titleEn: 'Model Training & Tuning',
       category: 'learning',
       status: 'locked',
+      stepNumber: '06',
       domain: 'AI/ML',
+      milestoneScale: 'md',
+      labelPosition: 'right',
       estimatedHours: 6,
-      whyNeededTr: 'Modelin en yüksek doğrulukla antrenman önermesini sağlamak için parametre optimizasyonu.',
+      whyNeededTr: 'Modelin en yüksek doğrulukla antrenman önermesini sağlamak için hiperparametre optimizasyonu.',
       whyNeededEn: 'Tuning parameters to maximize precision when suggesting exercise routines.',
-      prerequisitesTr: ['Supervised Learning & Sınıflandırma'],
-      prerequisitesEn: ['Supervised Learning & Classification'],
-      learningObjectivesTr: ['K-Fold Çapraz Doğrulama (Cross Validation)', 'GridSearchCV ile Ayarlama', 'Model Kaydetme (Pickle/Joblib)'],
+      prerequisitesTr: ['Veri Hazırlama & Özellik Çıkarımı', 'Supervised Learning & Sınıflandırma'],
+      prerequisitesEn: ['Data Prep & Feature Engineering', 'Supervised Learning'],
+      learningObjectivesTr: ['K-Fold Çapraz Doğrulama (Cross Validation)', 'GridSearchCV ile Ayarlama', 'Model Kaydetme (Joblib)'],
       learningObjectivesEn: ['K-Fold Cross Validation', 'GridSearchCV Hyperparameter Tuning', 'Model Serialization (Joblib)'],
       practicalTaskTr: 'En iyi F1-skorunu veren parametreleri cross-validation ile belirleyin.',
       practicalTaskEn: 'Determine best hyperparameter combination using cross-validation.',
     },
   },
 
-  // Convergence: Evaluation & Synthesis
+  // Near Summit: Evaluation & Validation (y: 190, x: 360)
   {
     id: 'ml-eval',
-    type: 'learning',
-    position: { x: 1140, y: 250 },
+    type: 'milestone',
+    position: { x: 360, y: 190 },
     data: {
       id: 'ml-eval',
       titleTr: 'Model Değerlendirme & Metrikler',
-      titleEn: 'Model Evaluation & Metrics',
+      titleEn: 'Evaluation & Metrics',
       category: 'learning',
       status: 'locked',
+      stepNumber: '07',
       domain: 'AI/ML',
+      milestoneScale: 'sm',
+      labelPosition: 'right',
       estimatedHours: 6,
-      whyNeededTr: 'Öneri motorunun kullanıcıyı zorlamayacak veya çok kolay gelmeyecek dengeli tavsiyeler ürettiğini kanıtlamak.',
+      whyNeededTr: 'Öneri motorunun dengeli ve fizyolojik olarak güvenli tavsiyeler ürettiğini kanıtlamak.',
       whyNeededEn: 'Validating that recommendations remain physiologically balanced and accurate.',
-      prerequisitesTr: ['Veri Hazırlama & Özellik Çıkarımı', 'Model Eğitimi ve Hiperparametreler'],
-      prerequisitesEn: ['Data Prep & Feature Engineering', 'Model Training & Hyperparameters'],
+      prerequisitesTr: ['Model Eğitimi ve Optimizasyon'],
+      prerequisitesEn: ['Model Training & Tuning'],
       learningObjectivesTr: ['Confusion Matrix & Doğruluk', 'Precision, Recall, F1 Skoru', 'A/B Test Temelleri'],
       learningObjectivesEn: ['Confusion Matrix & Accuracy', 'Precision, Recall, F1 Score', 'Offline Evaluation'],
       practicalTaskTr: 'Modelin test veri seti üzerindeki doğruluk ve karmaşıklık matrisini çıkarın.',
@@ -329,23 +391,26 @@ export const initialMlSubmapNodes: Node<NodeData>[] = [
     },
   },
 
-  // Final Practical Task Node
+  // The ML Expedition Summit Goal (y: 40, x: 360)
   {
     id: 'ml-final-task',
-    type: 'task',
-    position: { x: 1480, y: 250 },
+    type: 'milestone',
+    position: { x: 360, y: 40 },
     data: {
       id: 'ml-final-task',
-      titleTr: 'Fitness Öneri Modeli (Final)',
-      titleEn: 'Fitness Recommendation Engine (Final)',
+      titleTr: 'Fitness Öneri Modeli (Final Servis)',
+      titleEn: 'Fitness Recommendation Engine',
       category: 'task',
       status: 'locked',
+      stepNumber: '08',
       domain: 'AI/ML',
+      milestoneScale: 'lg',
+      labelPosition: 'bottom',
       estimatedHours: 12,
-      whyNeededTr: 'Tüm aşamaları birleştirerek mobil uygulamaya canlı öneri sunan çalışan Python servisini ayağa kaldırmak.',
+      whyNeededTr: 'Tüm aşamaları birleştirerek mobil uygulamaya canlı öneri sunan çalışan Python FastAPI servisi.',
       whyNeededEn: 'Assembling all stages into a deployable inference microservice for the mobile app.',
       prerequisitesTr: ['Model Değerlendirme & Metrikler'],
-      prerequisitesEn: ['Model Evaluation & Metrics'],
+      prerequisitesEn: ['Evaluation & Metrics'],
       learningObjectivesTr: ['FastAPI ile Model Sunumu', 'Girdi Doğrulama ve Tahmin Döndürme', 'Docker İmajı Oluşturma'],
       learningObjectivesEn: ['FastAPI Model Serving', 'Payload Validation & Inference Response', 'Docker Packaging'],
       practicalTaskTr: 'Eğitilmiş modeli bir FastAPI endpoint arkasında sunarak POST /recommend isteğini yanıtlayın.',
@@ -354,29 +419,34 @@ export const initialMlSubmapNodes: Node<NodeData>[] = [
   },
 ]
 
-// Machine Learning Submap Edges
+// Machine Learning Expedition Route Edges (Curved Bezier Paths Climbing Upward)
 export const initialMlSubmapEdges: Edge[] = [
-  // Branch A
-  { id: 'e-ml-python-numpy', source: 'ml-python', target: 'ml-numpy-pandas', animated: true, type: 'smoothstep' },
-  { id: 'e-ml-numpy-data', source: 'ml-numpy-pandas', target: 'ml-data-prep', type: 'smoothstep' },
-  
-  // Branch B
-  { id: 'e-ml-basics-sup', source: 'ml-basics', target: 'ml-supervised', animated: true, type: 'smoothstep' },
-  { id: 'e-ml-sup-train', source: 'ml-supervised', target: 'ml-training', type: 'smoothstep' },
+  // From Basecamp (Python) branching out to NumPy and ML Basics
+  { id: 'e-ml-python-numpy', source: 'ml-python', target: 'ml-numpy-pandas', type: 'expedition' },
+  { id: 'e-ml-python-basics', source: 'ml-python', target: 'ml-basics', type: 'expedition', data: { isActive: true } },
 
-  // Convergence to Evaluation
-  { id: 'e-ml-data-eval', source: 'ml-data-prep', target: 'ml-eval', type: 'smoothstep' },
-  { id: 'e-ml-train-eval', source: 'ml-training', target: 'ml-eval', type: 'smoothstep' },
+  // Left Data Route ascent
+  { id: 'e-ml-numpy-dataprep', source: 'ml-numpy-pandas', target: 'ml-data-prep', type: 'expedition' },
 
-  // Final Task
-  { id: 'e-ml-eval-final', source: 'ml-eval', target: 'ml-final-task', type: 'smoothstep' },
+  // Right Algorithm Route ascent
+  { id: 'e-ml-basics-supervised', source: 'ml-basics', target: 'ml-supervised', type: 'expedition' },
+
+  // Both branches converge into Model Training
+  { id: 'e-ml-data-training', source: 'ml-data-prep', target: 'ml-training', type: 'expedition' },
+  { id: 'e-ml-supervised-training', source: 'ml-supervised', target: 'ml-training', type: 'expedition' },
+
+  // From Training to Evaluation
+  { id: 'e-ml-training-eval', source: 'ml-training', target: 'ml-eval', type: 'expedition' },
+
+  // From Evaluation to Summit Goal
+  { id: 'e-ml-eval-final', source: 'ml-eval', target: 'ml-final-task', type: 'expedition' },
 ]
 
-// 3. Adaptive Remedial Node definition (inserted upon failure or advisor suggestion)
+// 3. Adaptive Remedial Detour Node (Placed near Python along winding route at y: 740, x: 210)
 export const remedialPythonNode: Node<NodeData> = {
   id: 'ml-remedial-python',
-  type: 'learning',
-  position: { x: 260, y: 240 },
+  type: 'milestone',
+  position: { x: 210, y: 740 },
   data: {
     id: 'ml-remedial-python',
     titleTr: 'Python Fonksiyonları — Ek Pratik',
@@ -384,9 +454,12 @@ export const remedialPythonNode: Node<NodeData> = {
     category: 'learning',
     status: 'in_progress',
     isRemedial: true,
+    stepNumber: '✦',
     domain: 'AI/ML',
+    milestoneScale: 'sm',
+    labelPosition: 'left',
     estimatedHours: 4,
-    whyNeededTr: 'Bilgi değerlendirmesinde eksik görülen fonksiyon yapıları ve parametre aktarımı pekiştirilerek NumPy aşamasına güvenle geçiş sağlanır.',
+    whyNeededTr: 'Bilgi değerlendirmesinde eksik görülen fonksiyon yapıları ve parametre aktarımı pekiştirilerek NumPy rotasına güvenle geçiş sağlanır.',
     whyNeededEn: 'Strengthens modular function parameters and return types before advancing to vectorized numerical arrays.',
     prerequisitesTr: ['Python Temelleri'],
     prerequisitesEn: ['Python Fundamentals'],
@@ -403,7 +476,7 @@ export const pythonQuizData: QuizData = {
   nodeId: 'ml-python',
   titleTr: 'Python Temelleri — Bilgi Değerlendirmesi',
   titleEn: 'Python Fundamentals — Knowledge Check',
-  passingScore: 3, // Requires 3/3 for pass
+  passingScore: 3,
   questions: [
     {
       id: 'q1',
@@ -411,7 +484,7 @@ export const pythonQuizData: QuizData = {
       questionEn: 'Which keyword is used to define a reusable function in Python?',
       optionsTr: ['function calculate()', 'def calculate():', 'fn calculate() -> int', 'func calculate:()'],
       optionsEn: ['function calculate()', 'def calculate():', 'fn calculate() -> int', 'func calculate:()'],
-      correctIndex: 1, // def calculate():
+      correctIndex: 1,
       explanationTr: 'Python dilinde fonksiyonlar "def" anahtar kelimesi ve iki nokta (:) ile tanımlanır.',
       explanationEn: 'In Python, functions are defined using the "def" keyword followed by a colon (:).',
     },
@@ -421,7 +494,7 @@ export const pythonQuizData: QuizData = {
       questionEn: 'Which Python data structure stores key-value pairs with fast lookup time?',
       optionsTr: ['List (Liste)', 'Tuple (Demet)', 'Dictionary (Sözlük)', 'Set (Küme)'],
       optionsEn: ['List', 'Tuple', 'Dictionary', 'Set'],
-      correctIndex: 2, // Dictionary
+      correctIndex: 2,
       explanationTr: 'Sözlükler (dict), süslü parantezlerle {"key": "value"} şeklinde anahtar-değer çiftlerini saklar.',
       explanationEn: 'Dictionaries (dict) store key-value mappings for rapid hash-based lookup.',
     },
@@ -431,7 +504,7 @@ export const pythonQuizData: QuizData = {
       questionEn: 'Which block in Python is used for secondary conditional checking when the initial "if" is false?',
       optionsTr: ['else if', 'elif', 'otherwise', 'case'],
       optionsEn: ['else if', 'elif', 'otherwise', 'case'],
-      correctIndex: 1, // elif
+      correctIndex: 1,
       explanationTr: 'Python "else if" yerine "elif" anahtar kelimesini kullanır.',
       explanationEn: 'Python uses "elif" (short for else if) for subsequent conditional evaluations.',
     },

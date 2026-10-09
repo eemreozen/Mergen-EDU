@@ -44,6 +44,9 @@ export interface NodeData {
   practicalTaskEn?: string
   resources?: { title: string; url: string; type: 'video' | 'doc' | 'interactive' }[]
   quizId?: string
+  stepNumber?: string
+  milestoneScale?: 'sm' | 'md' | 'lg'
+  labelPosition?: 'right' | 'left' | 'bottom'
   [key: string]: unknown
 }
 

@@ -4,31 +4,54 @@ import {
   BackgroundVariant,
   MiniMap,
   ReactFlow,
+  type EdgeTypes,
   type NodeTypes,
   useReactFlow,
 } from '@xyflow/react'
 import { AnimatePresence, motion } from 'motion/react'
-import { Maximize2, Minus, Plus, Sparkles, X } from 'lucide-react'
-import { useEffect, useMemo } from 'react'
+import { Compass, Maximize2, Minus, Plus, Sparkles, X } from 'lucide-react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CanvasHeader } from './CanvasHeader'
-import { DomainNode } from './nodes/DomainNode'
-import { LearningNode } from './nodes/LearningNode'
-import { PracticalTaskNode } from './nodes/PracticalTaskNode'
-import { ProjectRootNode } from './nodes/ProjectRootNode'
+import { FocusViewModal } from './FocusViewModal'
+import { ExpeditionEdge } from './edges/ExpeditionEdge'
+import { MilestoneNode } from './nodes/MilestoneNode'
 import { QuizModal } from '@/components/assessment/QuizModal'
 import { AiAdvisorPanel } from '@/components/drawer/AiAdvisorPanel'
-import { NodeDetailPanel } from '@/components/drawer/NodeDetailPanel'
 import { useTheme } from '@/hooks/useTheme'
 import { useRoadmapStore } from '@/store/useRoadmapStore'
 
 function CanvasControls() {
-  const { zoomIn, zoomOut, fitView } = useReactFlow()
+  const { zoomIn, zoomOut, fitView, setCenter } = useReactFlow()
   const { i18n } = useTranslation()
   const isEn = i18n.language.startsWith('en')
 
+  const currentLevel = useRoadmapStore(s => s.currentLevel)
+  const rootNodes = useRoadmapStore(s => s.rootNodes)
+  const mlSubmapNodes = useRoadmapStore(s => s.mlSubmapNodes)
+  const activeNodes = currentLevel === 'root' ? rootNodes : mlSubmapNodes
+
+  // Locate the currently active or in-progress milestone
+  const handleGoToMyLocation = useCallback(() => {
+    if (!activeNodes.length) return
+    const activeMilestone =
+      activeNodes.find(n => n.data.status === 'in_progress') ||
+      activeNodes.find(n => n.data.isRemedial) ||
+      activeNodes.find(n => n.data.status === 'available') ||
+      activeNodes.find(n => n.data.status === 'needs_review') ||
+      activeNodes[0]
+
+    if (activeMilestone) {
+      setCenter(activeMilestone.position.x + 24, activeMilestone.position.y + 24, {
+        zoom: 1.1,
+        duration: 650,
+      })
+    }
+  }, [activeNodes, setCenter])
+
   return (
     <div className="absolute bottom-6 left-6 z-30 flex items-center gap-1.5 p-1.5 rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF]/90 dark:bg-[#171A20]/90 backdrop-blur-md shadow-xl">
+      {/* Zoom in */}
       <button
         type="button"
         onClick={() => zoomIn()}
@@ -38,6 +61,7 @@ function CanvasControls() {
         <Plus className="w-4 h-4" />
       </button>
 
+      {/* Zoom out */}
       <button
         type="button"
         onClick={() => zoomOut()}
@@ -49,14 +73,28 @@ function CanvasControls() {
 
       <div className="h-4 w-[1px] bg-[#E3E7EC] dark:bg-[#2A3038]" />
 
+      {/* Fit to Map */}
       <button
         type="button"
-        onClick={() => fitView({ padding: 0.2, duration: 400 })}
+        onClick={() => fitView({ padding: 0.22, duration: 400 })}
         className="p-2 rounded-xl text-[#68717D] dark:text-[#9CA3AF] hover:text-[#111318] dark:hover:text-[#E9EDF3] hover:bg-[#F0F2F5] dark:hover:bg-[#20242B] transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-mono"
-        title={isEn ? 'Fit View' : 'Merkeze Odakla'}
+        title={isEn ? 'Fit Map to Screen' : 'Tüm Haritayı Göster'}
       >
         <Maximize2 className="w-3.5 h-3.5" />
         <span className="hidden sm:inline">{isEn ? 'Fit' : 'Odakla'}</span>
+      </button>
+
+      <div className="h-4 w-[1px] bg-[#E3E7EC] dark:bg-[#2A3038]" />
+
+      {/* "Konumuma Git" Button */}
+      <button
+        type="button"
+        onClick={handleGoToMyLocation}
+        className="px-2.5 py-1.5 rounded-xl text-[#2B660E] dark:text-[#B7F36B] bg-[#2B660E]/10 dark:bg-[#B7F36B]/15 hover:bg-[#2B660E]/20 dark:hover:bg-[#B7F36B]/25 transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-mono font-medium"
+        title={isEn ? 'Center on Active Milestone' : 'Mevcut Konumuma Odaklan'}
+      >
+        <Compass className="w-3.5 h-3.5 stroke-[2.2]" />
+        <span>{isEn ? 'My Location' : 'Konumuma Git'}</span>
       </button>
     </div>
   )
@@ -64,7 +102,7 @@ function CanvasControls() {
 
 function CanvasFlowInner() {
   const { isDark } = useTheme()
-  const { fitView } = useReactFlow()
+  const { setCenter } = useReactFlow()
 
   const currentLevel = useRoadmapStore(s => s.currentLevel)
   const rootNodes = useRoadmapStore(s => s.rootNodes)
@@ -80,23 +118,45 @@ function CanvasFlowInner() {
   const activeNodes = currentLevel === 'root' ? rootNodes : mlSubmapNodes
   const activeEdges = currentLevel === 'root' ? rootEdges : mlSubmapEdges
 
+  // Map all node types to the compact MilestoneNode component
   const nodeTypes: NodeTypes = useMemo(
     () => ({
-      projectRoot: ProjectRootNode,
-      domain: DomainNode,
-      learning: LearningNode,
-      task: PracticalTaskNode,
+      milestone: MilestoneNode,
+      projectRoot: MilestoneNode,
+      domain: MilestoneNode,
+      learning: MilestoneNode,
+      task: MilestoneNode,
     }),
     []
   )
 
-  // Smooth fit to view when level changes
+  // Custom organic curved edge
+  const edgeTypes: EdgeTypes = useMemo(
+    () => ({
+      expedition: ExpeditionEdge,
+    }),
+    []
+  )
+
+  // Start navigation near the bottom of the expedition route
   useEffect(() => {
+    const nodes = currentLevel === 'root' ? rootNodes : mlSubmapNodes
     const timer = setTimeout(() => {
-      fitView({ padding: 0.22, duration: 500 })
-    }, 100)
+      if (!nodes.length) return
+      // Find the milestone closest to the bottom (highest Y coordinate)
+      const basecampMilestone = nodes.reduce((lowest, curr) =>
+        curr.position.y > lowest.position.y ? curr : lowest,
+        nodes[0]
+      )
+      if (basecampMilestone) {
+        setCenter(basecampMilestone.position.x + 24, basecampMilestone.position.y - 120, {
+          zoom: 0.9,
+          duration: 650,
+        })
+      }
+    }, 120)
     return () => clearTimeout(timer)
-  }, [currentLevel, fitView])
+  }, [currentLevel, rootNodes, mlSubmapNodes, setCenter])
 
   return (
     <div className="w-full h-full relative select-none">
@@ -129,57 +189,56 @@ function CanvasFlowInner() {
         )}
       </AnimatePresence>
 
-      {/* React Flow Viewport */}
+      {/* React Flow Viewport with expedition defaults */}
       <ReactFlow
         nodes={activeNodes}
         edges={activeEdges}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
+        nodesDraggable={false}
+        nodesConnectable={false}
+        elementsSelectable={true}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onNodeClick={(_, node) => selectNode(node)}
         onPaneClick={() => selectNode(null)}
-        fitView
-        fitViewOptions={{ padding: 0.2 }}
-        minZoom={0.2}
-        maxZoom={2}
+        minZoom={0.25}
+        maxZoom={2.2}
         defaultEdgeOptions={{
-          style: {
-            stroke: isDark ? '#2A3038' : '#CBD5E1',
-            strokeWidth: 2,
-          },
+          type: 'expedition',
         }}
         proOptions={{ hideAttribution: true }}
         className="bg-[#F7F8FA] dark:bg-[#0B0D10]"
       >
         <Background
           variant={BackgroundVariant.Dots}
-          gap={24}
+          gap={32}
           size={1.2}
-          color={isDark ? '#2A3038' : '#CBD5E1'}
-          className="opacity-70"
+          color={isDark ? '#222730' : '#CBD5E1'}
+          className="opacity-60"
         />
 
         <MiniMap
           nodeColor={node => {
             if (node.data?.status === 'completed') return '#B7F36B'
-            if (node.data?.status === 'in_progress') return '#F59E0B'
+            if (node.data?.status === 'in_progress') return '#B7F36B'
             if (node.data?.isRemedial) return '#F59E0B'
-            return isDark ? '#2A3038' : '#CBD5E1'
+            return isDark ? '#222730' : '#CBD5E1'
           }}
-          maskColor={isDark ? 'rgba(11, 13, 16, 0.75)' : 'rgba(247, 248, 250, 0.75)'}
+          maskColor={isDark ? 'rgba(11, 13, 16, 0.8)' : 'rgba(247, 248, 250, 0.8)'}
           className="!bottom-6 !right-24 rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] !bg-[#FFFFFF]/90 dark:!bg-[#171A20]/90 !shadow-lg hidden md:block"
         />
 
         <CanvasControls />
       </ReactFlow>
 
-      {/* Right Drawer: Node Detail Panel */}
-      <NodeDetailPanel />
+      {/* Full-Screen Immersive Center Focus View (Replaces old right-side drawer) */}
+      <FocusViewModal />
 
-      {/* Floating AI Advisor */}
+      {/* Floating Persistent AI Advisor (Launcher at bottom-right) */}
       <AiAdvisorPanel />
 
-      {/* Quiz Modal */}
+      {/* Knowledge Assessment Modal */}
       <QuizModal />
     </div>
   )
