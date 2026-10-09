@@ -14,10 +14,11 @@ const SESSION_INTRO_KEY = 'projectpath_intro_seen'
 function AppContent() {
   const location = useLocation()
   const isCanvasView = location.pathname === '/canvas'
+  const isLandingPage = location.pathname === '/'
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F7F8FA] dark:bg-[#0B0D10] text-[#111318] dark:text-[#E9EDF3] transition-colors selection:bg-[#2B660E]/20 dark:selection:bg-[#B7F36B] dark:selection:text-[#0B0D10]">
-      {!isCanvasView && <Header />}
+      {!isCanvasView && !isLandingPage && <Header />}
 
       <main className="flex-1 flex flex-col">
         <Routes>

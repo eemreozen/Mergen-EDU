@@ -3,9 +3,13 @@ import { ArrowRight, Compass, Sparkles, Wand2 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import { AuthModal } from '@/components/shared/AuthModal'
+import { LanguageSelector } from '@/components/shared/LanguageSelector'
+import { ThemeToggle } from '@/components/shared/ThemeToggle'
 import { OnboardingModal } from '@/components/assessment/OnboardingModal'
 import { GuidedTourWizard } from '@/components/landing/GuidedTourWizard'
-import { TeacherAdvisorDesk } from '@/components/landing/TeacherAdvisorDesk'
+import { TeacherAdvisorFigure } from '@/components/landing/TeacherAdvisorFigure'
+import { ProjectAdvisor } from '@/components/shared/ProjectAdvisorModal'
 
 interface HeroSectionProps {
   externalIdea?: string
@@ -20,8 +24,10 @@ export function HeroSection({
   const isEn = i18n.language.startsWith('en')
 
   const [localIdea, setLocalIdea] = useState('')
+  const [isAuthOpen, setIsAuthOpen] = useState(false)
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false)
   const [isTourOpen, setIsTourOpen] = useState(false)
+  const [isAdvisorOpen, setIsAdvisorOpen] = useState(false)
 
   const projectIdea = externalIdea !== undefined ? externalIdea : localIdea
 
@@ -54,7 +60,7 @@ export function HeroSection({
     }
   }
 
-  // Accessible, non-technical human project suggestions
+  // Non-technical, human starter suggestions
   const starterIdeas = [
     {
       label: isEn ? 'Smart Fitness Coach' : 'Akıllı Fitness Koçu',
@@ -87,15 +93,15 @@ export function HeroSection({
 
   return (
     <>
-      <section className="relative w-full max-w-6xl mx-auto px-4 sm:px-6 pt-6 pb-4 flex flex-col items-center">
+      <section className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 min-h-[85vh] flex flex-col justify-between pt-6 pb-0 overflow-visible">
         
-        {/* 1. Symmetrical Top Wizard Card */}
+        {/* 1. TOP CENTER: Wizard Banner */}
         <motion.div
           id="tour-wizard-box"
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="w-full max-w-2xl mx-auto mb-6 p-2.5 sm:p-3 rounded-2xl border border-[#2B660E]/30 dark:border-[#B7F36B]/30 bg-[#FFFFFF]/90 dark:bg-[#171A20]/90 shadow-md backdrop-blur-md flex items-center justify-between gap-3 text-left"
+          className="w-full max-w-xl mx-auto mb-6 p-2.5 sm:p-3 rounded-2xl border border-[#2B660E]/30 dark:border-[#B7F36B]/30 bg-[#FFFFFF]/90 dark:bg-[#171A20]/90 shadow-md backdrop-blur-md flex items-center justify-between gap-3 text-left"
         >
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-[#2B660E] dark:bg-[#B7F36B] text-white dark:text-[#0B0D10] flex items-center justify-center font-bold shadow-xs shrink-0">
@@ -123,103 +129,137 @@ export function HeroSection({
           </button>
         </motion.div>
 
-        {/* 2. Symmetrical Two-Column Layout (50% / 50% with matching headers and heights) */}
-        <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        {/* 2. SYMMETRICAL 3-COLUMN WORKSPACE: LEFT (Logo) — CENTER (Input Box) — RIGHT (Sign In & Advisor) */}
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center pb-2">
           
-          {/* COLUMN 1: Main Project Idea Builder */}
-          <div className="w-full flex flex-col justify-between">
-            
-            {/* Header (Height matching Right Column) */}
-            <div className="h-14 sm:h-16 flex items-center gap-3 mb-3 px-1 text-left">
-              <div className="relative group w-12 h-12 rounded-2xl bg-[#FFFFFF] dark:bg-[#171A20] border-2 border-[#E3E7EC] dark:border-[#2A3038] flex items-center justify-center shrink-0 shadow-sm">
-                <svg
-                  viewBox="0 0 32 32"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-7 h-7"
-                  aria-hidden="true"
-                >
-                  <circle cx="7" cy="24" r="3" fill="currentColor" className="text-[#9CA3AF] dark:text-[#64748B]" />
-                  <circle cx="16" cy="8" r="3.5" fill="#2B660E" className="dark:fill-[#B7F36B]" />
-                  <circle cx="25" cy="20" r="3" fill="currentColor" className="text-[#9CA3AF] dark:text-[#64748B]" />
-                  <path d="M9 22L14.5 10.5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="text-[#9CA3AF] dark:text-[#64748B]" />
-                  <path d="M17.5 10L23 18.5" stroke="#2B660E" strokeWidth="3" strokeLinecap="round" className="dark:stroke-[#B7F36B]" />
-                </svg>
-                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#2B660E] dark:bg-[#B7F36B]" />
-              </div>
-
-              <div>
-                <h1 className="text-base sm:text-lg font-bold tracking-tight text-[#111318] dark:text-[#E9EDF3] leading-tight">
-                  <span>{t('hero.titleLine1')} </span>
-                  <span className="text-[#2B660E] dark:text-[#B7F36B]">{t('hero.titleLine2')}</span>
-                </h1>
-                <p className="text-xs text-[#68717D] dark:text-[#9CA3AF] mt-0.5 font-mono">
-                  {isEn
-                    ? 'State your project idea, climb your tailored roadmap.'
-                    : 'Aklındaki projeyi yaz, tırmanış haritanı keşfet.'}
-                </p>
-              </div>
+          {/* LEFT COLUMN: Enlarged Logo & Brand identity (Cols 1-3) */}
+          <motion.div
+            initial={{ opacity: 0, x: -16 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.45 }}
+            className="lg:col-span-3 flex flex-col items-center lg:items-start text-center lg:text-left space-y-3"
+          >
+            {/* Enlarged Geometric Logo Card */}
+            <div className="relative group w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-[#FFFFFF] dark:bg-[#171A20] border-2 border-[#E3E7EC] dark:border-[#2A3038] hover:border-[#2B660E] dark:hover:border-[#B7F36B] shadow-2xl flex items-center justify-center transition-all duration-300">
+              <svg
+                viewBox="0 0 32 32"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-12 h-12 sm:w-14 sm:h-14 transition-transform duration-300 group-hover:scale-105"
+                aria-hidden="true"
+              >
+                <circle cx="7" cy="24" r="3" fill="currentColor" className="text-[#9CA3AF] dark:text-[#64748B]" />
+                <circle cx="16" cy="8" r="3.5" fill="#2B660E" className="dark:fill-[#B7F36B]" />
+                <circle cx="25" cy="20" r="3" fill="currentColor" className="text-[#9CA3AF] dark:text-[#64748B]" />
+                <path d="M9 22L14.5 10.5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="text-[#9CA3AF] dark:text-[#64748B]" />
+                <path d="M17.5 10L23 18.5" stroke="#2B660E" strokeWidth="3" strokeLinecap="round" className="dark:stroke-[#B7F36B]" />
+              </svg>
+              <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#2B660E] dark:bg-[#B7F36B] border-2 border-white dark:border-[#171A20]" />
             </div>
 
-            {/* Main Input Box (Height matching Right Column: h-[340px]) */}
+            {/* Wordmark & Tagline */}
+            <div>
+              <span className="font-mono font-bold tracking-tight text-2xl text-[#111318] dark:text-[#E9EDF3] lowercase">
+                project<span className="text-[#2B660E] dark:text-[#B7F36B]">path</span>
+              </span>
+              <p className="text-xs font-mono text-[#68717D] dark:text-[#9CA3AF] mt-0.5 font-medium">
+                Fikrini. İnşa Et.
+              </p>
+            </div>
+
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono bg-[#2B660E]/10 dark:bg-[#B7F36B]/15 text-[#2B660E] dark:text-[#B7F36B]">
+              <span>{isEn ? 'Project-Based Learning' : 'Proje Odaklı Öğrenme'}</span>
+            </div>
+          </motion.div>
+
+          {/* CENTER COLUMN: Main Project Idea Input + Language & Theme Underneath (Cols 4-9) */}
+          <div className="lg:col-span-6 flex flex-col items-center text-center">
+            
+            {/* Main Headline */}
+            <div className="mb-4">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-[#111318] dark:text-[#E9EDF3] leading-tight">
+                <span>{t('hero.titleLine1')} </span>
+                <span className="text-[#2B660E] dark:text-[#B7F36B]">{t('hero.titleLine2')}</span>
+              </h1>
+              <p className="text-xs sm:text-sm text-[#68717D] dark:text-[#9CA3AF] mt-1 font-mono">
+                {isEn
+                  ? 'State your project idea. Climb your tailored learning roadmap.'
+                  : 'Aklındaki projeyi yaz, tırmanış haritanı keşfet.'}
+              </p>
+            </div>
+
+            {/* The Project Idea Box */}
             <motion.div
               id="tour-idea-input"
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35 }}
-              className="w-full h-[340px] rounded-3xl border-2 border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF] dark:bg-[#171A20] shadow-xl p-4 sm:p-5 flex flex-col justify-between text-left transition-all focus-within:border-[#2B660E] dark:focus-within:border-[#B7F36B] focus-within:ring-4 focus-within:ring-[#2B660E]/10 dark:focus-within:ring-[#B7F36B]/15"
+              transition={{ duration: 0.4 }}
+              className="w-full max-w-xl"
             >
-              <div className="flex items-center justify-between mb-2">
-                <label
-                  htmlFor="project-idea-input"
-                  className="text-xs font-mono font-semibold uppercase tracking-wider text-[#68717D] dark:text-[#9CA3AF] flex items-center gap-1.5"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-[#2B660E] dark:text-[#B7F36B]" />
-                  <span>{isEn ? 'What do you want to build?' : 'Ne hakkında proje geliştirmek istiyorsun?'}</span>
-                </label>
-                <span className="text-[11px] font-mono text-[#9CA3AF] dark:text-[#64748B]">
-                  {projectIdea.length} {t('hero.charCount')}
-                </span>
-              </div>
+              <div className="relative rounded-3xl border-2 border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF] dark:bg-[#171A20] shadow-2xl p-4 sm:p-5 flex flex-col justify-between text-left transition-all focus-within:border-[#2B660E] dark:focus-within:border-[#B7F36B] focus-within:ring-4 focus-within:ring-[#2B660E]/10 dark:focus-within:ring-[#B7F36B]/15">
+                <div className="flex items-center justify-between mb-2">
+                  <label
+                    htmlFor="project-idea-input"
+                    className="text-xs font-mono font-semibold uppercase tracking-wider text-[#68717D] dark:text-[#9CA3AF] flex items-center gap-1.5"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-[#2B660E] dark:text-[#B7F36B]" />
+                    <span>{isEn ? 'What do you want to build?' : 'Ne hakkında proje geliştirmek istiyorsun?'}</span>
+                  </label>
+                  <span className="text-[11px] font-mono text-[#9CA3AF] dark:text-[#64748B]">
+                    {projectIdea.length} {t('hero.charCount')}
+                  </span>
+                </div>
 
-              <textarea
-                id="project-idea-input"
-                value={projectIdea}
-                onChange={e => setIdea(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder={t('hero.inputPlaceholder')}
-                className="w-full flex-1 bg-transparent border-0 outline-none resize-none text-sm sm:text-base text-[#111318] dark:text-[#E9EDF3] placeholder:text-[#9CA3AF] dark:placeholder:text-[#64748B] leading-relaxed font-normal py-1"
-              />
+                <textarea
+                  id="project-idea-input"
+                  rows={4}
+                  value={projectIdea}
+                  onChange={e => setIdea(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder={t('hero.inputPlaceholder')}
+                  className="w-full bg-transparent border-0 outline-none resize-none text-sm sm:text-base text-[#111318] dark:text-[#E9EDF3] placeholder:text-[#9CA3AF] dark:placeholder:text-[#64748B] min-h-[105px] leading-relaxed font-normal py-1"
+                />
 
-              <div className="pt-3 border-t border-[#E3E7EC]/60 dark:border-[#2A3038]/60 flex items-center justify-between gap-3">
-                <span className="text-xs text-[#9CA3AF] dark:text-[#64748B] font-mono hidden sm:inline">
-                  {t('hero.hintText')} · ⌘+Enter
-                </span>
+                <div className="pt-3 border-t border-[#E3E7EC]/60 dark:border-[#2A3038]/60 flex items-center justify-between gap-3">
+                  <span className="text-xs text-[#9CA3AF] dark:text-[#64748B] font-mono hidden sm:inline">
+                    {t('hero.hintText')} · ⌘+Enter
+                  </span>
 
-                <button
-                  type="button"
-                  disabled={!isValid}
-                  onClick={handleStartRoadmap}
-                  className={`inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-150 select-none ${
-                    isValid
-                      ? 'bg-[#2B660E] hover:bg-[#22520B] dark:bg-[#B7F36B] dark:hover:bg-[#C5F785] text-white dark:text-[#0B0D10] cursor-pointer shadow-md shadow-[#2B660E]/15 dark:shadow-[#B7F36B]/20 active:scale-[0.98]'
-                      : 'bg-[#E3E7EC] dark:bg-[#2A3038] text-[#9CA3AF] dark:text-[#64748B] cursor-not-allowed opacity-60'
-                  }`}
-                >
-                  <span>{t('hero.submitButton')}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+                  <button
+                    type="button"
+                    disabled={!isValid}
+                    onClick={handleStartRoadmap}
+                    className={`inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-150 select-none ${
+                      isValid
+                        ? 'bg-[#2B660E] hover:bg-[#22520B] dark:bg-[#B7F36B] dark:hover:bg-[#C5F785] text-white dark:text-[#0B0D10] cursor-pointer shadow-md shadow-[#2B660E]/15 dark:shadow-[#B7F36B]/20 active:scale-[0.98]'
+                        : 'bg-[#E3E7EC] dark:bg-[#2A3038] text-[#9CA3AF] dark:text-[#64748B] cursor-not-allowed opacity-60'
+                    }`}
+                  >
+                    <span>{t('hero.submitButton')}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </motion.div>
 
-            {/* Inspiration Chips & Discreet Links */}
-            <div id="tour-inspiration-chips" className="mt-4 text-left">
+            {/* DİL DEĞİŞTİRME VE KARANLIK MOD (Ortadaki yazı yazılacak yerin tam altına konuldu) */}
+            <div className="mt-3.5 flex items-center justify-center gap-3 p-2 px-4 rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF]/85 dark:bg-[#171A20]/85 backdrop-blur-sm shadow-xs">
+              <span className="text-[11px] font-mono text-[#68717D] dark:text-[#9CA3AF]">
+                {isEn ? 'Preferences:' : 'Tercihler:'}
+              </span>
+              <LanguageSelector />
+              <div className="h-4 w-[1px] bg-[#E3E7EC] dark:bg-[#2A3038]" />
+              <ThemeToggle />
+            </div>
+
+            {/* Non-Technical Quick Inspiration Chips */}
+            <div id="tour-inspiration-chips" className="mt-4 w-full max-w-xl text-left">
               <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                 <span className="text-[11px] font-mono uppercase tracking-wider text-[#9CA3AF] dark:text-[#64748B]">
                   {t('hero.quickSuggestionsTitle')}
                 </span>
 
-                {/* Discreet Links */}
+                {/* Subtle Links */}
                 <div className="flex items-center gap-2 text-xs font-mono text-[#9CA3AF] dark:text-[#64748B]">
                   <button
                     type="button"
@@ -258,21 +298,57 @@ export function HeroSection({
             </div>
           </div>
 
-          {/* COLUMN 2: Mentor Consultation Desk & Symmetrical Teacher Character */}
-          <div className="w-full flex flex-col justify-between">
-            <TeacherAdvisorDesk
-              onApplyPrompt={(prompt) => setIdea(prompt)}
-            />
-          </div>
+          {/* RIGHT COLUMN: GİRİŞ YAP KUTUSU (Üstte) & ÖNLÜKLÜ DANIŞMAN (Altta, tıklayınca chat açılır) (Cols 10-12) */}
+          <motion.div
+            initial={{ opacity: 0, x: 16 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.45 }}
+            className="lg:col-span-3 flex flex-col items-center lg:items-end justify-between h-full space-y-6"
+          >
+            {/* GİRİŞ YAP BUTONU (Danışmanın/Sağ tarafın tam üzerine koyuldu) */}
+            <div className="w-full max-w-[220px] p-3 rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF] dark:bg-[#171A20] shadow-md text-left flex flex-col gap-2">
+              <div className="text-[11px] font-mono text-[#68717D] dark:text-[#9CA3AF]">
+                {isEn ? 'Already a member?' : 'Daha önce geldin mi?'}
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsAuthOpen(true)}
+                className="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-[#111318] dark:bg-[#E9EDF3] text-white dark:text-[#0B0D10] hover:bg-[#2B660E] dark:hover:bg-[#B7F36B] transition-colors cursor-pointer text-center shadow-xs active:scale-95"
+              >
+                {t('nav.signIn')}
+              </button>
+            </div>
+
+            {/* ÖNLÜKLÜ REHBER ÖĞRETMEN ÇİZİMİ (Altta ayaklarıyla basan, tıklandığında chat açılır) */}
+            <div className="relative translate-y-[2px]">
+              <TeacherAdvisorFigure
+                size="lg"
+                onClick={() => setIsAdvisorOpen(true)}
+                showBubble={true}
+                showCaption={true}
+              />
+            </div>
+          </motion.div>
 
         </div>
       </section>
+
+      {/* Auth Modal */}
+      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
 
       {/* Onboarding Knowledge Assessment Modal */}
       <OnboardingModal isOpen={isOnboardingOpen} onClose={() => setIsOnboardingOpen(false)} />
 
       {/* Guided Tour Wizard Walkthrough */}
       <GuidedTourWizard isOpen={isTourOpen} onClose={() => setIsTourOpen(false)} />
+
+      {/* Interactive Project Advisor (Danışmana tıklandığında açılan chat penceresi) */}
+      <ProjectAdvisor
+        isOpen={isAdvisorOpen}
+        onClose={() => setIsAdvisorOpen(false)}
+        hideFloatingTrigger
+        onSelectPrompt={(prompt) => setIdea(prompt)}
+      />
     </>
   )
 }
