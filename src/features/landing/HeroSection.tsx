@@ -98,24 +98,13 @@ export function HeroSection({
         {/* SYMMETRICAL 3-COLUMN WORKSPACE: LEFT (Wizard + Logo) — CENTER (Input Box) — RIGHT (Sign In + Preferences + Advisor) */}
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
           
-          {/* LEFT COLUMN: Small Wizard Button + (Logo Card & Advisor Figure Side-by-Side) + Brand info (Cols 1-3) */}
+          {/* LEFT COLUMN: (Logo Card & Advisor Figure Side-by-Side) + Brand info (Cols 1-3) */}
           <motion.div
             initial={{ opacity: 0, x: -16 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.45 }}
             className="lg:col-span-3 flex flex-col items-center lg:items-start text-center lg:text-left space-y-3.5"
           >
-            {/* Küçük Sihirbazı Başlat Butonu (Logonun üstünde) */}
-            <button
-              id="tour-wizard-box"
-              type="button"
-              onClick={() => setIsTourOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#2B660E]/30 dark:border-[#B7F36B]/30 bg-[#FFFFFF] dark:bg-[#171A20] hover:bg-[#2B660E]/10 dark:hover:bg-[#B7F36B]/15 text-[#2B660E] dark:text-[#B7F36B] text-xs font-semibold shadow-xs transition-all active:scale-95 cursor-pointer whitespace-nowrap"
-            >
-              <Wand2 className="w-3.5 h-3.5" />
-              <span>{isEn ? 'Start Wizard' : 'Sihirbazı Başlat'}</span>
-            </button>
-
             {/* LOGO & DANIŞMAN YAN YANA */}
             <div className="flex items-end gap-3 sm:gap-4">
               {/* ProjectPath Geometrik Logo Kartı */}
@@ -231,7 +220,7 @@ export function HeroSection({
             </motion.div>
 
             {/* Non-Technical Quick Inspiration Chips */}
-            <div id="tour-inspiration-chips" className="mt-4 w-full max-w-xl text-left">
+            <div id="tour-inspiration-chips" className="mt-8 sm:mt-9 w-full max-w-xl text-left">
               <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                 <span className="text-[11px] font-mono uppercase tracking-wider text-[#9CA3AF] dark:text-[#64748B]">
                   {t('hero.quickSuggestionsTitle')}
@@ -276,13 +265,24 @@ export function HeroSection({
             </div>
           </div>
 
-          {/* RIGHT COLUMN: GİRİŞ YAP & TERCİHLER (Ortadaki metin kutusuna göre tam ortalanmış) (Cols 10-12) */}
+          {/* RIGHT COLUMN: SİHİRBAZ + GİRİŞ YAP & TERCİHLER (Ortadaki metin kutusuna göre tam ortalanmış) (Cols 10-12) */}
           <motion.div
             initial={{ opacity: 0, x: 16 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.45 }}
             className="lg:col-span-3 flex flex-col items-center lg:items-center justify-center space-y-3.5 my-auto"
           >
+            {/* Küçük Sihirbazı Başlat Butonu (Giriş yapın üstünde) */}
+            <button
+              id="tour-wizard-box"
+              type="button"
+              onClick={() => setIsTourOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-[#2B660E]/30 dark:border-[#B7F36B]/30 bg-[#FFFFFF] dark:bg-[#171A20] hover:bg-[#2B660E]/10 dark:hover:bg-[#B7F36B]/15 text-[#2B660E] dark:text-[#B7F36B] text-xs font-semibold shadow-xs transition-all active:scale-95 cursor-pointer whitespace-nowrap"
+            >
+              <Wand2 className="w-3.5 h-3.5" />
+              <span>{isEn ? 'Start Wizard' : 'Sihirbazı Başlat'}</span>
+            </button>
+
             {/* GİRİŞ YAP BUTONU */}
             <div className="w-full max-w-[220px] p-3 rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF] dark:bg-[#171A20] shadow-md text-left flex flex-col gap-2">
               <div className="text-[11px] font-mono text-[#68717D] dark:text-[#9CA3AF]">
