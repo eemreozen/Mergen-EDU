@@ -1,0 +1,63 @@
+{
+  "nav": {
+    "brand": "projectpath",
+    "signIn": "Giriş Yap",
+    "selectLanguage": "Dil Seçin",
+    "toggleTheme": "Temayı Değiştir"
+  },
+  "loading": {
+    "slogan": "Fikrini. İnşa Et.",
+    "subtitle": "Kişiselleştirilmiş geliştirme rotan hazırlanıyor..."
+  },
+  "hero": {
+    "eyebrow": "KENDİ YOLUNU OLUŞTUR",
+    "titleLine1": "Bir fikirle başla.",
+    "titleLine2": "Bir projeyle öğren.",
+    "description": "Geliştirmek istediğin projeyi anlat. Sana özel oluşturulan yol haritasıyla öğrenerek ilerle.",
+    "inputPlaceholder": "Örneğin: Spring Boot ve React ile bir e-ticaret uygulaması geliştirmek istiyorum...",
+    "submitButton": "Yol Haritamı Oluştur",
+    "hintText": "Ne inşa etmek istediğini ve ilgilendiğin teknolojileri birkaç cümleyle yaz.",
+    "charCount": "karakter",
+    "quickSuggestionsTitle": "İlham Alabileceğin Örnek Fikirler:",
+    "suggestion1": "Spring Boot & React ile E-Ticaret Platformu",
+    "suggestion2": "Go & WebSockets ile Dağıtık Sohbet Sistemi",
+    "suggestion3": "Rust ile Yüksek Performanslı CLI Aracı",
+    "suggestion4": "Docker & GitHub Actions ile Modern CI/CD Pipeline"
+  },
+  "roadmap": {
+    "backButton": "Yeni Fikir",
+    "previewBadge": "ÖNİZLEME YOL HARİTASI",
+    "projectGoalLabel": "Hedeflenen Proje:",
+    "projectTitleDefault": "Kişiselleştirilmiş Geliştirme Yol Haritası",
+    "estimatedDuration": "Tahmini Süre",
+    "estimatedDurationValue": "6-8 Hafta",
+    "difficultyLevel": "Seviye",
+    "difficultyLevelValue": "Orta / İleri",
+    "stagesHeading": "Geliştirme ve Öğrenme Aşamaları",
+    "status": {
+      "completed": "Tamamlandı",
+      "inProgress": "Geliştiriliyor",
+      "upcoming": "Sırada"
+    },
+    "milestonesLabel": "Pratik Görevler",
+    "skillsLabel": "Öğrenilecek Kavramlar",
+    "previewNotice": "Bu ekran, fikrinize göre oluşturulan modüler aşama önizlemesidir. Detaylı interaktif kod editörü ve yapay zeka entegrasyonu bir sonraki sürümde açılacaktır.",
+    "actionStart": "Aşamayı Başlat",
+    "actionExport": "Rotayı Dışa Aktar"
+  },
+  "auth": {
+    "title": "ProjectPath'e Giriş Yap",
+    "subtitle": "Geliştirdiğin projeleri kaydet ve yol haritanda kaldığın yerden devam et.",
+    "github": "GitHub ile Giriş Yap",
+    "google": "Google ile Giriş Yap",
+    "or": "veya e-posta",
+    "emailPlaceholder": "ornek@sirket.com",
+    "submit": "Giriş Bağlantısı Gönder",
+    "demoNotice": "Prototip modundasınız. Kullanıcı girişi henüz aktif bir arka uca bağlı değildir.",
+    "close": "Kapat"
+  },
+  "footer": {
+    "tagline": "Geliştiriciler için proje odaklı öğrenme platformu.",
+    "rights": "Tüm hakları saklıdır."
+  }
+}

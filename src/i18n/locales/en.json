@@ -1,0 +1,63 @@
+{
+  "nav": {
+    "brand": "projectpath",
+    "signIn": "Sign In",
+    "selectLanguage": "Select Language",
+    "toggleTheme": "Toggle Theme"
+  },
+  "loading": {
+    "slogan": "Fikrini. İnşa Et.",
+    "subtitle": "Preparing your personalized development path..."
+  },
+  "hero": {
+    "eyebrow": "CRAFT YOUR OWN PATH",
+    "titleLine1": "Start with an idea.",
+    "titleLine2": "Learn by building.",
+    "description": "Describe the project you want to build. Progress with a tailored roadmap designed for hands-on learning.",
+    "inputPlaceholder": "For example: I want to build a real-time collaborative workspace with Spring Boot and React...",
+    "submitButton": "Generate Roadmap",
+    "hintText": "Detail what you want to construct and specify your preferred tech stack in a few sentences.",
+    "charCount": "characters",
+    "quickSuggestionsTitle": "Inspiration Starter Ideas:",
+    "suggestion1": "E-Commerce Platform with Spring Boot & React",
+    "suggestion2": "Distributed Chat System with Go & WebSockets",
+    "suggestion3": "High-Performance CLI Tool in Rust",
+    "suggestion4": "Modern CI/CD Pipeline with Docker & GitHub Actions"
+  },
+  "roadmap": {
+    "backButton": "New Idea",
+    "previewBadge": "ROADMAP PREVIEW",
+    "projectGoalLabel": "Target Project:",
+    "projectTitleDefault": "Personalized Development Roadmap",
+    "estimatedDuration": "Estimated Time",
+    "estimatedDurationValue": "6-8 Weeks",
+    "difficultyLevel": "Level",
+    "difficultyLevelValue": "Intermediate / Advanced",
+    "stagesHeading": "Development & Learning Stages",
+    "status": {
+      "completed": "Completed",
+      "inProgress": "In Progress",
+      "upcoming": "Upcoming"
+    },
+    "milestonesLabel": "Practical Milestones",
+    "skillsLabel": "Core Concepts Learned",
+    "previewNotice": "This preview demonstrates modular learning stages tailored to your project. The comprehensive interactive editor and AI sync will be available in future releases.",
+    "actionStart": "Begin Stage",
+    "actionExport": "Export Roadmap"
+  },
+  "auth": {
+    "title": "Sign in to ProjectPath",
+    "subtitle": "Save your roadmaps and pick up where you left off.",
+    "github": "Continue with GitHub",
+    "google": "Continue with Google",
+    "or": "or with email",
+    "emailPlaceholder": "name@company.com",
+    "submit": "Send Magic Link",
+    "demoNotice": "Running in frontend preview mode. Authentication services will be connected in future releases.",
+    "close": "Close"
+  },
+  "footer": {
+    "tagline": "Project-based learning platform for engineers.",
+    "rights": "All rights reserved."
+  }
+}

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="tr" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none'><rect width='32' height='32' rx='8' fill='%23171A20'/><path d='M8 22L16 10L24 22' stroke='%23B7F36B' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/><circle cx='16' cy='10' r='2.5' fill='%23B7F36B'/></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ProjectPath — Fikrini. İnşa Et. | Proje Odaklı Yol Haritası</title>
+    <meta name="description" content="Yazılım geliştirmeyi gerçek projeler üreterek öğrenin. Fikrinizi anlatın, kişiselleştirilmiş öğrenme ve geliştirme yol haritanızı oluşturun." />
+    
+    <!-- Preconnect to Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+      // Immediate theme initialization to prevent flash
+      (function() {
+        try {
+          var saved = localStorage.getItem('projectpath_theme');
+          var isDark = saved ? saved === 'dark' : true; // Dark by default
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch (e) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+  </head>
+  <body class="bg-[#0B0D10] dark:bg-[#0B0D10] text-[#E9EDF3] dark:text-[#E9EDF3] antialiased selection:bg-[#B7F36B] selection:text-[#0B0D10]">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
