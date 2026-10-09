@@ -353,3 +353,12 @@ teknoloji, haftalık süre ve teslim/bütçe kısıtları. Roadmap tüm gerekli 
 sonra üretilir. Projeye özel sorular ilk proje analizi çağrısında kaydedilir; bölüm
 geçişi yeni AI çağrısı yapmaz. Eski projelerin cevapları korunur, mevcut soru kimlikleri
 üzerinden bölüm bilgisi geriye uyumlu olarak sunulur. Yeni soru seti yeni projelerde kullanılır.
+
+Alt harita ve adaptif dal üretiminde hedef durağın açıklaması/becerileri ile üst
+haritalardaki diğer durakların başlık ve becerileri gönderilir. Diğer duraklar yeni
+ders olarak tekrarlanmamalıdır. Sunucu aynı/çok benzer başlıkları ve başka bir durağa
+ait ayırt edici beceri adlarını ayrıca kontrol eder. Adaptif çıktıda saptanan kopya
+ders, bağlantıları ve beceri kapsamı korunarak yerel bir odak alıştırmasına çevrilir;
+ek AI çağrısı yapılmaz. Normal alt haritada kapsam ihlali kaydedilmeden reddedilir.
+Önbellekteki eski adaptif dallarda bu düzeltme yalnız açılmamış, değerlendirmesi
+olmayan derslere uygulanır; çalışılmış içerik ve ilerleme değiştirilmez.

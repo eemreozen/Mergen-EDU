@@ -1,7 +1,8 @@
-from app.ai.prompts.roadmap import SYSTEM
+from app.ai.prompts.submap import SYSTEM
 from app.errors import AppError
 from app.models.roadmap import RoadmapMap
 from app.schemas.roadmap import RoadmapDraft
+from app.services.branch_scope import branch_scope, validate_submap_scope
 from app.services.discovery_service import answer_fields
 from app.services.project_service import owned_project
 from app.services.roadmap_service import map_view, owned_map, owned_node, persist_draft
@@ -32,8 +33,10 @@ async def generate_submap(db, node_id, user_id, gateway):
     from app.services.project_service import ensure_ai_source
 
     ensure_ai_source(project, gateway)
+    scope = await branch_scope(db, parent, node)
     if topic:
         draft = expand_topic(topic, project, answer_fields(project))
+        validate_submap_scope(draft, scope)
         node.type = "submap"
         return await map_view(db, await persist_draft(db, project, draft, parent, node))
     draft = await gateway.generate_structured(
@@ -42,11 +45,13 @@ async def generate_submap(db, node_id, user_id, gateway):
         {
             "project": project.analysis,
             "locale": project.locale,
-            "node": {"title": node.title, "skills": node.skills},
+            "node": {"title": node.title, "summary": node.summary, "skills": node.skills},
+            "branchScope": scope,
             "discovery": answer_fields(project),
             "learnerProfile": (await learner_profile(db, project)).model_dump(),
             "depth": depth,
         },
         RoadmapDraft,
     )
+    validate_submap_scope(draft, scope)
     return await map_view(db, await persist_draft(db, project, draft, parent, node))

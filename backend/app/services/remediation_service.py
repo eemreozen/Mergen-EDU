@@ -7,6 +7,7 @@ from app.graph.validator import validate_graph
 from app.models.project import Project
 from app.models.roadmap import RoadmapEdge, RoadmapMap, RoadmapNode
 from app.schemas.roadmap import AdaptiveRoadmapDraft
+from app.services.branch_scope import branch_scope, focus_adaptive_draft, repair_unused_branch
 
 
 async def adaptive_nodes(db, roadmap):
@@ -47,6 +48,7 @@ async def add_remediation(db, node, weak_skills, gateway, trigger="knowledge_gap
     missing = skills
     previous_exits = []
     if existing:
+        await repair_unused_branch(db, existing, await branch_scope(db, parent, node), node, project.locale)
         nodes = await adaptive_nodes(db, existing)
         outgoing = set(
             await db.scalars(
@@ -64,13 +66,15 @@ async def add_remediation(db, node, weak_skills, gateway, trigger="knowledge_gap
         existing.weak_skills = sorted(set(existing.weak_skills) | set(skills))
         existing.trigger = trigger
     if not existing or missing:
+        scope = await branch_scope(db, parent, node)
         draft = await gateway.generate_structured(
             "adaptive_roadmap",
             SYSTEM,
             {
                 "project": {"goal": project.analysis["goal"], "title": project.title},
                 "locale": project.locale,
-                "node": {"id": node.id, "title": node.title, "skills": node.skills},
+                "node": {"id": node.id, "title": node.title, "summary": node.summary, "skills": node.skills},
+                "branchScope": scope,
                 "weakSkills": missing,
                 "trigger": trigger,
                 "failedQuestions": failed_questions or [],
@@ -84,6 +88,7 @@ async def add_remediation(db, node, weak_skills, gateway, trigger="knowledge_gap
             )
         if not set(missing) <= {s for n in draft.nodes for s in n.skills}:
             raise AppError("AI_INVALID_OUTPUT", "Öğrenme dalı eksik becerileri kapsamıyor.", 502, True)
+        draft = focus_adaptive_draft(draft, scope, node, project.locale)
         if not existing:
             existing = RoadmapMap(
                 id=new_id(),
@@ -159,6 +164,8 @@ async def start_learning(db, node_id, user_id, gateway):
         select(RoadmapMap).where(RoadmapMap.target_node_id == node.id, RoadmapMap.kind == "adaptive")
     )
     if existing:
+        project = await db.get(Project, parent.project_id)
+        await repair_unused_branch(db, existing, await branch_scope(db, parent, node), node, project.locale)
         return await map_view(db, existing)
     branch, _ = await add_remediation(db, node, node.skills, gateway, trigger="learn_from_scratch")
     node.status = "needs_review"

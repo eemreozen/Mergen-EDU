@@ -95,12 +95,17 @@ function arrange(map: MapView) {
     }
   }
   const columns = Math.max(1, ...[...rows.values()].map(row => row.length))
+  // Bend the whole route, not just graphs containing a single column. A brief
+  // fork must not turn every later single-node row into a straight vertical line.
+  // All nodes in a rank share the bend, preserving parallel-track separation.
+  const bendWidth = 700
+  const bend = (rank: number) => (1 - Math.cos(rank * Math.PI / 4)) * bendWidth / 2
   const positions = new Map<string, { x: number; y: number }>()
   const steps = new Map<string, number>()
   let step = 0
   for (const [rank, row] of rankedRows) {
     row.forEach((id, i) => {
-      positions.set(id, { x: columns === 1 ? [0, 0.5, 1, 0.5][rank % 4] * COLUMN : (i + Math.floor((columns - row.length) / 2)) * COLUMN, y: rank * ROW })
+      positions.set(id, { x: bend(rank) + (i + (columns - row.length) / 2) * COLUMN, y: rank * ROW })
       steps.set(id, ++step)
     })
   }
