@@ -1,11 +1,12 @@
 import { motion } from 'motion/react'
-import { ArrowRight, Sparkles } from 'lucide-react'
+import { ArrowRight, Compass, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { AuthModal } from '@/components/shared/AuthModal'
 import { LanguageSelector } from '@/components/shared/LanguageSelector'
 import { ThemeToggle } from '@/components/shared/ThemeToggle'
+import { OnboardingModal } from '@/components/assessment/OnboardingModal'
 
 interface HeroSectionProps {
   externalIdea?: string
@@ -15,10 +16,10 @@ interface HeroSectionProps {
 export function HeroSection({ externalIdea, onIdeaChange }: HeroSectionProps) {
   const { t, i18n } = useTranslation()
   const isEn = i18n.language.startsWith('en')
-  const navigate = useNavigate()
 
   const [localIdea, setLocalIdea] = useState('')
   const [isAuthOpen, setIsAuthOpen] = useState(false)
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false)
 
   const projectIdea = externalIdea !== undefined ? externalIdea : localIdea
 
@@ -33,7 +34,16 @@ export function HeroSection({ externalIdea, onIdeaChange }: HeroSectionProps) {
   const handleStartRoadmap = () => {
     const trimmed = projectIdea.trim()
     if (!trimmed) return
-    navigate('/roadmap', { state: { idea: trimmed } })
+    // Open conversational knowledge assessment
+    setIsOnboardingOpen(true)
+  }
+
+  const handleStartFitnessDemo = () => {
+    const fitnessPrompt = isEn
+      ? 'I want to build an AI-powered fitness and nutrition recommendation application.'
+      : 'Yapay zekâ destekli bir fitness uygulaması geliştirmek istiyorum.'
+    setIdea(fitnessPrompt)
+    setIsOnboardingOpen(true)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -44,6 +54,13 @@ export function HeroSection({ externalIdea, onIdeaChange }: HeroSectionProps) {
   }
 
   const starterIdeas = [
+    {
+      label: isEn ? 'AI-Powered Fitness App' : 'Yapay Zekâ Destekli Fitness Uygulaması',
+      prompt: isEn
+        ? 'I want to build an AI-powered fitness and nutrition recommendation application.'
+        : 'Yapay zekâ destekli bir fitness uygulaması geliştirmek istiyorum.',
+      highlight: true,
+    },
     {
       label: t('hero.suggestion1'),
       prompt: 'Spring Boot ve React kullanarak JWT tabanlı kimlik doğrulama, sepet yönetimi ve sipariş takibi içeren tam teşekküllü bir e-ticaret platformu geliştirmek istiyorum.',
@@ -56,10 +73,6 @@ export function HeroSection({ externalIdea, onIdeaChange }: HeroSectionProps) {
       label: t('hero.suggestion3'),
       prompt: 'Rust diliyle geliştirilmiş, sistem kaynaklarını izleyen ve JSON/YAML çıktıları üreten yüksek performanslı bir komut satırı (CLI) aracı geliştirmek istiyorum.',
     },
-    {
-      label: t('hero.suggestion4'),
-      prompt: 'Docker, GitHub Actions ve AWS kullanarak otomatik test ve dağıtım yapan modern bir CI/CD pipeline mimarisi inşa etmek istiyorum.',
-    },
   ]
 
   const isValid = projectIdea.trim().length > 0
@@ -67,7 +80,7 @@ export function HeroSection({ externalIdea, onIdeaChange }: HeroSectionProps) {
   return (
     <>
       <section className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 min-h-[82vh] flex flex-col justify-center items-center pt-8 pb-16">
-        {/* Subtle Top Eyebrow & Slogan */}
+        {/* Top Eyebrow & Slogan */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -83,6 +96,26 @@ export function HeroSection({ externalIdea, onIdeaChange }: HeroSectionProps) {
             <span>{t('hero.titleLine1')} </span>
             <span className="text-[#2B660E] dark:text-[#B7F36B]">{t('hero.titleLine2')}</span>
           </h1>
+
+          {/* Quick Demo Access Bar */}
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={handleStartFitnessDemo}
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#2B660E]/40 dark:border-[#B7F36B]/40 bg-[#2B660E]/10 dark:bg-[#B7F36B]/15 text-xs font-mono font-semibold text-[#2B660E] dark:text-[#B7F36B] hover:bg-[#2B660E]/20 transition-all cursor-pointer shadow-xs active:scale-95"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>{isEn ? '⚡️ Run Demo: AI Fitness App' : '⚡️ Hazır Demo: AI Fitness Uygulaması'}</span>
+            </button>
+
+            <Link
+              to="/canvas"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono text-[#68717D] dark:text-[#9CA3AF] hover:text-[#111318] dark:hover:text-[#E9EDF3] transition-colors"
+            >
+              <Compass className="w-3.5 h-3.5" />
+              <span>{isEn ? 'Direct to Canvas →' : 'Doğrudan Kanvasa Git →'}</span>
+            </Link>
+          </div>
         </motion.div>
 
         {/* The Non-Traditional Center Workspace Layout:
@@ -207,7 +240,11 @@ export function HeroSection({ externalIdea, onIdeaChange }: HeroSectionProps) {
                     key={idx}
                     type="button"
                     onClick={() => setIdea(item.prompt)}
-                    className="text-xs px-3 py-1.5 rounded-lg border border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF]/70 dark:bg-[#171A20]/70 text-[#68717D] dark:text-[#9CA3AF] hover:text-[#111318] dark:hover:text-[#E9EDF3] hover:border-[#CBD5E1] dark:hover:border-[#3E4752] transition-colors cursor-pointer text-left"
+                    className={`text-xs px-3 py-1.5 rounded-lg border transition-colors cursor-pointer text-left ${
+                      item.highlight
+                        ? 'border-[#2B660E]/50 dark:border-[#B7F36B]/50 bg-[#2B660E]/10 dark:bg-[#B7F36B]/15 text-[#2B660E] dark:text-[#B7F36B] font-bold'
+                        : 'border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF]/70 dark:bg-[#171A20]/70 text-[#68717D] dark:text-[#9CA3AF] hover:text-[#111318] dark:hover:text-[#E9EDF3] hover:border-[#CBD5E1] dark:hover:border-[#3E4752]'
+                    }`}
                   >
                     + {item.label}
                   </button>
@@ -259,6 +296,9 @@ export function HeroSection({ externalIdea, onIdeaChange }: HeroSectionProps) {
 
       {/* Auth Modal */}
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
+
+      {/* Onboarding Knowledge Assessment Modal */}
+      <OnboardingModal isOpen={isOnboardingOpen} onClose={() => setIsOnboardingOpen(false)} />
     </>
   )
 }
