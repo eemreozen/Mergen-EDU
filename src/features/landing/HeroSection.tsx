@@ -8,8 +8,6 @@ import { LanguageSelector } from '@/components/shared/LanguageSelector'
 import { ThemeToggle } from '@/components/shared/ThemeToggle'
 import { OnboardingModal } from '@/components/assessment/OnboardingModal'
 import { GuidedTourWizard } from '@/components/landing/GuidedTourWizard'
-import { TeacherAdvisorFigure } from '@/components/landing/TeacherAdvisorFigure'
-import { ProjectAdvisor } from '@/components/shared/ProjectAdvisorModal'
 
 interface HeroSectionProps {
   externalIdea?: string
@@ -27,7 +25,6 @@ export function HeroSection({
   const [isAuthOpen, setIsAuthOpen] = useState(false)
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false)
   const [isTourOpen, setIsTourOpen] = useState(false)
-  const [isAdvisorOpen, setIsAdvisorOpen] = useState(false)
 
   const projectIdea = externalIdea !== undefined ? externalIdea : localIdea
 
@@ -98,40 +95,29 @@ export function HeroSection({
         {/* SYMMETRICAL 3-COLUMN WORKSPACE: LEFT (Wizard + Logo) — CENTER (Input Box) — RIGHT (Sign In + Preferences + Advisor) */}
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
           
-          {/* LEFT COLUMN: (Logo Card & Advisor Figure Side-by-Side) + Brand info (Cols 1-3) */}
+          {/* LEFT COLUMN: Logo & Brand identity (Cols 1-3) */}
           <motion.div
             initial={{ opacity: 0, x: -16 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.45 }}
             className="lg:col-span-3 flex flex-col items-center lg:items-start text-center lg:text-left space-y-3.5"
           >
-            {/* LOGO & DANIŞMAN YAN YANA */}
-            <div className="flex items-end gap-3 sm:gap-4">
-              {/* ProjectPath Geometrik Logo Kartı */}
-              <div className="relative group w-20 h-20 sm:w-22 sm:h-22 rounded-3xl bg-[#FFFFFF] dark:bg-[#171A20] border-2 border-[#E3E7EC] dark:border-[#2A3038] hover:border-[#2B660E] dark:hover:border-[#B7F36B] shadow-xl flex items-center justify-center transition-all duration-300">
-                <svg
-                  viewBox="0 0 32 32"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-12 h-12 sm:w-13 sm:h-13 transition-transform duration-300 group-hover:scale-105"
-                  aria-hidden="true"
-                >
-                  <circle cx="7" cy="24" r="3" fill="currentColor" className="text-[#9CA3AF] dark:text-[#64748B]" />
-                  <circle cx="16" cy="8" r="3.5" fill="#2B660E" className="dark:fill-[#B7F36B]" />
-                  <circle cx="25" cy="20" r="3" fill="currentColor" className="text-[#9CA3AF] dark:text-[#64748B]" />
-                  <path d="M9 22L14.5 10.5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="text-[#9CA3AF] dark:text-[#64748B]" />
-                  <path d="M17.5 10L23 18.5" stroke="#2B660E" strokeWidth="3" strokeLinecap="round" className="dark:stroke-[#B7F36B]" />
-                </svg>
-                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#2B660E] dark:bg-[#B7F36B] border-2 border-white dark:border-[#171A20]" />
-              </div>
-
-              {/* Danışman Rehber Logosu (Tıkla Planlayalım Balonu ile) */}
-              <TeacherAdvisorFigure
-                size="md"
-                onClick={() => setIsAdvisorOpen(true)}
-                showBubble={true}
-                showCaption={false}
-              />
+            {/* Enlarged Geometric Logo Card */}
+            <div className="relative group w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-[#FFFFFF] dark:bg-[#171A20] border-2 border-[#E3E7EC] dark:border-[#2A3038] hover:border-[#2B660E] dark:hover:border-[#B7F36B] shadow-2xl flex items-center justify-center transition-all duration-300">
+              <svg
+                viewBox="0 0 32 32"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-12 h-12 sm:w-14 sm:h-14 transition-transform duration-300 group-hover:scale-105"
+                aria-hidden="true"
+              >
+                <circle cx="7" cy="24" r="3" fill="currentColor" className="text-[#9CA3AF] dark:text-[#64748B]" />
+                <circle cx="16" cy="8" r="3.5" fill="#2B660E" className="dark:fill-[#B7F36B]" />
+                <circle cx="25" cy="20" r="3" fill="currentColor" className="text-[#9CA3AF] dark:text-[#64748B]" />
+                <path d="M9 22L14.5 10.5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="text-[#9CA3AF] dark:text-[#64748B]" />
+                <path d="M17.5 10L23 18.5" stroke="#2B660E" strokeWidth="3" strokeLinecap="round" className="dark:stroke-[#B7F36B]" />
+              </svg>
+              <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#2B660E] dark:bg-[#B7F36B] border-2 border-white dark:border-[#171A20]" />
             </div>
 
             {/* Wordmark & Tagline */}
@@ -284,7 +270,7 @@ export function HeroSection({
             </button>
 
             {/* GİRİŞ YAP BUTONU */}
-            <div className="w-full max-w-[220px] p-3 rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF] dark:bg-[#171A20] shadow-md text-left flex flex-col gap-2">
+            <div className="w-full max-w-[250px] p-3.5 rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF] dark:bg-[#171A20] shadow-md text-left flex flex-col gap-2">
               <div className="text-[11px] font-mono text-[#68717D] dark:text-[#9CA3AF]">
                 {isEn ? 'Already a member?' : 'Daha önce geldin mi?'}
               </div>
@@ -297,14 +283,14 @@ export function HeroSection({
               </button>
             </div>
 
-            {/* TERCİHLER KISMI */}
-            <div className="w-full max-w-[220px] p-2.5 px-3 rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF] dark:bg-[#171A20] shadow-sm flex items-center justify-between">
-              <span className="text-[11px] font-mono text-[#68717D] dark:text-[#9CA3AF]">
+            {/* TERCİHLER KISMI (Genişletildi, karanlık mod tam sığacak şekilde düzenlendi) */}
+            <div className="w-full max-w-[250px] p-2.5 px-3.5 rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF] dark:bg-[#171A20] shadow-sm flex items-center justify-between gap-2">
+              <span className="text-[11px] font-mono text-[#68717D] dark:text-[#9CA3AF] shrink-0">
                 {isEn ? 'Preferences:' : 'Tercihler:'}
               </span>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2 shrink-0">
                 <LanguageSelector />
-                <div className="h-3.5 w-[1px] bg-[#E3E7EC] dark:bg-[#2A3038]" />
+                <div className="h-4 w-[1px] bg-[#E3E7EC] dark:bg-[#2A3038] shrink-0" />
                 <ThemeToggle />
               </div>
             </div>
@@ -321,14 +307,6 @@ export function HeroSection({
 
       {/* Guided Tour Wizard Walkthrough */}
       <GuidedTourWizard isOpen={isTourOpen} onClose={() => setIsTourOpen(false)} />
-
-      {/* Interactive Project Advisor (Danışmana tıklandığında açılan chat penceresi) */}
-      <ProjectAdvisor
-        isOpen={isAdvisorOpen}
-        onClose={() => setIsAdvisorOpen(false)}
-        hideFloatingTrigger
-        onSelectPrompt={(prompt) => setIdea(prompt)}
-      />
     </>
   )
 }

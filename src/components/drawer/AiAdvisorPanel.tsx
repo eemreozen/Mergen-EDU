@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { Bot, Send, Sparkles, X } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { TeacherAdvisorFigure } from '@/components/landing/TeacherAdvisorFigure'
 import { useRoadmapStore } from '@/store/useRoadmapStore'
 
 export function AiAdvisorPanel() {
@@ -56,22 +57,14 @@ export function AiAdvisorPanel() {
 
   return (
     <>
-      {/* Floating Launcher Button (Bottom-Right) */}
+      {/* Floating Advisor Launcher (Bottom-Right) - Teacher Advisor Figure */}
       <div className="fixed bottom-6 right-6 z-40">
-        <motion.button
-          type="button"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+        <TeacherAdvisorFigure
+          size="md"
           onClick={toggleAdvisor}
-          className="flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-[#171A20] border-2 border-[#2A3038] hover:border-[#B7F36B] shadow-2xl text-xs font-mono font-bold text-[#E9EDF3] transition-all cursor-pointer group"
-          aria-label="AI Danışman"
-        >
-          <div className="relative">
-            <Bot className="w-4 h-4 text-[#B7F36B] group-hover:rotate-12 transition-transform" />
-            <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#B7F36B] animate-pulse" />
-          </div>
-          <span>{isEn ? 'AI Advisor' : 'AI Danışman'}</span>
-        </motion.button>
+          showBubble={!isAdvisorOpen}
+          showCaption={true}
+        />
       </div>
 
       {/* Slide-over Drawer Panel */}

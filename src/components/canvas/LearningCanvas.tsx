@@ -226,7 +226,7 @@ function CanvasFlowInner() {
             return isDark ? '#222730' : '#CBD5E1'
           }}
           maskColor={isDark ? 'rgba(11, 13, 16, 0.8)' : 'rgba(247, 248, 250, 0.8)'}
-          className="!bottom-6 !right-24 rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] !bg-[#FFFFFF]/90 dark:!bg-[#171A20]/90 !shadow-lg hidden md:block"
+          className="!bottom-6 !right-36 rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] !bg-[#FFFFFF]/90 dark:!bg-[#171A20]/90 !shadow-lg hidden md:block"
         />
 
         <CanvasControls />
