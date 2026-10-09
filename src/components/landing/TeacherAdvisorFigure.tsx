@@ -4,24 +4,33 @@ import { useTranslation } from 'react-i18next'
 
 interface TeacherAdvisorFigureProps {
   onClick?: () => void
-  size?: 'md' | 'lg'
+  size?: 'sm' | 'md' | 'lg'
   showBubble?: boolean
+  showCaption?: boolean
+  className?: string
 }
 
 export function TeacherAdvisorFigure({
   onClick,
-  size = 'lg',
+  size = 'md',
   showBubble = true,
+  showCaption = true,
+  className = '',
 }: TeacherAdvisorFigureProps) {
   const { i18n } = useTranslation()
   const isEn = i18n.language.startsWith('en')
 
-  const sizeClasses = size === 'lg' ? 'w-48 h-64 sm:w-56 sm:h-72' : 'w-36 h-48 sm:w-40 sm:h-52'
+  const sizeClasses =
+    size === 'lg'
+      ? 'w-44 h-60 sm:w-48 sm:h-68'
+      : size === 'md'
+      ? 'w-36 h-52 sm:w-40 sm:h-58'
+      : 'w-28 h-40 sm:w-32 sm:h-46'
 
   return (
     <div
       id="tour-teacher-guide"
-      className="relative flex flex-col items-center select-none group cursor-pointer"
+      className={`relative flex flex-col items-center select-none group cursor-pointer ${className}`}
       onClick={onClick}
     >
       {/* 1. Animated Speech Bubble floating above teacher's head */}
@@ -270,10 +279,12 @@ export function TeacherAdvisorFigure({
       </div>
 
       {/* 3. Small Caption Under Teacher */}
-      <div className="mt-1 flex items-center gap-1.5 text-[11px] font-mono font-medium text-[#68717D] dark:text-[#9CA3AF] group-hover:text-[#2B660E] dark:group-hover:text-[#B7F36B] transition-colors">
-        <MessageSquare className="w-3 h-3 text-[#2B660E] dark:text-[#B7F36B]" />
-        <span>{isEn ? 'Click to consult advisor' : 'Danışmana danışmak için tıkla'}</span>
-      </div>
+      {showCaption && (
+        <div className="mt-1 flex items-center gap-1.5 text-[11px] font-mono font-medium text-[#68717D] dark:text-[#9CA3AF] group-hover:text-[#2B660E] dark:group-hover:text-[#B7F36B] transition-colors">
+          <MessageSquare className="w-3 h-3 text-[#2B660E] dark:text-[#B7F36B]" />
+          <span>{isEn ? 'Click to consult advisor' : 'Danışmana danışmak için tıkla'}</span>
+        </div>
+      )}
     </div>
   )
 }
