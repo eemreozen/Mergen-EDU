@@ -26,9 +26,21 @@ Mergen, geliştiricilerin gerçek projeler üreterek yazılım geliştirmeyi ö�
 
 ---
 
+---
+
+## 📂 Proje Yapısı
+
+- **`frontend/`**: React 19 + TypeScript + Vite 8 tabanlı web kullanıcı arayüzü.
+- **`backend/`**: Yapay zeka servisleri, yol haritası motoru ve backend mimarisi.
+
+---
+
 ## 💻 Kurulum ve Çalıştırma
 
+### Frontend (Web)
 ```bash
+cd frontend
+
 # Bağımlılıkları yükleyin
 npm install
 
