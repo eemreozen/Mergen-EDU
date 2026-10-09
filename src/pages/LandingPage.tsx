@@ -5,7 +5,7 @@ export function LandingPage() {
   const [projectIdea, setProjectIdea] = useState('')
 
   return (
-    <div className="w-full flex flex-col items-center justify-between flex-1 relative">
+    <div className="w-full flex-1 flex flex-col items-center justify-center relative py-4 sm:py-6 my-auto">
       <HeroSection
         externalIdea={projectIdea}
         onIdeaChange={setProjectIdea}

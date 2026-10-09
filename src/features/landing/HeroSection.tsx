@@ -93,10 +93,10 @@ export function HeroSection({
 
   return (
     <>
-      <section className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 min-h-[85vh] flex flex-col justify-between pt-8 sm:pt-12 pb-0 overflow-visible">
+      <section className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 flex flex-col justify-center items-center my-auto py-4 sm:py-8 overflow-visible">
         
         {/* SYMMETRICAL 3-COLUMN WORKSPACE: LEFT (Wizard + Logo) — CENTER (Input Box) — RIGHT (Sign In + Preferences + Advisor) */}
-        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center pb-2">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
           
           {/* LEFT COLUMN: Small Wizard Button + Logo & Brand identity (Cols 1-3) */}
           <motion.div
@@ -265,12 +265,12 @@ export function HeroSection({
             </div>
           </div>
 
-          {/* RIGHT COLUMN: GİRİŞ YAP KUTUSU (Üstte) & TERCİHLER (Altında) & ÖNLÜKLÜ DANIŞMAN (En altta) (Cols 10-12) */}
+          {/* RIGHT COLUMN: GİRİŞ YAP KUTUSU (Üstte) & TERCİHLER (Ortada) & DANIŞMAN KAFASI (Altta) (Cols 10-12) */}
           <motion.div
             initial={{ opacity: 0, x: 16 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.45 }}
-            className="lg:col-span-3 flex flex-col items-center lg:items-end justify-between h-full space-y-4"
+            className="lg:col-span-3 flex flex-col items-center lg:items-end justify-center space-y-3.5"
           >
             {/* GİRİŞ YAP BUTONU */}
             <div className="w-full max-w-[220px] p-3 rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF] dark:bg-[#171A20] shadow-md text-left flex flex-col gap-2">
@@ -298,10 +298,10 @@ export function HeroSection({
               </div>
             </div>
 
-            {/* ÖNLÜKLÜ REHBER ÖĞRETMEN ÇİZİMİ (Altta ayaklarıyla basan, tıklandığında chat açılır) */}
-            <div className="relative translate-y-[2px]">
+            {/* REHBER DANIŞMAN KAFA AVATARI (Tıklandığında chat açılır) */}
+            <div className="w-full max-w-[220px] flex flex-col items-center lg:items-end">
               <TeacherAdvisorFigure
-                size="lg"
+                size="md"
                 onClick={() => setIsAdvisorOpen(true)}
                 showBubble={true}
                 showCaption={true}
