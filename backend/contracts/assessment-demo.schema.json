@@ -1,0 +1,96 @@
+{
+  "$defs": {
+    "AssessmentQuestion": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "prompt": {
+          "minLength": 1,
+          "title": "Prompt",
+          "type": "string"
+        },
+        "options": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 6,
+          "minItems": 2,
+          "title": "Options",
+          "type": "array"
+        },
+        "correctIndex": {
+          "minimum": 0,
+          "title": "Correctindex",
+          "type": "integer"
+        },
+        "explanation": {
+          "title": "Explanation",
+          "type": "string"
+        },
+        "targetSkill": {
+          "title": "Targetskill",
+          "type": "string"
+        },
+        "difficulty": {
+          "title": "Difficulty",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "prompt",
+        "options",
+        "correctIndex",
+        "explanation",
+        "targetSkill",
+        "difficulty"
+      ],
+      "title": "AssessmentQuestion",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "nodeId": {
+      "title": "Nodeid",
+      "type": "string"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "passingScore": {
+      "title": "Passingscore",
+      "type": "number"
+    },
+    "version": {
+      "title": "Version",
+      "type": "integer"
+    },
+    "questions": {
+      "items": {
+        "$ref": "#/$defs/AssessmentQuestion"
+      },
+      "title": "Questions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "nodeId",
+    "title",
+    "passingScore",
+    "version",
+    "questions"
+  ],
+  "title": "DemoAssessmentView",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

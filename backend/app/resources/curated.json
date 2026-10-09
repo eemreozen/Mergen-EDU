@@ -1,0 +1,9 @@
+[
+  {"id":"python-tutorial","title":"Python Tutorial","url":"https://docs.python.org/3/tutorial/","type":"documentation","provider":"Python Software Foundation","language":"en","verified":true,"skills":["python"]},
+  {"id":"react-native","title":"React Native Documentation","url":"https://reactnative.dev/docs/getting-started","type":"documentation","provider":"React Native","language":"en","verified":true,"skills":["react_native","mobile"]},
+  {"id":"fastapi","title":"FastAPI Tutorial","url":"https://fastapi.tiangolo.com/tutorial/","type":"documentation","provider":"FastAPI","language":"en","verified":true,"skills":["fastapi","backend"]},
+  {"id":"sklearn","title":"Scikit-learn User Guide","url":"https://scikit-learn.org/stable/user_guide.html","type":"documentation","provider":"Scikit-learn","language":"en","verified":true,"skills":["ml","machine_learning"]},
+  {"id":"pandas","title":"Pandas Getting Started","url":"https://pandas.pydata.org/docs/getting_started/index.html","type":"documentation","provider":"Pandas","language":"en","verified":true,"skills":["pandas","data"]},
+  {"id":"godot","title":"Godot Documentation","url":"https://docs.godotengine.org/en/stable/","type":"documentation","provider":"Godot","language":"en","verified":true,"skills":["godot"]},
+  {"id":"javascript","title":"JavaScript Guide","url":"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide","type":"documentation","provider":"MDN","language":"en","verified":true,"skills":["javascript","programming"]}
+]

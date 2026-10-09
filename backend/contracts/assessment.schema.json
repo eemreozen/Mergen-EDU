@@ -1,0 +1,87 @@
+{
+  "$defs": {
+    "PublicQuestion": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "prompt": {
+          "title": "Prompt",
+          "type": "string"
+        },
+        "options": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Options",
+          "type": "array"
+        },
+        "explanation": {
+          "default": "",
+          "title": "Explanation",
+          "type": "string"
+        },
+        "targetSkill": {
+          "title": "Targetskill",
+          "type": "string"
+        },
+        "difficulty": {
+          "title": "Difficulty",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "prompt",
+        "options",
+        "targetSkill",
+        "difficulty"
+      ],
+      "title": "PublicQuestion",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "nodeId": {
+      "title": "Nodeid",
+      "type": "string"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "passingScore": {
+      "title": "Passingscore",
+      "type": "number"
+    },
+    "version": {
+      "title": "Version",
+      "type": "integer"
+    },
+    "questions": {
+      "items": {
+        "$ref": "#/$defs/PublicQuestion"
+      },
+      "title": "Questions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "nodeId",
+    "title",
+    "passingScore",
+    "version",
+    "questions"
+  ],
+  "title": "AssessmentView",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

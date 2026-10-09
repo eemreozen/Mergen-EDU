@@ -1,0 +1,158 @@
+{
+  "schemaVersion": "mergen/v1",
+  "project": {
+    "id": "0431386f-f4b5-4c15-96b9-41b7ea4ddc40",
+    "projectId": "0431386f-f4b5-4c15-96b9-41b7ea4ddc40",
+    "title": "AI Fitness App",
+    "originalIdea": "Yapay zekâ destekli fitness uygulaması geliştirmek istiyorum.",
+    "primaryDomain": "mobile",
+    "secondaryDomains": [
+      "ai_ml"
+    ],
+    "goal": "Yapay zekâ destekli fitness uygulaması geliştirmek istiyorum.",
+    "locale": "tr",
+    "status": "discovery",
+    "metadata": {
+      "source": "deterministic_fixture",
+      "demo": true
+    }
+  },
+  "learnerProfile": {
+    "experienceLevel": "unknown",
+    "knownTechnologies": [],
+    "selfReportedSkills": [],
+    "verifiedSkills": [],
+    "weeklyHours": null
+  },
+  "discovery": {
+    "questions": [
+      {
+        "id": "goal",
+        "questionId": "goal",
+        "text": "Öncelikli hedefin nedir?",
+        "type": "single_choice",
+        "options": [
+          "mvp",
+          "deep_learning",
+          "portfolio",
+          "startup"
+        ],
+        "targetField": "goal",
+        "required": true,
+        "parentQuestionId": null,
+        "completed": false
+      },
+      {
+        "id": "experience",
+        "questionId": "experience",
+        "text": "Mevcut bilgi seviyen nedir? (Öz-beyan)",
+        "type": "single_choice",
+        "options": [
+          "beginner",
+          "basic",
+          "intermediate",
+          "advanced"
+        ],
+        "targetField": "experienceLevel",
+        "required": true,
+        "parentQuestionId": null,
+        "completed": false
+      },
+      {
+        "id": "technologies",
+        "questionId": "technologies",
+        "text": "Hangi teknolojileri biliyorsun? (Virgülle ayırabilirsin)",
+        "type": "short_text",
+        "options": [],
+        "targetField": "knownTechnologies",
+        "required": true,
+        "parentQuestionId": null,
+        "completed": false
+      },
+      {
+        "id": "platform",
+        "questionId": "platform",
+        "text": "Hangi platformu hedefliyorsun?",
+        "type": "single_choice",
+        "options": [
+          "mobile",
+          "web",
+          "desktop",
+          "other"
+        ],
+        "targetField": "platform",
+        "required": true,
+        "parentQuestionId": null,
+        "completed": false
+      },
+      {
+        "id": "hours",
+        "questionId": "hours",
+        "text": "Haftada kaç saat ayırabilirsin?",
+        "type": "short_text",
+        "options": [],
+        "targetField": "weeklyHours",
+        "required": true,
+        "parentQuestionId": null,
+        "completed": false
+      },
+      {
+        "id": "mobile_stack",
+        "questionId": "mobile_stack",
+        "text": "Mobil teknoloji tercihin nedir?",
+        "type": "single_choice",
+        "options": [
+          "react_native",
+          "flutter",
+          "native",
+          "undecided"
+        ],
+        "targetField": "mobileStack",
+        "required": true,
+        "parentQuestionId": null,
+        "completed": false
+      },
+      {
+        "id": "ai_strategy",
+        "questionId": "ai_strategy",
+        "text": "Hazır AI API mi, kendi modelin mi?",
+        "type": "single_choice",
+        "options": [
+          "api",
+          "train_model",
+          "undecided"
+        ],
+        "targetField": "aiStrategy",
+        "required": true,
+        "parentQuestionId": null,
+        "completed": false
+      }
+    ],
+    "answers": [],
+    "completed": false,
+    "nextQuestion": {
+      "id": "goal",
+      "questionId": "goal",
+      "text": "Öncelikli hedefin nedir?",
+      "type": "single_choice",
+      "options": [
+        "mvp",
+        "deep_learning",
+        "portfolio",
+        "startup"
+      ],
+      "targetField": "goal",
+      "required": true,
+      "parentQuestionId": null,
+      "completed": false
+    },
+    "readyForRoadmap": false
+  },
+  "maps": [],
+  "assessments": [],
+  "resources": [],
+  "metadata": {
+    "source": "deterministic_fixture",
+    "demo": true
+  }
+}

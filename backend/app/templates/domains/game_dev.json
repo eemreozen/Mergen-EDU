@@ -1,0 +1,37 @@
+[
+  {
+    "id": "engine",
+    "text": "Hangi oyun motoru?",
+    "type": "single_choice",
+    "targetField": "engine",
+    "options": [
+      "unity",
+      "godot",
+      "unreal",
+      "undecided"
+    ],
+    "required": true
+  },
+  {
+    "id": "dimensions",
+    "text": "2D mi 3D mi?",
+    "type": "single_choice",
+    "targetField": "dimensions",
+    "options": [
+      "2d",
+      "3d"
+    ],
+    "required": true
+  },
+  {
+    "id": "multiplayer",
+    "text": "Multiplayer gerekli mi?",
+    "type": "single_choice",
+    "targetField": "multiplayer",
+    "options": [
+      "yes",
+      "no"
+    ],
+    "required": true
+  }
+]

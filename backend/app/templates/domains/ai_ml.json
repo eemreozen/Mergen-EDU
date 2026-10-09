@@ -1,0 +1,14 @@
+[
+  {
+    "id": "ai_strategy",
+    "text": "Hazır AI API mi, kendi modelin mi?",
+    "type": "single_choice",
+    "targetField": "aiStrategy",
+    "options": [
+      "api",
+      "train_model",
+      "undecided"
+    ],
+    "required": true
+  }
+]

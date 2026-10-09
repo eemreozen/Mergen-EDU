@@ -1,0 +1,146 @@
+{
+  "$defs": {
+    "DiscoveryAnswer": {
+      "additionalProperties": false,
+      "properties": {
+        "questionId": {
+          "title": "Questionid",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "questionId",
+        "value"
+      ],
+      "title": "DiscoveryAnswer",
+      "type": "object"
+    },
+    "DiscoveryQuestion": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "questionId": {
+          "title": "Questionid",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "single_choice",
+            "multi_choice",
+            "short_text"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "options": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Options",
+          "type": "array"
+        },
+        "targetField": {
+          "title": "Targetfield",
+          "type": "string"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        },
+        "parentQuestionId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parentquestionid"
+        },
+        "completed": {
+          "default": false,
+          "title": "Completed",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "questionId",
+        "text",
+        "type",
+        "targetField"
+      ],
+      "title": "DiscoveryQuestion",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "questions": {
+      "items": {
+        "$ref": "#/$defs/DiscoveryQuestion"
+      },
+      "title": "Questions",
+      "type": "array"
+    },
+    "answers": {
+      "items": {
+        "$ref": "#/$defs/DiscoveryAnswer"
+      },
+      "title": "Answers",
+      "type": "array"
+    },
+    "completed": {
+      "title": "Completed",
+      "type": "boolean"
+    },
+    "nextQuestion": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/DiscoveryQuestion"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "readyForRoadmap": {
+      "title": "Readyforroadmap",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "questions",
+    "answers",
+    "completed",
+    "nextQuestion",
+    "readyForRoadmap"
+  ],
+  "title": "DiscoveryView",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

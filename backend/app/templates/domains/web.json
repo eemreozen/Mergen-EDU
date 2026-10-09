@@ -1,0 +1,26 @@
+[
+  {
+    "id": "web_experience",
+    "text": "Frontend/backend deneyimin var mı?",
+    "type": "multi_choice",
+    "targetField": "webExperience",
+    "options": [
+      "frontend",
+      "backend",
+      "none"
+    ],
+    "required": true
+  },
+  {
+    "id": "web_features",
+    "text": "Hangi özellikler gerekli?",
+    "type": "multi_choice",
+    "targetField": "webFeatures",
+    "options": [
+      "authentication",
+      "payments",
+      "none"
+    ],
+    "required": true
+  }
+]

@@ -1,0 +1,362 @@
+{
+  "$defs": {
+    "EdgeView": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "source": {
+          "title": "Source",
+          "type": "string"
+        },
+        "target": {
+          "title": "Target",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "requires",
+            "supports"
+          ],
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "source",
+        "target",
+        "kind"
+      ],
+      "title": "EdgeView",
+      "type": "object"
+    },
+    "Metadata": {
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "default": "openai",
+          "title": "Source",
+          "type": "string"
+        },
+        "demo": {
+          "default": false,
+          "title": "Demo",
+          "type": "boolean"
+        }
+      },
+      "title": "Metadata",
+      "type": "object"
+    },
+    "NodeView": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "mapId": {
+          "title": "Mapid",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "summary": {
+          "title": "Summary",
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "learning",
+            "development_task",
+            "submap",
+            "milestone",
+            "remedial"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "locked",
+            "available",
+            "in_progress",
+            "completed",
+            "needs_review"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "skills": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Skills",
+          "type": "array"
+        },
+        "estimatedHours": {
+          "title": "Estimatedhours",
+          "type": "number"
+        },
+        "prerequisites": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Prerequisites",
+          "type": "array"
+        },
+        "whyNeeded": {
+          "default": "",
+          "title": "Whyneeded",
+          "type": "string"
+        },
+        "learningObjectives": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Learningobjectives",
+          "type": "array"
+        },
+        "subtopics": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Subtopics",
+          "type": "array"
+        },
+        "practicalTask": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PracticalTask"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "resources": {
+          "items": {
+            "$ref": "#/$defs/ResourceView"
+          },
+          "title": "Resources",
+          "type": "array"
+        },
+        "assessmentId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Assessmentid"
+        },
+        "childMapId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Childmapid"
+        },
+        "remediationForNodeId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Remediationfornodeid"
+        },
+        "taskCompleted": {
+          "default": false,
+          "title": "Taskcompleted",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "mapId",
+        "title",
+        "summary",
+        "type",
+        "status",
+        "skills",
+        "estimatedHours"
+      ],
+      "title": "NodeView",
+      "type": "object"
+    },
+    "PracticalTask": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "expectedOutput": {
+          "title": "Expectedoutput",
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "expectedOutput"
+      ],
+      "title": "PracticalTask",
+      "type": "object"
+    },
+    "ResourceView": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "nodeId": {
+          "title": "Nodeid",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "url": {
+          "title": "Url",
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "documentation",
+            "youtube",
+            "article",
+            "interactive",
+            "course"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "language": {
+          "title": "Language",
+          "type": "string"
+        },
+        "verified": {
+          "title": "Verified",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "nodeId",
+        "title",
+        "url",
+        "type",
+        "provider",
+        "language",
+        "verified"
+      ],
+      "title": "ResourceView",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "projectId": {
+      "title": "Projectid",
+      "type": "string"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "description": {
+      "title": "Description",
+      "type": "string"
+    },
+    "parentMapId": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Parentmapid"
+    },
+    "parentNodeId": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Parentnodeid"
+    },
+    "generationStatus": {
+      "title": "Generationstatus",
+      "type": "string"
+    },
+    "version": {
+      "title": "Version",
+      "type": "integer"
+    },
+    "nodes": {
+      "items": {
+        "$ref": "#/$defs/NodeView"
+      },
+      "title": "Nodes",
+      "type": "array"
+    },
+    "edges": {
+      "items": {
+        "$ref": "#/$defs/EdgeView"
+      },
+      "title": "Edges",
+      "type": "array"
+    },
+    "metadata": {
+      "$ref": "#/$defs/Metadata"
+    }
+  },
+  "required": [
+    "id",
+    "projectId",
+    "title",
+    "description",
+    "parentMapId",
+    "parentNodeId",
+    "generationStatus",
+    "version",
+    "nodes",
+    "edges",
+    "metadata"
+  ],
+  "title": "MapView",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

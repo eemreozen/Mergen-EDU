@@ -1,0 +1,868 @@
+{
+  "$defs": {
+    "AssessmentQuestion": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "prompt": {
+          "minLength": 1,
+          "title": "Prompt",
+          "type": "string"
+        },
+        "options": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 6,
+          "minItems": 2,
+          "title": "Options",
+          "type": "array"
+        },
+        "correctIndex": {
+          "minimum": 0,
+          "title": "Correctindex",
+          "type": "integer"
+        },
+        "explanation": {
+          "title": "Explanation",
+          "type": "string"
+        },
+        "targetSkill": {
+          "title": "Targetskill",
+          "type": "string"
+        },
+        "difficulty": {
+          "title": "Difficulty",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "prompt",
+        "options",
+        "correctIndex",
+        "explanation",
+        "targetSkill",
+        "difficulty"
+      ],
+      "title": "AssessmentQuestion",
+      "type": "object"
+    },
+    "AssessmentView": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "nodeId": {
+          "title": "Nodeid",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "passingScore": {
+          "title": "Passingscore",
+          "type": "number"
+        },
+        "version": {
+          "title": "Version",
+          "type": "integer"
+        },
+        "questions": {
+          "items": {
+            "$ref": "#/$defs/PublicQuestion"
+          },
+          "title": "Questions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "nodeId",
+        "title",
+        "passingScore",
+        "version",
+        "questions"
+      ],
+      "title": "AssessmentView",
+      "type": "object"
+    },
+    "DemoAssessmentView": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "nodeId": {
+          "title": "Nodeid",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "passingScore": {
+          "title": "Passingscore",
+          "type": "number"
+        },
+        "version": {
+          "title": "Version",
+          "type": "integer"
+        },
+        "questions": {
+          "items": {
+            "$ref": "#/$defs/AssessmentQuestion"
+          },
+          "title": "Questions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "nodeId",
+        "title",
+        "passingScore",
+        "version",
+        "questions"
+      ],
+      "title": "DemoAssessmentView",
+      "type": "object"
+    },
+    "DiscoveryAnswer": {
+      "additionalProperties": false,
+      "properties": {
+        "questionId": {
+          "title": "Questionid",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "questionId",
+        "value"
+      ],
+      "title": "DiscoveryAnswer",
+      "type": "object"
+    },
+    "DiscoveryQuestion": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "questionId": {
+          "title": "Questionid",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "single_choice",
+            "multi_choice",
+            "short_text"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "options": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Options",
+          "type": "array"
+        },
+        "targetField": {
+          "title": "Targetfield",
+          "type": "string"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        },
+        "parentQuestionId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parentquestionid"
+        },
+        "completed": {
+          "default": false,
+          "title": "Completed",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "questionId",
+        "text",
+        "type",
+        "targetField"
+      ],
+      "title": "DiscoveryQuestion",
+      "type": "object"
+    },
+    "DiscoveryView": {
+      "additionalProperties": false,
+      "properties": {
+        "questions": {
+          "items": {
+            "$ref": "#/$defs/DiscoveryQuestion"
+          },
+          "title": "Questions",
+          "type": "array"
+        },
+        "answers": {
+          "items": {
+            "$ref": "#/$defs/DiscoveryAnswer"
+          },
+          "title": "Answers",
+          "type": "array"
+        },
+        "completed": {
+          "title": "Completed",
+          "type": "boolean"
+        },
+        "nextQuestion": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DiscoveryQuestion"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "readyForRoadmap": {
+          "title": "Readyforroadmap",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "questions",
+        "answers",
+        "completed",
+        "nextQuestion",
+        "readyForRoadmap"
+      ],
+      "title": "DiscoveryView",
+      "type": "object"
+    },
+    "EdgeView": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "source": {
+          "title": "Source",
+          "type": "string"
+        },
+        "target": {
+          "title": "Target",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "requires",
+            "supports"
+          ],
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "source",
+        "target",
+        "kind"
+      ],
+      "title": "EdgeView",
+      "type": "object"
+    },
+    "LearnerProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "experienceLevel": {
+          "default": "unknown",
+          "title": "Experiencelevel",
+          "type": "string"
+        },
+        "knownTechnologies": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Knowntechnologies",
+          "type": "array"
+        },
+        "selfReportedSkills": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Selfreportedskills",
+          "type": "array"
+        },
+        "verifiedSkills": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Verifiedskills",
+          "type": "array"
+        },
+        "weeklyHours": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Weeklyhours"
+        }
+      },
+      "title": "LearnerProfile",
+      "type": "object"
+    },
+    "MapView": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "projectId": {
+          "title": "Projectid",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "parentMapId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Parentmapid"
+        },
+        "parentNodeId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Parentnodeid"
+        },
+        "generationStatus": {
+          "title": "Generationstatus",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "integer"
+        },
+        "nodes": {
+          "items": {
+            "$ref": "#/$defs/NodeView"
+          },
+          "title": "Nodes",
+          "type": "array"
+        },
+        "edges": {
+          "items": {
+            "$ref": "#/$defs/EdgeView"
+          },
+          "title": "Edges",
+          "type": "array"
+        },
+        "metadata": {
+          "$ref": "#/$defs/Metadata"
+        }
+      },
+      "required": [
+        "id",
+        "projectId",
+        "title",
+        "description",
+        "parentMapId",
+        "parentNodeId",
+        "generationStatus",
+        "version",
+        "nodes",
+        "edges",
+        "metadata"
+      ],
+      "title": "MapView",
+      "type": "object"
+    },
+    "Metadata": {
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "default": "openai",
+          "title": "Source",
+          "type": "string"
+        },
+        "demo": {
+          "default": false,
+          "title": "Demo",
+          "type": "boolean"
+        }
+      },
+      "title": "Metadata",
+      "type": "object"
+    },
+    "NodeView": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "mapId": {
+          "title": "Mapid",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "summary": {
+          "title": "Summary",
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "learning",
+            "development_task",
+            "submap",
+            "milestone",
+            "remedial"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "locked",
+            "available",
+            "in_progress",
+            "completed",
+            "needs_review"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "skills": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Skills",
+          "type": "array"
+        },
+        "estimatedHours": {
+          "title": "Estimatedhours",
+          "type": "number"
+        },
+        "prerequisites": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Prerequisites",
+          "type": "array"
+        },
+        "whyNeeded": {
+          "default": "",
+          "title": "Whyneeded",
+          "type": "string"
+        },
+        "learningObjectives": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Learningobjectives",
+          "type": "array"
+        },
+        "subtopics": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Subtopics",
+          "type": "array"
+        },
+        "practicalTask": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PracticalTask"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "resources": {
+          "items": {
+            "$ref": "#/$defs/ResourceView"
+          },
+          "title": "Resources",
+          "type": "array"
+        },
+        "assessmentId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Assessmentid"
+        },
+        "childMapId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Childmapid"
+        },
+        "remediationForNodeId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Remediationfornodeid"
+        },
+        "taskCompleted": {
+          "default": false,
+          "title": "Taskcompleted",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "mapId",
+        "title",
+        "summary",
+        "type",
+        "status",
+        "skills",
+        "estimatedHours"
+      ],
+      "title": "NodeView",
+      "type": "object"
+    },
+    "PracticalTask": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "expectedOutput": {
+          "title": "Expectedoutput",
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "expectedOutput"
+      ],
+      "title": "PracticalTask",
+      "type": "object"
+    },
+    "ProjectView": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "projectId": {
+          "title": "Projectid",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "originalIdea": {
+          "title": "Originalidea",
+          "type": "string"
+        },
+        "primaryDomain": {
+          "enum": [
+            "core",
+            "web",
+            "mobile",
+            "ai_ml",
+            "game_dev"
+          ],
+          "title": "Primarydomain",
+          "type": "string"
+        },
+        "secondaryDomains": {
+          "items": {
+            "enum": [
+              "core",
+              "web",
+              "mobile",
+              "ai_ml",
+              "game_dev"
+            ],
+            "type": "string"
+          },
+          "title": "Secondarydomains",
+          "type": "array"
+        },
+        "goal": {
+          "title": "Goal",
+          "type": "string"
+        },
+        "locale": {
+          "title": "Locale",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "discovery",
+            "ready_for_roadmap",
+            "generating",
+            "active",
+            "failed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "metadata": {
+          "$ref": "#/$defs/Metadata"
+        }
+      },
+      "required": [
+        "id",
+        "projectId",
+        "title",
+        "originalIdea",
+        "primaryDomain",
+        "secondaryDomains",
+        "goal",
+        "locale",
+        "status",
+        "metadata"
+      ],
+      "title": "ProjectView",
+      "type": "object"
+    },
+    "PublicQuestion": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "prompt": {
+          "title": "Prompt",
+          "type": "string"
+        },
+        "options": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Options",
+          "type": "array"
+        },
+        "explanation": {
+          "default": "",
+          "title": "Explanation",
+          "type": "string"
+        },
+        "targetSkill": {
+          "title": "Targetskill",
+          "type": "string"
+        },
+        "difficulty": {
+          "title": "Difficulty",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "prompt",
+        "options",
+        "targetSkill",
+        "difficulty"
+      ],
+      "title": "PublicQuestion",
+      "type": "object"
+    },
+    "ResourceView": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "nodeId": {
+          "title": "Nodeid",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "url": {
+          "title": "Url",
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "documentation",
+            "youtube",
+            "article",
+            "interactive",
+            "course"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "language": {
+          "title": "Language",
+          "type": "string"
+        },
+        "verified": {
+          "title": "Verified",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "nodeId",
+        "title",
+        "url",
+        "type",
+        "provider",
+        "language",
+        "verified"
+      ],
+      "title": "ResourceView",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": "mergen/v1",
+      "default": "mergen/v1",
+      "title": "Schemaversion",
+      "type": "string"
+    },
+    "project": {
+      "$ref": "#/$defs/ProjectView"
+    },
+    "learnerProfile": {
+      "$ref": "#/$defs/LearnerProfile"
+    },
+    "discovery": {
+      "$ref": "#/$defs/DiscoveryView"
+    },
+    "maps": {
+      "items": {
+        "$ref": "#/$defs/MapView"
+      },
+      "title": "Maps",
+      "type": "array"
+    },
+    "assessments": {
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/AssessmentView"
+          },
+          {
+            "$ref": "#/$defs/DemoAssessmentView"
+          }
+        ]
+      },
+      "title": "Assessments",
+      "type": "array"
+    },
+    "resources": {
+      "items": {
+        "$ref": "#/$defs/ResourceView"
+      },
+      "title": "Resources",
+      "type": "array"
+    },
+    "metadata": {
+      "$ref": "#/$defs/Metadata"
+    }
+  },
+  "required": [
+    "project",
+    "learnerProfile",
+    "discovery",
+    "metadata"
+  ],
+  "title": "ExportBundle",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -1,0 +1,57 @@
+[
+  {
+    "id": "goal",
+    "text": "Öncelikli hedefin nedir?",
+    "type": "single_choice",
+    "targetField": "goal",
+    "options": [
+      "mvp",
+      "deep_learning",
+      "portfolio",
+      "startup"
+    ],
+    "required": true
+  },
+  {
+    "id": "experience",
+    "text": "Mevcut bilgi seviyen nedir? (Öz-beyan)",
+    "type": "single_choice",
+    "targetField": "experienceLevel",
+    "options": [
+      "beginner",
+      "basic",
+      "intermediate",
+      "advanced"
+    ],
+    "required": true
+  },
+  {
+    "id": "technologies",
+    "text": "Hangi teknolojileri biliyorsun? (Virgülle ayırabilirsin)",
+    "type": "short_text",
+    "targetField": "knownTechnologies",
+    "options": [],
+    "required": true
+  },
+  {
+    "id": "platform",
+    "text": "Hangi platformu hedefliyorsun?",
+    "type": "single_choice",
+    "targetField": "platform",
+    "options": [
+      "mobile",
+      "web",
+      "desktop",
+      "other"
+    ],
+    "required": true
+  },
+  {
+    "id": "hours",
+    "text": "Haftada kaç saat ayırabilirsin?",
+    "type": "short_text",
+    "targetField": "weeklyHours",
+    "options": [],
+    "required": true
+  }
+]

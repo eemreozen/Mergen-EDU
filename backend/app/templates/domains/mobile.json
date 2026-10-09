@@ -1,0 +1,15 @@
+[
+  {
+    "id": "mobile_stack",
+    "text": "Mobil teknoloji tercihin nedir?",
+    "type": "single_choice",
+    "targetField": "mobileStack",
+    "options": [
+      "react_native",
+      "flutter",
+      "native",
+      "undecided"
+    ],
+    "required": true
+  }
+]
