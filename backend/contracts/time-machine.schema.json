@@ -1,0 +1,169 @@
+{
+  "$defs": {
+    "MemoryReviewView": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "sourceNodeId": {
+          "title": "Sourcenodeid",
+          "type": "string"
+        },
+        "sourceTitle": {
+          "title": "Sourcetitle",
+          "type": "string"
+        },
+        "skill": {
+          "title": "Skill",
+          "type": "string"
+        },
+        "level": {
+          "title": "Level",
+          "type": "integer"
+        },
+        "status": {
+          "enum": [
+            "scheduled",
+            "refresher"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "due": {
+          "title": "Due",
+          "type": "boolean"
+        },
+        "dueAt": {
+          "format": "date-time",
+          "title": "Dueat",
+          "type": "string"
+        },
+        "remainingSteps": {
+          "title": "Remainingsteps",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "sourceNodeId",
+        "sourceTitle",
+        "skill",
+        "level",
+        "status",
+        "due",
+        "dueAt",
+        "remainingSteps"
+      ],
+      "title": "MemoryReviewView",
+      "type": "object"
+    },
+    "WrongQuestionView": {
+      "additionalProperties": false,
+      "properties": {
+        "questionId": {
+          "title": "Questionid",
+          "type": "string"
+        },
+        "nodeId": {
+          "title": "Nodeid",
+          "type": "string"
+        },
+        "nodeTitle": {
+          "title": "Nodetitle",
+          "type": "string"
+        },
+        "prompt": {
+          "title": "Prompt",
+          "type": "string"
+        },
+        "selectedOption": {
+          "title": "Selectedoption",
+          "type": "string"
+        },
+        "correctOption": {
+          "title": "Correctoption",
+          "type": "string"
+        },
+        "explanation": {
+          "title": "Explanation",
+          "type": "string"
+        },
+        "skill": {
+          "title": "Skill",
+          "type": "string"
+        },
+        "wrongCount": {
+          "title": "Wrongcount",
+          "type": "integer"
+        },
+        "lastWrongAt": {
+          "format": "date-time",
+          "title": "Lastwrongat",
+          "type": "string"
+        },
+        "reviewId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reviewid"
+        }
+      },
+      "required": [
+        "questionId",
+        "nodeId",
+        "nodeTitle",
+        "prompt",
+        "selectedOption",
+        "correctOption",
+        "explanation",
+        "skill",
+        "wrongCount",
+        "lastWrongAt"
+      ],
+      "title": "WrongQuestionView",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "completedSteps": {
+      "title": "Completedsteps",
+      "type": "integer"
+    },
+    "dueCount": {
+      "title": "Duecount",
+      "type": "integer"
+    },
+    "reviews": {
+      "items": {
+        "$ref": "#/$defs/MemoryReviewView"
+      },
+      "title": "Reviews",
+      "type": "array"
+    },
+    "wrongQuestions": {
+      "items": {
+        "$ref": "#/$defs/WrongQuestionView"
+      },
+      "title": "Wrongquestions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "completedSteps",
+    "dueCount",
+    "reviews",
+    "wrongQuestions"
+  ],
+  "title": "TimeMachineView",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

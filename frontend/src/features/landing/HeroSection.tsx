@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import { ArrowRight, Compass, Sparkles, Wand2 } from 'lucide-react'
+import { ArrowRight, Compass, Wand2 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
@@ -48,10 +48,6 @@ export function HeroSection({
     finally { setCreating(false) }
   }
 
-  const handleStartFitnessDemo = () => {
-    setIdea(isEn ? 'I want to build an AI-powered fitness and nutrition recommendation application.' : 'Egzersiz hareketlerimi ve günlük beslenmemi analiz eden akıllı bir fitness asistanı geliştirmek istiyorum.')
-  }
-
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault()
@@ -92,17 +88,28 @@ export function HeroSection({
 
   return (
     <>
-      <section className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 flex flex-col justify-center items-center my-auto py-4 sm:py-8 overflow-visible">
-        
-        {/* SYMMETRICAL 3-COLUMN WORKSPACE: LEFT (Wizard + Logo) — CENTER (Input Box) — RIGHT (Sign In + Preferences + Advisor) */}
-        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
+      <section className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 flex flex-col justify-start items-center py-6 sm:py-8 overflow-visible">
+        <div className="w-full text-center mb-8 sm:mb-10">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-[#111318] dark:text-[#E9EDF3] leading-tight">
+            <span>{t('hero.titleLine1')} </span>
+            <span className="text-[#2B660E] dark:text-[#B7F36B]">{t('hero.titleLine2')}</span>
+          </h1>
+          <p className="text-xs sm:text-sm text-[#68717D] dark:text-[#9CA3AF] mt-2 font-mono">
+            {isEn
+              ? 'State your project idea. Climb your tailored learning roadmap.'
+              : 'Aklındaki projeyi yaz, tırmanış haritanı keşfet.'}
+          </p>
+        </div>
+
+        {/* Brand, idea and account actions form a balanced three-column layout. */}
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
           
           {/* LEFT COLUMN: Logo & Brand identity (Cols 1-3) */}
           <motion.div
             initial={{ opacity: 0, x: -16 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.45 }}
-            className="lg:col-span-3 flex flex-col items-center lg:items-start text-center lg:text-left space-y-3.5"
+            className="lg:col-span-2 self-center flex flex-col items-center lg:items-start text-center lg:text-left space-y-3.5"
           >
             {/* Enlarged Geometric Logo Card */}
             <div className="relative group w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-[#FFFFFF] dark:bg-[#171A20] border-2 border-[#E3E7EC] dark:border-[#2A3038] hover:border-[#2B660E] dark:hover:border-[#B7F36B] shadow-2xl flex items-center justify-center transition-all duration-300">
@@ -137,59 +144,29 @@ export function HeroSection({
             </div>
           </motion.div>
 
-          {/* CENTER COLUMN: Main Project Idea Input + Inspiration Chips (Cols 4-9) */}
-          <div className="lg:col-span-6 flex flex-col items-center text-center">
-            
-            {/* Main Headline */}
-            <div className="mb-4">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-[#111318] dark:text-[#E9EDF3] leading-tight">
-                <span>{t('hero.titleLine1')} </span>
-                <span className="text-[#2B660E] dark:text-[#B7F36B]">{t('hero.titleLine2')}</span>
-              </h1>
-              <p className="text-xs sm:text-sm text-[#68717D] dark:text-[#9CA3AF] mt-1 font-mono">
-                {isEn
-                  ? 'State your project idea. Climb your tailored learning roadmap.'
-                  : 'Aklındaki projeyi yaz, tırmanış haritanı keşfet.'}
-              </p>
-            </div>
-
+          {/* CENTER COLUMN: Project idea and optional examples */}
+          <div className="lg:col-span-8 flex flex-col items-center text-center px-0 sm:px-2">
             {/* The Project Idea Box */}
             <motion.div
               id="tour-idea-input"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
-              className="w-full max-w-xl"
+              className="w-full max-w-3xl"
             >
-              <div className="relative rounded-3xl border-2 border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF] dark:bg-[#171A20] shadow-2xl p-4 sm:p-5 flex flex-col justify-between text-left transition-all focus-within:border-[#2B660E] dark:focus-within:border-[#B7F36B] focus-within:ring-4 focus-within:ring-[#2B660E]/10 dark:focus-within:ring-[#B7F36B]/15">
-                <div className="flex items-center justify-between mb-2">
-                  <label
-                    htmlFor="project-idea-input"
-                    className="text-xs font-mono font-semibold uppercase tracking-wider text-[#68717D] dark:text-[#9CA3AF] flex items-center gap-1.5"
-                  >
-                    <Sparkles className="w-3.5 h-3.5 text-[#2B660E] dark:text-[#B7F36B]" />
-                    <span>{isEn ? 'What do you want to build?' : 'Ne hakkında proje geliştirmek istiyorsun?'}</span>
-                  </label>
-                  <span className="text-[11px] font-mono text-[#9CA3AF] dark:text-[#64748B]">
-                    {projectIdea.length} {t('hero.charCount')}
-                  </span>
-                </div>
-
+              <div className="relative rounded-3xl border border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF] dark:bg-[#171A20] shadow-lg p-5 sm:p-6 flex flex-col justify-between text-left transition-all focus-within:border-[#2B660E] dark:focus-within:border-[#B7F36B] focus-within:ring-4 focus-within:ring-[#2B660E]/10 dark:focus-within:ring-[#B7F36B]/15">
                 <textarea
                   id="project-idea-input"
-                  rows={4}
+                  aria-label={isEn ? 'Describe your project idea' : 'Proje fikrini yaz'}
+                  rows={5}
                   value={projectIdea}
                   onChange={e => setIdea(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder={t('hero.inputPlaceholder')}
-                  className="w-full bg-transparent border-0 outline-none resize-none text-sm sm:text-base text-[#111318] dark:text-[#E9EDF3] placeholder:text-[#9CA3AF] dark:placeholder:text-[#64748B] min-h-[105px] leading-relaxed font-normal py-1"
+                  placeholder={isEn ? 'What would you like to build?' : 'Ne geliştirmek istiyorsun?'}
+                  className="w-full bg-transparent border-0 outline-none resize-none text-base sm:text-lg text-[#111318] dark:text-[#E9EDF3] placeholder:text-[#9CA3AF] dark:placeholder:text-[#64748B] min-h-[150px] leading-relaxed font-normal py-2"
                 />
 
-                <div className="pt-3 border-t border-[#E3E7EC]/60 dark:border-[#2A3038]/60 flex items-center justify-between gap-3">
-                  <span className="text-xs text-[#9CA3AF] dark:text-[#64748B] font-mono hidden sm:inline">
-                    {t('hero.hintText')} · ⌘+Enter
-                  </span>
-
+                <div className="pt-4 border-t border-[#E3E7EC]/60 dark:border-[#2A3038]/60 flex justify-end">
                   <button
                     type="button"
                     disabled={!isValid || creating}
@@ -208,33 +185,17 @@ export function HeroSection({
             </motion.div>
 
             {/* Non-Technical Quick Inspiration Chips */}
-            <div id="tour-inspiration-chips" className="mt-8 sm:mt-9 w-full max-w-xl text-left">
-              <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                <span className="text-[11px] font-mono uppercase tracking-wider text-[#9CA3AF] dark:text-[#64748B]">
-                  {t('hero.quickSuggestionsTitle')}
+            <div id="tour-inspiration-chips" className="mt-5 w-full max-w-3xl text-left">
+              <div className="flex items-center justify-between gap-3 mb-2">
+                <span className="text-xs text-[#68717D] dark:text-[#9CA3AF]">
+                  {isEn ? 'Need an idea?' : 'Bir fikir seç'}
                 </span>
-
-                {/* Subtle Links */}
-                <div className="flex items-center gap-2 text-xs font-mono text-[#9CA3AF] dark:text-[#64748B]">
-                  <button
-                    type="button"
-                    onClick={handleStartFitnessDemo}
-                    className="hover:text-[#111318] dark:hover:text-[#E9EDF3] transition-colors cursor-pointer hover:underline"
-                  >
-                    <span>⚡️ {isEn ? 'Use fitness idea' : 'Fitness fikrini kullan'}</span>
-                  </button>
-                  <span>·</span>
-                  <Link
-                    to="/canvas?demo=1"
-                    className="hover:text-[#111318] dark:hover:text-[#E9EDF3] transition-colors inline-flex items-center gap-0.5 hover:underline"
-                  >
-                    <Compass className="w-3 h-3" />
-                    <span>{isEn ? 'Example canvas →' : 'Örnek kanvas →'}</span>
-                  </Link>
-                </div>
+                <Link to="/canvas?demo=1" className="text-xs text-[#68717D] dark:text-[#9CA3AF] hover:text-[#2B660E] dark:hover:text-[#B7F36B] transition-colors inline-flex items-center gap-1">
+                  <Compass className="w-3 h-3" />{isEn ? 'View example' : 'Örnek harita'}
+                </Link>
               </div>
 
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap justify-center lg:justify-start gap-2">
                 {starterIdeas.map((item, idx) => (
                   <button
                     key={idx}
@@ -253,49 +214,31 @@ export function HeroSection({
             </div>
           </div>
 
-          {/* RIGHT COLUMN: SİHİRBAZ + GİRİŞ YAP & TERCİHLER (Ortadaki metin kutusuna göre tam ortalanmış) (Cols 10-12) */}
+          {/* RIGHT COLUMN: Account controls and wizard sit beside the idea box. */}
           <motion.div
             initial={{ opacity: 0, x: 16 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.45 }}
-            className="lg:col-span-3 flex flex-col items-center lg:items-center justify-center space-y-3.5 my-auto"
+            className="lg:col-span-2 flex flex-col items-center justify-center gap-2.5 lg:-translate-y-9"
           >
-            {/* Küçük Sihirbazı Başlat Butonu (Giriş yapın üstünde) */}
+            <button
+              type="button"
+              onClick={() => setIsAuthOpen(true)}
+              className="w-full max-w-[170px] px-4 py-2.5 rounded-xl text-sm font-semibold bg-[#111318] dark:bg-[#E9EDF3] text-white dark:text-[#0B0D10] hover:bg-[#2B660E] dark:hover:bg-[#B7F36B] transition-colors cursor-pointer"
+            >
+              {t('nav.signIn')}
+            </button>
+            <LanguageSelector />
+            <ThemeToggle />
             <button
               id="tour-wizard-box"
               type="button"
               onClick={() => setIsTourOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-[#2B660E]/30 dark:border-[#B7F36B]/30 bg-[#FFFFFF] dark:bg-[#171A20] hover:bg-[#2B660E]/10 dark:hover:bg-[#B7F36B]/15 text-[#2B660E] dark:text-[#B7F36B] text-xs font-semibold shadow-xs transition-all active:scale-95 cursor-pointer whitespace-nowrap"
+              className="mt-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[#2B660E]/25 dark:border-[#B7F36B]/25 bg-[#FFFFFF] dark:bg-[#171A20] hover:bg-[#2B660E]/10 dark:hover:bg-[#B7F36B]/15 text-[#2B660E] dark:text-[#B7F36B] text-sm font-semibold transition-colors active:scale-[0.99] cursor-pointer whitespace-nowrap"
             >
-              <Wand2 className="w-3.5 h-3.5" />
+              <Wand2 className="w-4 h-4" />
               <span>{isEn ? 'Start Wizard' : 'Sihirbazı Başlat'}</span>
             </button>
-
-            {/* GİRİŞ YAP BUTONU */}
-            <div className="w-full max-w-[250px] p-3.5 rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF] dark:bg-[#171A20] shadow-md text-left flex flex-col gap-2">
-              <div className="text-[11px] font-mono text-[#68717D] dark:text-[#9CA3AF]">
-                {isEn ? 'Already a member?' : 'Daha önce geldin mi?'}
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsAuthOpen(true)}
-                className="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-[#111318] dark:bg-[#E9EDF3] text-white dark:text-[#0B0D10] hover:bg-[#2B660E] dark:hover:bg-[#B7F36B] transition-colors cursor-pointer text-center shadow-xs active:scale-95"
-              >
-                {t('nav.signIn')}
-              </button>
-            </div>
-
-            {/* TERCİHLER KISMI (Genişletildi, karanlık mod tam sığacak şekilde düzenlendi) */}
-            <div className="w-full max-w-[250px] p-2.5 px-3.5 rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF] dark:bg-[#171A20] shadow-sm flex items-center justify-between gap-2">
-              <span className="text-[11px] font-mono text-[#68717D] dark:text-[#9CA3AF] shrink-0">
-                {isEn ? 'Preferences:' : 'Tercihler:'}
-              </span>
-              <div className="flex items-center gap-2 shrink-0">
-                <LanguageSelector />
-                <div className="h-4 w-[1px] bg-[#E3E7EC] dark:bg-[#2A3038] shrink-0" />
-                <ThemeToggle />
-              </div>
-            </div>
           </motion.div>
 
         </div>

@@ -4,10 +4,27 @@ from app.schemas.discovery import DiscoveryAnswer, DiscoveryQuestion, DiscoveryV
 from app.services.project_service import owned_project
 
 
+def question_section(question, questions):
+    if question.get("section"):
+        return question["section"]
+    if question["target_field"].startswith("projectDetail") or question["id"].startswith("project-detail-"):
+        return "project"
+    parent = next((q for q in questions if q["id"] == question.get("parent_question_id")), None)
+    if parent and (parent.get("section") == "project" or parent["target_field"].startswith("projectDetail")):
+        return "project"
+    return "advisor"
+
+
 def discovery_view(project):
     data = project.discovery_data
     answers = {a["question_id"]: a for a in data["answers"]}
-    questions = [DiscoveryQuestion(**{**q, "completed": q["id"] in answers}) for q in data["questions"]]
+    questions = [
+        DiscoveryQuestion(
+            **{**q, "section": question_section(q, data["questions"]), "completed": q["id"] in answers}
+        )
+        for q in data["questions"]
+    ]
+    questions.sort(key=lambda q: q.section == "project")
     pending = [q for q in questions if q.required and not q.completed]
     ready = not pending and data.get("followupsGenerated", False)
     return DiscoveryView(
@@ -65,12 +82,17 @@ async def save_answers(db, project_id, user_id, request, gateway):
     data["answers"] = list(answers.values())
     project.discovery_data = data
     if (
-        all(not q["required"] or q["id"] in answers for q in data["questions"])
+        all(
+            not q["required"] or q["id"] in answers
+            for q in data["questions"]
+            if question_section(q, data["questions"]) == "advisor"
+        )
         and not data["followupsGenerated"]
     ):
         fields = answer_fields(project)
         if fields.get("aiStrategy") == "train_model":
             followup = DiscoveryQuestion(
+                section="advisor",
                 id="followup-python",
                 question_id="followup-python",
                 text="Do you have Python and dataset preparation experience?"
@@ -95,6 +117,7 @@ async def save_answers(db, project_id, user_id, request, gateway):
                 q = DiscoveryQuestion(
                     id=identifier,
                     question_id=identifier,
+                    section=question_section(questions[item.parent_question_id], data["questions"]),
                     text=item.text,
                     type="short_text",
                     target_field=item.target_field,

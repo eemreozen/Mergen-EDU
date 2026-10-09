@@ -120,7 +120,13 @@ async def submit_assessment(db, node_id, user_id, body, gateway):
         ("in_progress" if node.type == "development_task" else "completed") if passed else "needs_review"
     )
     branch, created = None, False
+    memory_reviews = []
     if not passed:
+        from app.services.memory_service import recall_old_gaps
+
+        current_map = await owned_map(db, node.map_id, user_id)
+        if current_map.kind != "adaptive":
+            memory_reviews = await recall_old_gaps(db, current_map.project_id, node.id, weak)
         selected = {a.question_id: a.selected_index for a in body.answers}
         failed_questions = [
             {
@@ -131,10 +137,23 @@ async def submit_assessment(db, node_id, user_id, body, gateway):
             for q in assessment.questions
             if selected[q["id"]] != q["correct_index"]
         ]
-        branch, created = await add_remediation(db, node, weak, gateway, failed_questions=failed_questions)
+        old_skills = {review.skill for review in memory_reviews}
+        new_weak = [skill for skill in weak if skill not in old_skills]
+        if new_weak:
+            branch, created = await add_remediation(
+                db,
+                node,
+                new_weak,
+                gateway,
+                failed_questions=[q for q in failed_questions if q["targetSkill"] in new_weak],
+            )
     await update_assessed(db, user_id, [q["target_skill"] for q in assessment.questions], weak, score)
     await recalculate(db, node.map_id)
-    roadmap = await map_view(db, await owned_map(db, node.map_id, user_id))
+    current_map = await owned_map(db, node.map_id, user_id)
+    from app.services.memory_service import sync_reviews
+
+    await sync_reviews(db, current_map.project_id)
+    roadmap = await map_view(db, current_map)
     attempt_id = new_id()
     result = AssessmentResult(
         attempt_id=attempt_id,
@@ -143,6 +162,7 @@ async def submit_assessment(db, node_id, user_id, body, gateway):
         weak_skills=weak,
         remediation_created=created,
         adaptive_map=await map_view(db, branch) if branch else None,
+        memory_review_ids=[r.id for r in memory_reviews],
         map=roadmap,
     )
     db.add(

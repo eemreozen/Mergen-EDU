@@ -11,7 +11,7 @@ from app.services.assessment_service import evaluate
 async def prepare_ml(client, project_id):
     await finish_discovery(client, project_id)
     root = (await client.post(f"/api/v1/projects/{project_id}/roadmap/generate")).json()
-    ml = next(n for n in root["nodes"] if n["type"] == "submap")
+    ml = next(n for n in root["nodes"] if n["type"] == "submap" and "Machine" in n["title"])
     child = (await client.post(f"/api/v1/nodes/{ml['id']}/submap")).json()
     python = next(n for n in child["nodes"] if n["title"] == "Python")
     return root, child, python

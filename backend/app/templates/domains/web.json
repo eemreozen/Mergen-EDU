@@ -1,25 +1,14 @@
 [
   {
-    "id": "web_experience",
-    "text": "Frontend/backend deneyimin var mı?",
-    "type": "multi_choice",
-    "targetField": "webExperience",
-    "options": [
-      "frontend",
-      "backend",
-      "none"
-    ],
-    "required": true
-  },
-  {
     "id": "web_features",
-    "text": "Hangi özellikler gerekli?",
+    "text": "İlk sürümde kullanıcı hesabı veya ödeme alma gerekli mi?",
     "type": "multi_choice",
     "targetField": "webFeatures",
     "options": [
       "authentication",
       "payments",
-      "none"
+      "neither",
+      "undecided"
     ],
     "required": true
   }

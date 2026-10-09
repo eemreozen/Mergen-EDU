@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from app.config import Settings
 from app.db.base import Base
-from app.models import advisor, assessment, project, roadmap, skill  # noqa: F401
+from app.models import advisor, assessment, memory, project, roadmap, skill  # noqa: F401
 
 config = context.config
 config.set_main_option("sqlalchemy.url", Settings().database_url.replace("%", "%%"))

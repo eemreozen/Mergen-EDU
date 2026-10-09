@@ -59,7 +59,11 @@ async def create_project(db, user_id, request, gateway):
 
             raise AppError("AI_INVALID_OUTPUT", "Proje keşif soruları tutarsız.", 502, True)
         identifier = f"project-detail-{index}"
-        questions.append(DiscoveryQuestion(id=identifier, question_id=identifier, **question.model_dump()))
+        questions.append(
+            DiscoveryQuestion(
+                id=identifier, question_id=identifier, section="project", **question.model_dump()
+            )
+        )
         used_fields.add(question.target_field)
     project = Project(
         user_id=user_id,

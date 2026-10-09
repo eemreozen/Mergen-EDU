@@ -65,3 +65,27 @@ const activate = () => {}
 assert.deepEqual(layoutMaps(converging, activate), layoutMaps(converging, activate))
 if (process.argv[2]) checkGeometry(JSON.parse(readFileSync(process.argv[2])))
 console.log('Learning layout: prerequisite order, convergence, non-overlap, stable root, separate branches — passed')
+
+// Ordinary child maps have their own canvas; remediation remains attached locally.
+const nested = structuredClone(original)
+const main = nested.maps.find(m => !m.parentMapId)
+const parent = main.nodes[0]
+parent.childMapId = 'detail'
+parent.status = 'in_progress'
+const detail = { ...structuredClone(main), id: 'detail', kind: 'submap', parentMapId: main.id, parentNodeId: parent.id,
+  nodes: [{...structuredClone(parent), id: 'detail-1', mapId: 'detail', childMapId: null, status: 'available'},
+    {...structuredClone(parent), id: 'detail-2', mapId: 'detail', childMapId: null, status: 'locked'}],
+  edges: [{id:'detail-edge', source:'detail-1', target:'detail-2', kind:'requires'}] }
+nested.maps.push(detail)
+assert.ok(!layoutMaps(nested, () => {}, main.id).nodes.some(n => n.id === 'detail-1'))
+const detailGraph = layoutMaps(nested, () => {}, detail.id)
+assert.deepEqual(detailGraph.nodes.map(n => n.id), ['detail-1', 'detail-2'])
+assert.notEqual(detailGraph.nodes[0].position.x, detailGraph.nodes[1].position.x)
+assert.notEqual(recommendedNode(nested)?.id, parent.id)
+const remediation = {...structuredClone(detail), id:'local-gap', kind:'adaptive', parentMapId:detail.id, targetNodeId:'detail-1',
+ nodes:[{...detail.nodes[0],id:'local-gap-1',mapId:'local-gap'}],edges:[]}
+nested.maps.push(remediation)
+const scoped = layoutMaps(nested, () => {}, detail.id)
+assert.ok(scoped.edges.some(e => e.source === 'detail-1' && e.target === 'local-gap-1'))
+assert.ok(!scoped.nodes.some(n => n.mapId === main.id))
+console.log('Separate submaps, local remediation and non-linear chain placement — passed')

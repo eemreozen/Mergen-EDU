@@ -1,4 +1,5 @@
 import type { ExportBundle, ProjectView, DiscoveryView, MapView, NodeView, AssessmentView } from './types'
+import type { MemoryChallenge, MemoryResult, TimeMachine } from './memory-types'
 
 const SESSION_KEY = 'mergen_demo_session'
 export function sessionId(): string {
@@ -31,13 +32,19 @@ async function request<T>(path: string, method = 'GET', body?: unknown): Promise
 export interface QuizResult {
   attemptId: string; passed: boolean; score: number; weakSkills: string[];
   remediationCreated: boolean; adaptiveMap: MapView | null; map: MapView
+  memoryReviewIds: string[]
 }
 export const api = {
+  timeMachine: (projectId: string) => request<TimeMachine>(`/projects/${projectId}/time-machine`),
+  prepareMemory: (reviewId: string) => request<MemoryChallenge>(`/memory/${reviewId}/prepare`, 'POST'),
+  answerMemory: (reviewId: string, checkId: string, selectedIndex: number, submissionId: string) =>
+    request<MemoryResult>(`/memory/${reviewId}/answer`, 'POST', { checkId, selectedIndex, submissionId }),
   projects: () => request<ProjectView[]>('/projects'),
   createProject: (idea: string, locale = 'tr') => request<ProjectView>('/projects', 'POST', { idea, locale }),
   exportProject: (id: string) => request<ExportBundle>(`/projects/${id}/export`),
   answer: (id: string, questionId: string, value: string | string[]) => request<DiscoveryView>(`/projects/${id}/discovery/answers`, 'POST', { answers: [{ questionId, value }] }),
   generate: (id: string) => request<MapView>(`/projects/${id}/roadmap/generate`, 'POST'),
+  submap: (id: string) => request<MapView>(`/nodes/${id}/submap`, 'POST'),
   learn: (id: string) => request<MapView>(`/nodes/${id}/learn`, 'POST'),
   node: (id: string) => request<NodeView>(`/nodes/${id}`),
   assessment: (id: string) => request<AssessmentView>(`/nodes/${id}/assessment`),

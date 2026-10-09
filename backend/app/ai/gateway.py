@@ -67,8 +67,10 @@ class AIGateway:
             if operation in {"roadmap", "submap", "adaptive_roadmap"}
             else self.settings.llm_max_output_tokens_fast
         )
+        if operation == "memory_review":
+            max_tokens = min(max_tokens, 1500)
         timeout_seconds = self.settings.llm_timeout_seconds
-        if operation == "project_analysis":
+        if operation in {"project_analysis", "memory_review"}:
             timeout_seconds = min(timeout_seconds, self.settings.llm_project_analysis_timeout_seconds)
         for attempt in range(self.settings.llm_retries + 1):
             started = monotonic()

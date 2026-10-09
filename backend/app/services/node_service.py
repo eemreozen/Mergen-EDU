@@ -41,4 +41,8 @@ async def update_node(db, node_id, user_id, body):
             )
         node.task_completed, node.task_evidence, node.status = True, body.expected_output, "completed"
     await recalculate(db, node.map_id)
-    return await map_view(db, await owned_map(db, node.map_id, user_id))
+    roadmap = await owned_map(db, node.map_id, user_id)
+    from app.services.memory_service import sync_reviews
+
+    await sync_reviews(db, roadmap.project_id)
+    return await map_view(db, roadmap)

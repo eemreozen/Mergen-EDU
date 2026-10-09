@@ -37,6 +37,7 @@ export type DiscoveryQuestion = {
   id: string;
   questionId: string;
   text: string;
+  section?: "advisor" | "project";
   type: "single_choice" | "multi_choice" | "short_text";
   options?: Array<string>;
   targetField: string;

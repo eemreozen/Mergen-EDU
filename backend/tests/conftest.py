@@ -6,7 +6,7 @@ from httpx import ASGITransport, AsyncClient
 from app.config import Settings
 from app.db.base import Base
 from app.main import create_app
-from app.models import advisor, assessment, project, roadmap, skill  # noqa: F401
+from app.models import advisor, assessment, memory, project, roadmap, skill  # noqa: F401
 
 
 @pytest.fixture

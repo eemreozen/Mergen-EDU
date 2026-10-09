@@ -14,7 +14,7 @@ async def test_root_submap_export(client, project_id):
     assert all(r.status_code == 200 for r in results), [r.text for r in results]
     root = results[0].json()
     assert root["id"] == results[1].json()["id"]
-    node = next(n for n in root["nodes"] if n["type"] == "submap")
+    node = next(n for n in root["nodes"] if n["type"] == "submap" and "Machine" in n["title"])
     results = await asyncio.gather(*[client.post(f"/api/v1/nodes/{node['id']}/submap") for _ in range(2)])
     assert all(r.status_code == 200 for r in results), [r.text for r in results]
     child = results[0].json()

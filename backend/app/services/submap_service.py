@@ -6,13 +6,15 @@ from app.services.discovery_service import answer_fields
 from app.services.project_service import owned_project
 from app.services.roadmap_service import map_view, owned_map, owned_node, persist_draft
 from app.services.skill_service import learner_profile
+from app.services.topic_expansion import broad_topic, expand_topic
 
 
 async def generate_submap(db, node_id, user_id, gateway):
     node = await owned_node(db, node_id, user_id, lock=True)
     if node.child_map_id:
         return await map_view(db, await db.get(RoadmapMap, node.child_map_id))
-    if node.type != "submap":
+    topic = broad_topic(node)
+    if node.type != "submap" and not topic:
         raise AppError("NOT_SUBMAP_NODE", "Bu düğüm alt harita türünde değil.", 409)
     from app.graph.progression import require_access
 
@@ -30,6 +32,10 @@ async def generate_submap(db, node_id, user_id, gateway):
     from app.services.project_service import ensure_ai_source
 
     ensure_ai_source(project, gateway)
+    if topic:
+        draft = expand_topic(topic, project, answer_fields(project))
+        node.type = "submap"
+        return await map_view(db, await persist_draft(db, project, draft, parent, node))
     draft = await gateway.generate_structured(
         "submap",
         SYSTEM,

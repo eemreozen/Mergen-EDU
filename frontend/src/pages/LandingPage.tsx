@@ -12,7 +12,7 @@ export function LandingPage() {
   }
 
   return (
-    <div className="w-full flex-1 flex flex-col items-center justify-center relative py-4 sm:py-6 my-auto">
+    <div className="w-full flex-1 flex flex-col items-center justify-start relative pt-4 sm:pt-6">
       <HeroSection
         externalIdea={projectIdea}
         onIdeaChange={setProjectIdea}

@@ -74,4 +74,5 @@ class AssessmentResult(Schema):
     weak_skills: list[str]
     remediation_created: bool
     adaptive_map: MapView | None = None
+    memory_review_ids: list[str] = Field(default_factory=list)
     map: MapView

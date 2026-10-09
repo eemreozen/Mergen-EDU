@@ -3,7 +3,16 @@ import type { ExportBundle, MapView, NodeView } from '@/api/types'
 
 export type LearningNodeData = { node: NodeView; stepNumber: number; mapTitle: string; adaptive: boolean; recommended: boolean; activate: (id: string) => void }
 
-export function recommendedNode(bundle: ExportBundle): NodeView | undefined {
+export function recommendedNode(bundle: ExportBundle, mapId?: string): NodeView | undefined {
+  if (mapId) {
+    const scope = new Set([mapId])
+    let changed = true
+    while (changed) {
+      changed = false
+      for (const map of bundle.maps ?? []) if (map.parentMapId && scope.has(map.parentMapId) && !scope.has(map.id)) { scope.add(map.id); changed = true }
+    }
+    bundle = { ...bundle, maps: bundle.maps?.filter(m => scope.has(m.id)) }
+  }
   const ordered = (map: MapView) => {
     const { steps } = arrange(map)
     return [...map.nodes].sort((a, b) => steps.get(a.id)! - steps.get(b.id)!)
@@ -18,9 +27,10 @@ export function recommendedNode(bundle: ExportBundle): NodeView | undefined {
     if (target && branch.nodes.every(n => n.status === 'completed')) return target
   }
   const activeTargets = new Set(branches.filter(m => m.nodes.some(n => n.status !== 'completed')).map(m => m.targetNodeId))
-  return all.find(n => !activeTargets.has(n.id) && n.status === 'in_progress')
-    || all.find(n => !activeTargets.has(n.id) && n.status === 'available')
-    || all.find(n => !activeTargets.has(n.id) && n.status === 'needs_review')
+  const candidates = all.filter(n => !n.childMapId || !bundle.maps?.find(m => m.id === n.childMapId)?.nodes.some(child => child.status !== 'completed'))
+  return candidates.find(n => !activeTargets.has(n.id) && n.status === 'in_progress')
+    || candidates.find(n => !activeTargets.has(n.id) && n.status === 'available')
+    || candidates.find(n => !activeTargets.has(n.id) && n.status === 'needs_review')
 }
 
 // Deterministic layered DAG layout. Progress and additional maps never move the root.
@@ -90,20 +100,28 @@ function arrange(map: MapView) {
   let step = 0
   for (const [rank, row] of rankedRows) {
     row.forEach((id, i) => {
-      positions.set(id, { x: (i + Math.floor((columns - row.length) / 2)) * COLUMN, y: rank * ROW })
+      positions.set(id, { x: columns === 1 ? [0, 0.5, 1, 0.5][rank % 4] * COLUMN : (i + Math.floor((columns - row.length) / 2)) * COLUMN, y: rank * ROW })
       steps.set(id, ++step)
     })
   }
-  return { positions, steps, ranks, width: (columns - 1) * COLUMN + WIDTH }
+  return { positions, steps, ranks, width: Math.max(0, ...[...positions.values()].map(p => p.x)) + WIDTH }
 }
 
-export function layoutMaps(bundle: ExportBundle, activate: (id: string) => void) {
+export function layoutMaps(bundle: ExportBundle, activate: (id: string) => void, activeMapId?: string) {
   const nodes: Node<LearningNodeData>[] = []
   const edges: Edge[] = []
-  const recommendation = recommendedNode(bundle)?.id
-  const root = (bundle.maps ?? []).find(m => !m.parentMapId)
+  const recommendation = recommendedNode(bundle, activeMapId)?.id
+  const root = (bundle.maps ?? []).find(m => activeMapId ? m.id === activeMapId : !m.parentMapId)
   if (!root) return { nodes, edges }
-  const remaining = (bundle.maps ?? []).filter(m => m.id !== root.id)
+  const visible = new Set([root.id])
+  if (activeMapId) {
+    let changed = true
+    while (changed) {
+      changed = false
+      for (const map of bundle.maps ?? []) if (map.kind === 'adaptive' && map.parentMapId && visible.has(map.parentMapId) && !visible.has(map.id)) { visible.add(map.id); changed = true }
+    }
+  }
+  const remaining = (bundle.maps ?? []).filter(m => m.id !== root.id && (!activeMapId || visible.has(m.id)))
   const maps = [root]
   // Parent maps are positioned before their children even when the API order differs.
   while (remaining.length) {

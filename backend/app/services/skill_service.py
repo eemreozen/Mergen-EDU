@@ -6,10 +6,16 @@ from app.schemas.project import LearnerProfile
 from app.services.discovery_service import answer_fields
 
 
+def known_technologies(fields):
+    values = fields.get("knownTechnologies", "")
+    if isinstance(values, str):
+        values = values.split(",")
+    unknown = {"none", "yok", "hiçbiri", "bilmiyorum", "hiç bilmiyorum", "henüz bilmiyorum", "no experience", "i don't know", "starting from scratch"}
+    return [value.strip() for value in values if value.strip().casefold().strip(".! ") not in unknown and value.strip()]
+
+
 async def save_self_reported(db, user_id, fields):
-    technologies = fields.get("knownTechnologies", "")
-    if isinstance(technologies, str):
-        technologies = [s.strip().lower() for s in technologies.split(",") if s.strip()]
+    technologies = [value.lower() for value in known_technologies(fields)]
     for technology in technologies:
         slug = f"{technology}.basics"
         skill = await db.scalar(
@@ -42,9 +48,7 @@ async def update_assessed(db, user_id, tested_skills, weak_skills, score):
 async def learner_profile(db, project):
     fields = answer_fields(project)
     skills = list(await db.scalars(select(UserSkill).where(UserSkill.user_id == project.user_id)))
-    technologies = fields.get("knownTechnologies", "")
-    if isinstance(technologies, str):
-        technologies = [s.strip() for s in technologies.split(",") if s.strip()]
+    technologies = known_technologies(fields)
     return LearnerProfile(
         experience_level=fields.get("experienceLevel", "unknown"),
         known_technologies=technologies,

@@ -44,6 +44,15 @@
           "title": "Text",
           "type": "string"
         },
+        "section": {
+          "default": "advisor",
+          "enum": [
+            "advisor",
+            "project"
+          ],
+          "title": "Section",
+          "type": "string"
+        },
         "type": {
           "enum": [
             "single_choice",

@@ -16,15 +16,17 @@ def select_questions(primary, secondary, locale="tr"):
 
 
 ENGLISH = {
-    "goal": "What is your primary goal?",
-    "experience": "What is your current level? (Self-reported)",
-    "technologies": "Which technologies do you know? (Comma-separated)",
-    "platform": "Which platform are you targeting?",
-    "hours": "How many hours per week can you spend?",
+    "goal": "What should the first version deliver?",
+    "experience": "What is your current experience with building this project?",
+    "technologies": "Which technologies can you already use for this project? You can say you are starting from scratch.",
+    "platform": "Which platform should the first version run on?",
+    "hours": "How many hours per week can you spend building this project?",
+    "preferred_stack": "Is there a technology you want or need to use? You can leave the choice to us.",
+    "constraints": "Do you have a delivery deadline or budget limit for the first version? If not, say flexible.",
     "mobile_stack": "Which mobile stack do you prefer?",
     "ai_strategy": "Will you use an AI API or train your own model?",
     "web_experience": "Do you have frontend/backend experience?",
-    "web_features": "Which features do you need?",
+    "web_features": "Does the first version need user accounts or payments?",
     "engine": "Which game engine?",
     "dimensions": "2D or 3D?",
     "multiplayer": "Do you need multiplayer?",

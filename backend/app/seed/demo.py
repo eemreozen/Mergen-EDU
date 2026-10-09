@@ -193,6 +193,25 @@ def fixture(operation, payload):
                 )
             )
         return dict(title=payload["node"]["title"] + " Değerlendirmesi", questions=questions)
+    if operation == "memory_review":
+        variant = (
+            "Başka bir girdide"
+            if payload.get("previousQuestion", "") and not payload["previousQuestion"].startswith("Başka")
+            else "Projene yeni bir özellik eklerken"
+        )
+        return dict(
+            question=dict(
+                id="memory-question",
+                prompt=f"{variant} {payload['skill']} için sonucun doğru olduğunu nasıl kontrol edersin?",
+                options=["Beklenen sonucu belirleyip küçük bir testle", "Tahmin ederek", "Kontrol etmeden"],
+                correctIndex=0,
+                explanation="Önce beklenen sonucu belirlemek ve küçük bir örnekte sınamak hatayı görünür kılar.",
+                targetSkill=payload["skill"],
+                difficulty="beginner",
+            ),
+            refresher="Konuyu baştan öğrenmene gerek yok. Girdiyi ve beklediğin çıktıyı yaz; işlemi küçük adımlara böl. Her adımın sonucunu tek bir örnekle kontrol et. Bu tekrar sorusu yalnız demo fixture içindir.",
+            miniExercise="Projenden bir örnek girdi seç. Beklenen çıktıyı yaz ve tek bir sınır durumu ekleyerek kontrol et.",
+        )
     if operation == "advisor":
         failed = payload.get("lastAssessment", {})
         if failed.get("weakSkills") and not failed.get("passed"):

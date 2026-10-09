@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.v1 import advisor, assessments, discovery, nodes, projects, roadmaps
+from app.api.v1 import advisor, assessments, discovery, memory, nodes, projects, roadmaps
 from app.schemas.common import ErrorResponse
 
 router = APIRouter(
@@ -14,5 +14,6 @@ router.include_router(roadmaps.router, tags=["Haritalar"])
 
 router.include_router(nodes.router, tags=["Öğrenme düğümleri"])
 router.include_router(assessments.router, tags=["Değerlendirme"])
+router.include_router(memory.router, tags=["Zaman Makinesi"])
 
 router.include_router(advisor.router, tags=["AI danışman"])

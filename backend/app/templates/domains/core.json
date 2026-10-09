@@ -1,20 +1,34 @@
 [
   {
     "id": "goal",
-    "text": "Öncelikli hedefin nedir?",
+    "text": "İlk sürümde hangi çıktıya ulaşmak istiyorsun?",
     "type": "single_choice",
     "targetField": "goal",
     "options": [
+      "prototype",
       "mvp",
-      "deep_learning",
-      "portfolio",
-      "startup"
+      "production_ready"
+    ],
+    "required": true
+  },
+  {
+    "id": "platform",
+    "text": "Projenin ilk sürümü hangi platformda çalışmalı?",
+    "type": "single_choice",
+    "targetField": "platform",
+    "options": [
+      "web",
+      "mobile",
+      "desktop",
+      "backend_api",
+      "cli",
+      "undecided"
     ],
     "required": true
   },
   {
     "id": "experience",
-    "text": "Mevcut bilgi seviyen nedir? (Öz-beyan)",
+    "text": "Bu projeyi geliştirirken mevcut seviyen hangisine yakın?",
     "type": "single_choice",
     "targetField": "experienceLevel",
     "options": [
@@ -27,30 +41,33 @@
   },
   {
     "id": "technologies",
-    "text": "Hangi teknolojileri biliyorsun? (Virgülle ayırabilirsin)",
+    "text": "Bu projede kullanabilecek kadar bildiğin teknolojiler hangileri? Henüz bilmiyorsan bunu yazabilirsin.",
     "type": "short_text",
     "targetField": "knownTechnologies",
     "options": [],
     "required": true
   },
   {
-    "id": "platform",
-    "text": "Hangi platformu hedefliyorsun?",
-    "type": "single_choice",
-    "targetField": "platform",
-    "options": [
-      "mobile",
-      "web",
-      "desktop",
-      "other"
-    ],
+    "id": "preferred_stack",
+    "text": "Projede kullanmak istediğin veya kullanman gereken bir teknoloji var mı? Yoksa öneriyi bize bırakabilirsin.",
+    "type": "short_text",
+    "targetField": "preferredStack",
+    "options": [],
     "required": true
   },
   {
     "id": "hours",
-    "text": "Haftada kaç saat ayırabilirsin?",
+    "text": "Bu projeyi geliştirmeye haftada kaç saat ayırabilirsin?",
     "type": "short_text",
     "targetField": "weeklyHours",
+    "options": [],
+    "required": true
+  },
+  {
+    "id": "constraints",
+    "text": "İlk sürüm için teslim tarihi veya bütçe sınırın var mı? Yoksa “esnek” yazabilirsin.",
+    "type": "short_text",
+    "targetField": "deliveryConstraints",
     "options": [],
     "required": true
   }

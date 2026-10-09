@@ -10,6 +10,7 @@ from app.schemas.roadmap import EdgeView, MapView, NodeView, RootRoadmapDraft
 from app.services.discovery_service import answer_fields, discovery_view
 from app.services.project_service import owned_project, project_view
 from app.services.skill_service import learner_profile
+from app.services.topic_expansion import broad_topic
 
 
 async def owned_map(db, map_id, user_id, lock=False):
@@ -70,7 +71,7 @@ async def map_view(db, roadmap):
                 map_id=node.map_id,
                 title=node.title,
                 summary=node.summary,
-                type=node.type,
+                type="submap" if roadmap.kind == "root" and broad_topic(node) else node.type,
                 status=node.status,
                 skills=node.skills,
                 estimated_hours=node.estimated_hours,

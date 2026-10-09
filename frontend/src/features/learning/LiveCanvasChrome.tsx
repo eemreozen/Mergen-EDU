@@ -6,12 +6,12 @@ import { Logo } from '@/components/shared/Logo'
 import { ThemeToggle } from '@/components/shared/ThemeToggle'
 
 const floating = 'rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF]/90 dark:bg-[#171A20]/90 backdrop-blur-md shadow-lg'
-export function LiveCanvasHeader({ title, completed, total, download }: { title: string; completed: number; total: number; download: () => void }) {
+export function LiveCanvasHeader({ title, completed, total, download, submap = false }: { title: string; completed: number; total: number; download: () => void; submap?: boolean }) {
   const progress = total ? Math.round(completed / total * 100) : 0
   return <header className="absolute top-4 left-4 right-4 z-30 flex items-center justify-between gap-3 pointer-events-none">
     <div className={`${floating} flex items-center gap-3 p-1.5 px-3 pointer-events-auto`}>
       <Logo iconOnly className="w-8 h-8" /><div className="h-4 w-px bg-[#E3E7EC] dark:bg-[#2A3038]" />
-      <div className="flex items-center gap-2 text-xs font-mono"><Link to="/learn" className="text-[#68717D] dark:text-[#9CA3AF] flex items-center gap-1"><ArrowLeft size={12} />Projelerim</Link><ChevronRight size={14} className="text-[#9CA3AF]" /><h1 className="font-bold truncate max-w-md">{title}</h1><span className="px-1.5 py-0.5 rounded text-[10px] bg-[#2B660E]/10 dark:bg-[#B7F36B]/15 text-[#2B660E] dark:text-[#B7F36B]">Ana Harita</span></div>
+      <div className="flex items-center gap-2 text-xs font-mono"><Link to="/learn" className="text-[#68717D] dark:text-[#9CA3AF] flex items-center gap-1"><ArrowLeft size={12} />Projelerim</Link><ChevronRight size={14} className="text-[#9CA3AF]" /><h1 className="font-bold truncate max-w-md">{title}</h1><span className="px-1.5 py-0.5 rounded text-[10px] bg-[#2B660E]/10 dark:bg-[#B7F36B]/15 text-[#2B660E] dark:text-[#B7F36B]">{submap ? 'Alt Harita' : 'Ana Harita'}</span></div>
     </div>
     <div className={`${floating} flex items-center gap-2.5 p-1.5 px-3 pointer-events-auto`}>
       <div className="flex items-center gap-2.5 pr-3 border-r border-[#E3E7EC] dark:border-[#2A3038]"><div className="text-right font-mono"><p className="text-[10px] uppercase tracking-wider text-[#9CA3AF]">İlerleme</p><p className="text-xs font-bold">%{progress}</p></div><div className="w-16 h-2 rounded-full bg-[#E3E7EC] dark:bg-[#2A3038] overflow-hidden"><div className="h-full bg-[#2B660E] dark:bg-[#B7F36B] transition-all" style={{width:`${progress}%`}} /></div></div>

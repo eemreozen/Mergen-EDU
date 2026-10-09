@@ -334,3 +334,22 @@ Gemini `503 UNAVAILABLE` yanıtı `AI_SERVICE_UNAVAILABLE` olarak, zaman aşım�
 İlk proje analizi ve soru üretimi `LLM_PROJECT_ANALYSIS_TIMEOUT_SECONDS=35` ile sınırlıdır; genel 120 saniyelik sınırı aşamaz. Bu sınır yalnız ilk aşamayı etkiler. Roadmap üretiminin süre ve düğüm kapsamı korunur. İlk prompt kompakt analiz ve dört projeye özel soru ister. Bu optimizasyon sağlayıcının 503 hatasını giderme garantisi değildir; kullanıcıyı uzun süre bekletmeden hatayı döndürür.
 
 `LLM_MODEL_PROJECT_ANALYSIS=gemini-3.5-flash-lite` yalnız ilk proje analizi ve projeye özel keşif sorularını üretir. Boş bırakılırsa `LLM_MODEL_FAST` kullanılır. Mevcut yapılandırmada üç model ayarı da `gemini-3.5-flash-lite` kullanır; roadmap, öğrenme dalları, testler, dersler ve danışman dahil tüm AI işlemleri bu modele gider.
+
+## Zaman Makinesi
+
+Canvas üzerindeki Zaman Makinesi geçmiş yanlış soruları, verilen yanıtı, doğru yanıtı ve açıklamayı saklar. Eski değerlendirme kayıtları da görüntülenir. Tamamlanan ana/alt harita düğümlerindeki beceriler için kısa tekrar planlanır; öğrenme dalındaki düğümler ayrı tekrar kuyruğu oluşturmaz.
+
+İlk hatırlatma üç yeni ana durak tamamlanınca veya bir gün sonra gelir. Doğru cevaplarda aralıklar 3/6/12/24 yeni durak veya 1/3/7/14 gün olarak uzar. Canvas küçük bir hatırlatma gösterir; çalışma akışını zorunlu modal ile kesmez. Kullanıcı istediğinde daha erken de tekrar yapabilir.
+
+`GET /api/v1/projects/{id}/time-machine` geçmişi ve tekrar kuyruğunu döndürür; AI çağırmaz. `POST /api/v1/memory/{id}/prepare` tek farklı senaryo sorusu üretir ve cevaplanana kadar önbellekten döndürür. `POST /api/v1/memory/{id}/answer` sunucuda puanlar. Yanlışta kısa anlatım ve mini uygulama sunulur; ardından farklı bir soruyla denenebilir. Tekrarların tamamlanmış düğümlere, harita bağlantılarına veya ilerleme yüzdesine etkisi yoktur.
+
+Yeni düğümün testinde daha önce tamamlanmış bir düğümün aynı becerisi yanlış cevaplanırsa bu eski beceri kısa pekiştirmeye yönlendirilir; bu beceri için yeniden uzun bir öğrenme dalı üretilmez. Yeni beceri açıkları mevcut adaptif dal akışını kullanır. Kısa tekrarlar engelleyici değildir; asıl düğümün testi yine geçilmelidir. Veriler `memory_reviews` ve `memory_checks` tablolarında kalıcıdır; kurulumda `alembic upgrade head` çalıştırın.
+
+
+Keşif ekranı iki bölümden oluşur: sabit ve alana göre seçilen `advisor` soruları,
+ardından ürün fikrine özel `project` soruları. Sabit çekirdek yedi karar toplar:
+ilk sürümün olgunluğu, platform, deneyim, kullanılabilen teknolojiler, tercih edilen
+teknoloji, haftalık süre ve teslim/bütçe kısıtları. Roadmap tüm gerekli cevaplardan
+sonra üretilir. Projeye özel sorular ilk proje analizi çağrısında kaydedilir; bölüm
+geçişi yeni AI çağrısı yapmaz. Eski projelerin cevapları korunur, mevcut soru kimlikleri
+üzerinden bölüm bilgisi geriye uyumlu olarak sunulur. Yeni soru seti yeni projelerde kullanılır.

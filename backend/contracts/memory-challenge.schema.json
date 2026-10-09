@@ -1,0 +1,43 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "reviewId": {
+      "title": "Reviewid",
+      "type": "string"
+    },
+    "sourceTitle": {
+      "title": "Sourcetitle",
+      "type": "string"
+    },
+    "skill": {
+      "title": "Skill",
+      "type": "string"
+    },
+    "prompt": {
+      "title": "Prompt",
+      "type": "string"
+    },
+    "options": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Options",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "reviewId",
+    "sourceTitle",
+    "skill",
+    "prompt",
+    "options"
+  ],
+  "title": "MemoryChallenge",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

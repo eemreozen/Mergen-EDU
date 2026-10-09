@@ -1,0 +1,51 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "checkId": {
+      "title": "Checkid",
+      "type": "string"
+    },
+    "correct": {
+      "title": "Correct",
+      "type": "boolean"
+    },
+    "correctIndex": {
+      "title": "Correctindex",
+      "type": "integer"
+    },
+    "explanation": {
+      "title": "Explanation",
+      "type": "string"
+    },
+    "refresher": {
+      "title": "Refresher",
+      "type": "string"
+    },
+    "miniExercise": {
+      "title": "Miniexercise",
+      "type": "string"
+    },
+    "nextDueAt": {
+      "format": "date-time",
+      "title": "Nextdueat",
+      "type": "string"
+    },
+    "remainingSteps": {
+      "title": "Remainingsteps",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "checkId",
+    "correct",
+    "correctIndex",
+    "explanation",
+    "refresher",
+    "miniExercise",
+    "nextDueAt",
+    "remainingSteps"
+  ],
+  "title": "MemoryResult",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

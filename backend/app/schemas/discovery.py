@@ -9,6 +9,7 @@ class DiscoveryQuestion(Schema):
     id: str
     question_id: str
     text: str
+    section: Literal["advisor", "project"] = "advisor"
     type: Literal["single_choice", "multi_choice", "short_text"]
     options: list[str] = Field(default_factory=list)
     target_field: str
