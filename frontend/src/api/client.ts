@@ -1,5 +1,6 @@
 import type { ExportBundle, ProjectView, DiscoveryView, MapView, NodeView, AssessmentView } from './types'
 import type { MemoryChallenge, MemoryResult, TimeMachine } from './memory-types'
+import type { ReferenceView } from './resource-types'
 
 const SESSION_KEY = 'mergen_demo_session'
 export function sessionId(): string {
@@ -11,9 +12,12 @@ export class ApiError extends Error {
   constructor(public code: string, message: string, public retryable: boolean) { super(message) }
 }
 const baseUrl = import.meta.env.VITE_API_BASE_URL || '/api/v1'
-async function request<T>(path: string, method = 'GET', body?: unknown): Promise<T> {
+async function request<T>(path: string, method = 'GET', body?: unknown, signal?: AbortSignal): Promise<T> {
   const controller = new AbortController()
   const timeout = window.setTimeout(() => controller.abort(), 150_000)
+  const abort = () => controller.abort()
+  signal?.addEventListener('abort', abort, { once: true })
+  if (signal?.aborted) controller.abort()
   try {
     const response = await fetch(`${baseUrl}${path}`, {
       method, signal: controller.signal,
@@ -24,10 +28,11 @@ async function request<T>(path: string, method = 'GET', body?: unknown): Promise
     if (!response.ok) throw new ApiError(data.error?.code || 'REQUEST_FAILED', data.error?.message || 'İstek tamamlanamadı.', !!data.error?.retryable)
     return data as T
   } catch (error) {
+    if (signal?.aborted) throw error
     if (error instanceof ApiError) throw error
     throw new Error(error instanceof DOMException && error.name === 'AbortError'
       ? 'İstek zaman aşımına uğradı. Yeniden deneyebilirsin.' : 'Backend bağlantısı kurulamadı. Sunucunun açık olduğundan emin ol.')
-  } finally { window.clearTimeout(timeout) }
+  } finally { window.clearTimeout(timeout); signal?.removeEventListener('abort', abort) }
 }
 export interface QuizResult {
   attemptId: string; passed: boolean; score: number; weakSkills: string[];
@@ -47,6 +52,7 @@ export const api = {
   submap: (id: string) => request<MapView>(`/nodes/${id}/submap`, 'POST'),
   learn: (id: string) => request<MapView>(`/nodes/${id}/learn`, 'POST'),
   node: (id: string) => request<NodeView>(`/nodes/${id}`),
+  references: (id: string, signal?: AbortSignal) => request<ReferenceView>(`/nodes/${id}/references`, 'GET', undefined, signal),
   assessment: (id: string) => request<AssessmentView>(`/nodes/${id}/assessment`),
   submit: (nodeId: string, quiz: AssessmentView, submissionId: string, answers: Record<string, number>) => request<QuizResult>(`/nodes/${nodeId}/assessment/submit`, 'POST', {
     assessmentId: quiz.id, version: quiz.version, submissionId,

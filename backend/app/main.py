@@ -14,6 +14,7 @@ from app.config import Settings
 from app.db.session import make_database
 from app.errors import AppError
 from app.schemas.common import Health
+from app.services.web_resource_service import WebResourceService
 
 
 def create_app(settings=None, gateway=None):
@@ -35,6 +36,7 @@ def create_app(settings=None, gateway=None):
     )
     app.state.settings, app.state.engine = settings, engine
     app.state.session_factory, app.state.gateway = sessions, ai
+    app.state.resource_search = WebResourceService()
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[s.strip() for s in settings.cors_origins.split(",") if s.strip()],

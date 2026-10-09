@@ -282,7 +282,27 @@ taşınmaz. PostgreSQL migration DDL'i offline doğrulandı; bu ortamda canlı P
 
 Curated kaynaklar resmî Python, React Native, FastAPI, scikit-learn, pandas, Godot ve MDN
 sayfalarıdır. `verified=true` URL'nin kontrol edildiğini gösterir; canlı içerik izleme anlamına gelmez.
-AI içerik modeli URL üretmez; eşleşme yoksa boş kaynak listesi döner.
+AI içerik modeli URL üretmez; sabit katalogda eşleşme yoksa boş kaynak listesi döner.
+
+Graf üzerinde bir düğüm açıldığında “Kaynakça” bölümü
+`GET /api/v1/nodes/{id}/references` üzerinden konu başlığıyla canlı arama yapar.
+Bing arama sonuçlarının RSS çıktısından en fazla üç makale/doküman, YouTube arama
+sayfasındaki verilerden en fazla üç doğrudan video bağlantısı alınır. Ek API anahtarı
+gerekmez. Arama dili projenin diline göre seçilir; bulunan içeriğin dili garanti edilmez.
+Bu bağlantılar `verified=false`, dili bilinmeyenler `language=und` olarak işaretlenir.
+
+İki arama paralel yürütülür ve her isteğin zaman aşımı 10 saniyedir. Tam sonuçlar
+sunucu belleğinde konu ve dile göre bir saat saklanır (en fazla 128 konu); aynı anda
+aynı konuyu açan kullanıcılar aynı aramayı paylaşır. Bir sağlayıcı hata verirse diğer
+sonuçlar gösterilir. Yazılı sonuç alınamazsa sabit katalogdaki mevcut kaynaklar
+korunur. Panelde yükleme, eksik sonuç ve yeniden arama durumları bulunur.
+Kaynakça, ders/test üretmeden ve kilitli bir durağın ilerleme durumunu değiştirmeden
+incelenebilir; düğüm sahipliği kontrol edilir. SQLite kilidi web aramasından önce
+serbest bırakılır. Mevcut `/nodes/{id}/resources` katalog endpoint'i korunur.
+
+Arama sayfalarının yapısı değişebilir veya servisler istekleri engelleyebilir;
+bu durumda API `partial` ya da `unavailable` durumunu döndürür ve panel tekrar
+denemeyi sunar. CAPTCHA veya onay sayfaları kaynak sonucu olarak kullanılmaz.
 
 ## Test ve demo üretimi
 
@@ -318,7 +338,7 @@ Smoke iç değerlendirmeleri geçmek için cevap anahtarını yalnız test DB'si
 
 ## Kapsam dışında kalanlar
 
-P2: canlı web/YouTube araması, gelişmiş hafıza/Time Machine, analitik, ek sağlayıcılar,
+P2: gelişmiş hafıza/Time Machine, analitik, ek sağlayıcılar,
 arka plan iş kuyruğu ve gelişmiş token optimizasyonu eklenmedi. Gerçek authentication,
 ve otomatik kod değerlendirmesi kapsam dışındadır.
 Gerçek LLM akışının ve canlı PostgreSQL'in doğrulanması ilgili ortam/anahtar sağlandığında yapılmalıdır.
