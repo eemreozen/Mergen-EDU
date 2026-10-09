@@ -58,6 +58,7 @@ interface RoadmapState {
 
   // Onboarding
   setOnboardingAnswers: (answers: OnboardingAnswers) => void
+  setProjectName: (name: string) => void
 
   // Advisor
   toggleAdvisor: () => void
@@ -329,6 +330,11 @@ export const useRoadmapStore = create<RoadmapState>((set, get) => {
         mlSubmapNodes: updatedMlNodes,
         currentLevel: 'root',
       })
+      saveStateToStorage(get())
+    },
+
+    setProjectName: (name: string) => {
+      set({ projectName: name })
       saveStateToStorage(get())
     },
 

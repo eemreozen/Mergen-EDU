@@ -3,6 +3,7 @@ import { Check, Mail, X } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Logo } from './Logo'
+import { useAuthStore } from '@/store/useAuthStore'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -10,7 +11,9 @@ interface AuthModalProps {
 }
 
 export function AuthModal({ isOpen, onClose }: AuthModalProps) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const isEn = i18n.language.startsWith('en')
+  const loginAsMockUser = useAuthStore(s => s.loginAsMockUser)
   const [email, setEmail] = useState('')
   const [isSubmitted, setIsSubmitted] = useState(false)
 
@@ -102,6 +105,37 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   />
                 </svg>
                 <span>{t('auth.google')}</span>
+              </button>
+
+              {/* Mock Kullanıcı ile 1-Tıkla Doğrudan Giriş */}
+              <button
+                type="button"
+                onClick={() => {
+                  loginAsMockUser()
+                  onClose()
+                }}
+                className="w-full p-2.5 rounded-xl border-2 border-[#2B660E]/40 dark:border-[#B7F36B]/40 bg-[#2B660E]/5 dark:bg-[#B7F36B]/10 hover:bg-[#2B660E]/15 dark:hover:bg-[#B7F36B]/20 text-[#111318] dark:text-[#E9EDF3] flex items-center justify-between transition-all cursor-pointer group shadow-xs active:scale-[0.99]"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full bg-[#2B660E] dark:bg-[#B7F36B] text-white dark:text-[#0B0D10] font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+                    EÖ
+                  </div>
+                  <div className="text-left">
+                    <div className="text-xs font-bold flex items-center gap-1.5 leading-snug">
+                      <span>Emre Özen</span>
+                      <span className="text-[9px] font-mono font-semibold px-1.5 py-0.5 rounded-full bg-[#2B660E]/20 text-[#2B660E] dark:text-[#B7F36B]">
+                        {isEn ? 'Demo User' : 'Mock Kullanıcı'}
+                      </span>
+                    </div>
+                    <div className="text-[10px] font-mono text-[#68717D] dark:text-[#9CA3AF]">
+                      {isEn ? '1-Click Fast Sign In' : '1 Tıkla Hızlı Giriş Yap'}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-xs font-bold text-[#2B660E] dark:text-[#B7F36B] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                  <span>{isEn ? 'Sign In →' : 'Giriş Yap →'}</span>
+                </div>
               </button>
             </div>
 
