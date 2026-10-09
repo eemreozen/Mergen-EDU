@@ -22,10 +22,10 @@ export function TeacherAdvisorFigure({
 
   const sizeClasses =
     size === 'lg'
-      ? 'w-20 h-20 sm:w-24 sm:h-24'
+      ? 'w-22 h-22 sm:w-24 sm:h-24'
       : size === 'md'
-      ? 'w-16 h-16 sm:w-20 sm:h-20'
-      : 'w-12 h-12 sm:w-14 sm:h-14'
+      ? 'w-20 h-20 sm:w-22 sm:h-22'
+      : 'w-16 h-16 sm:w-18 sm:h-18'
 
   return (
     <div
@@ -36,19 +36,19 @@ export function TeacherAdvisorFigure({
       {/* 1. Animated Speech Bubble floating above teacher's head */}
       {showBubble && (
         <motion.div
-          animate={{ y: [0, -4, 0] }}
+          animate={{ y: [0, -3, 0] }}
           transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
-          className="mb-2 px-3 py-1.5 rounded-2xl border border-[#2B660E]/40 dark:border-[#B7F36B]/40 bg-[#FFFFFF] dark:bg-[#171A20] shadow-xl text-left flex items-center gap-2 max-w-[220px] pointer-events-auto group-hover:scale-105 transition-transform"
+          className="mb-2 px-2.5 py-1.5 rounded-2xl border border-[#2B660E]/40 dark:border-[#B7F36B]/40 bg-[#FFFFFF] dark:bg-[#171A20] shadow-md text-left flex items-center gap-1.5 max-w-[200px] pointer-events-auto group-hover:scale-105 transition-transform"
         >
-          <div className="w-5 h-5 rounded-lg bg-[#2B660E]/15 dark:bg-[#B7F36B]/20 text-[#2B660E] dark:text-[#B7F36B] flex items-center justify-center shrink-0">
-            <Sparkles className="w-3 h-3 animate-pulse" />
+          <div className="w-4 h-4 rounded-md bg-[#2B660E]/15 dark:bg-[#B7F36B]/20 text-[#2B660E] dark:text-[#B7F36B] flex items-center justify-center shrink-0">
+            <Sparkles className="w-2.5 h-2.5 animate-pulse" />
           </div>
           <div>
-            <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#2B660E] dark:text-[#B7F36B] flex items-center gap-1">
-              <span>{isEn ? 'Mentor Advisor' : 'Rehber Danışman'}</span>
+            <div className="text-[9px] font-mono font-bold uppercase tracking-wider text-[#2B660E] dark:text-[#B7F36B] flex items-center gap-1">
+              <span>{isEn ? 'Mentor' : 'Rehber Danışman'}</span>
               <span className="w-1.5 h-1.5 rounded-full bg-[#2B660E] dark:bg-[#B7F36B]" />
             </div>
-            <div className="text-[11px] font-semibold text-[#111318] dark:text-[#E9EDF3] leading-snug">
+            <div className="text-[11px] font-semibold text-[#111318] dark:text-[#E9EDF3] leading-none mt-0.5 whitespace-nowrap">
               {isEn ? 'Click to brainstorm! 💬' : 'Tıkla, planlayalım! 💬'}
             </div>
           </div>

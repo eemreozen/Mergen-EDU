@@ -98,40 +98,51 @@ export function HeroSection({
         {/* SYMMETRICAL 3-COLUMN WORKSPACE: LEFT (Wizard + Logo) — CENTER (Input Box) — RIGHT (Sign In + Preferences + Advisor) */}
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
           
-          {/* LEFT COLUMN: Small Wizard Button + Logo & Brand identity (Cols 1-3) */}
+          {/* LEFT COLUMN: Small Wizard Button + (Logo Card & Advisor Figure Side-by-Side) + Brand info (Cols 1-3) */}
           <motion.div
             initial={{ opacity: 0, x: -16 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.45 }}
-            className="lg:col-span-3 flex flex-col items-center lg:items-start text-center lg:text-left space-y-3"
+            className="lg:col-span-3 flex flex-col items-center lg:items-start text-center lg:text-left space-y-3.5"
           >
             {/* Küçük Sihirbazı Başlat Butonu (Logonun üstünde) */}
             <button
               id="tour-wizard-box"
               type="button"
               onClick={() => setIsTourOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#2B660E]/30 dark:border-[#B7F36B]/30 bg-[#FFFFFF] dark:bg-[#171A20] hover:bg-[#2B660E]/10 dark:hover:bg-[#B7F36B]/15 text-[#2B660E] dark:text-[#B7F36B] text-xs font-semibold shadow-xs transition-all active:scale-95 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#2B660E]/30 dark:border-[#B7F36B]/30 bg-[#FFFFFF] dark:bg-[#171A20] hover:bg-[#2B660E]/10 dark:hover:bg-[#B7F36B]/15 text-[#2B660E] dark:text-[#B7F36B] text-xs font-semibold shadow-xs transition-all active:scale-95 cursor-pointer whitespace-nowrap"
             >
               <Wand2 className="w-3.5 h-3.5" />
               <span>{isEn ? 'Start Wizard' : 'Sihirbazı Başlat'}</span>
             </button>
 
-            {/* Enlarged Geometric Logo Card */}
-            <div className="relative group w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-[#FFFFFF] dark:bg-[#171A20] border-2 border-[#E3E7EC] dark:border-[#2A3038] hover:border-[#2B660E] dark:hover:border-[#B7F36B] shadow-2xl flex items-center justify-center transition-all duration-300">
-              <svg
-                viewBox="0 0 32 32"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-12 h-12 sm:w-14 sm:h-14 transition-transform duration-300 group-hover:scale-105"
-                aria-hidden="true"
-              >
-                <circle cx="7" cy="24" r="3" fill="currentColor" className="text-[#9CA3AF] dark:text-[#64748B]" />
-                <circle cx="16" cy="8" r="3.5" fill="#2B660E" className="dark:fill-[#B7F36B]" />
-                <circle cx="25" cy="20" r="3" fill="currentColor" className="text-[#9CA3AF] dark:text-[#64748B]" />
-                <path d="M9 22L14.5 10.5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="text-[#9CA3AF] dark:text-[#64748B]" />
-                <path d="M17.5 10L23 18.5" stroke="#2B660E" strokeWidth="3" strokeLinecap="round" className="dark:stroke-[#B7F36B]" />
-              </svg>
-              <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#2B660E] dark:bg-[#B7F36B] border-2 border-white dark:border-[#171A20]" />
+            {/* LOGO & DANIŞMAN YAN YANA */}
+            <div className="flex items-end gap-3 sm:gap-4">
+              {/* ProjectPath Geometrik Logo Kartı */}
+              <div className="relative group w-20 h-20 sm:w-22 sm:h-22 rounded-3xl bg-[#FFFFFF] dark:bg-[#171A20] border-2 border-[#E3E7EC] dark:border-[#2A3038] hover:border-[#2B660E] dark:hover:border-[#B7F36B] shadow-xl flex items-center justify-center transition-all duration-300">
+                <svg
+                  viewBox="0 0 32 32"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-12 h-12 sm:w-13 sm:h-13 transition-transform duration-300 group-hover:scale-105"
+                  aria-hidden="true"
+                >
+                  <circle cx="7" cy="24" r="3" fill="currentColor" className="text-[#9CA3AF] dark:text-[#64748B]" />
+                  <circle cx="16" cy="8" r="3.5" fill="#2B660E" className="dark:fill-[#B7F36B]" />
+                  <circle cx="25" cy="20" r="3" fill="currentColor" className="text-[#9CA3AF] dark:text-[#64748B]" />
+                  <path d="M9 22L14.5 10.5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="text-[#9CA3AF] dark:text-[#64748B]" />
+                  <path d="M17.5 10L23 18.5" stroke="#2B660E" strokeWidth="3" strokeLinecap="round" className="dark:stroke-[#B7F36B]" />
+                </svg>
+                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#2B660E] dark:bg-[#B7F36B] border-2 border-white dark:border-[#171A20]" />
+              </div>
+
+              {/* Danışman Rehber Logosu (Tıkla Planlayalım Balonu ile) */}
+              <TeacherAdvisorFigure
+                size="md"
+                onClick={() => setIsAdvisorOpen(true)}
+                showBubble={true}
+                showCaption={false}
+              />
             </div>
 
             {/* Wordmark & Tagline */}
@@ -265,12 +276,12 @@ export function HeroSection({
             </div>
           </div>
 
-          {/* RIGHT COLUMN: GİRİŞ YAP KUTUSU (Üstte) & TERCİHLER (Ortada) & DANIŞMAN KAFASI (Altta) (Cols 10-12) */}
+          {/* RIGHT COLUMN: GİRİŞ YAP & TERCİHLER (Ortadaki metin kutusuna göre tam ortalanmış) (Cols 10-12) */}
           <motion.div
             initial={{ opacity: 0, x: 16 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.45 }}
-            className="lg:col-span-3 flex flex-col items-center lg:items-end justify-center space-y-3.5"
+            className="lg:col-span-3 flex flex-col items-center lg:items-center justify-center space-y-3.5 my-auto"
           >
             {/* GİRİŞ YAP BUTONU */}
             <div className="w-full max-w-[220px] p-3 rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF] dark:bg-[#171A20] shadow-md text-left flex flex-col gap-2">
@@ -286,7 +297,7 @@ export function HeroSection({
               </button>
             </div>
 
-            {/* TERCİHLER KISMI (Giriş yapın tam altında) */}
+            {/* TERCİHLER KISMI */}
             <div className="w-full max-w-[220px] p-2.5 px-3 rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF] dark:bg-[#171A20] shadow-sm flex items-center justify-between">
               <span className="text-[11px] font-mono text-[#68717D] dark:text-[#9CA3AF]">
                 {isEn ? 'Preferences:' : 'Tercihler:'}
@@ -296,16 +307,6 @@ export function HeroSection({
                 <div className="h-3.5 w-[1px] bg-[#E3E7EC] dark:bg-[#2A3038]" />
                 <ThemeToggle />
               </div>
-            </div>
-
-            {/* REHBER DANIŞMAN KAFA AVATARI (Tıklandığında chat açılır) */}
-            <div className="w-full max-w-[220px] flex flex-col items-center lg:items-end">
-              <TeacherAdvisorFigure
-                size="md"
-                onClick={() => setIsAdvisorOpen(true)}
-                showBubble={true}
-                showCaption={true}
-              />
             </div>
           </motion.div>
 
