@@ -179,7 +179,7 @@ export function ProjectAdvisor({
                   </div>
                   <div>
                     <h3 className="text-xs font-bold text-[#111318] dark:text-[#E9EDF3]">
-                      {isEn ? 'ProjectPath Advisor' : 'Proje Danışmanı'}
+                      {isEn ? 'Mergen Advisor' : 'Mergen Danışmanı'}
                     </h3>
                     <p className="text-[11px] text-[#68717D] dark:text-[#9CA3AF] flex items-center gap-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#2B660E] dark:bg-[#B7F36B]" />

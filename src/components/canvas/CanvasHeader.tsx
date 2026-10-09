@@ -37,7 +37,7 @@ export function CanvasHeader() {
             className="text-[#68717D] dark:text-[#9CA3AF] hover:text-[#111318] dark:hover:text-[#E9EDF3] transition-colors"
             title={isEn ? 'Return to Home' : 'Ana Sayfaya Dön'}
           >
-            ProjectPath
+            Mergen
           </Link>
 
           <ChevronRight className="w-3.5 h-3.5 text-[#9CA3AF] dark:text-[#64748B]" />

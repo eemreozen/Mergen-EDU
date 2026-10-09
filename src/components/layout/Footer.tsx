@@ -17,7 +17,7 @@ export function Footer() {
         </div>
 
         <div className="flex items-center gap-6 text-xs text-[#9CA3AF] dark:text-[#64748B]">
-          <span>© {CURRENT_YEAR} ProjectPath. {t('footer.rights')}</span>
+          <span>© {CURRENT_YEAR} Mergen. {t('footer.rights')}</span>
           <span className="font-mono text-[11px] opacity-70">v0.1.0-preview</span>
         </div>
       </div>

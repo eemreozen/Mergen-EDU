@@ -10,7 +10,7 @@ export function Logo({ className = '', iconOnly = false }: LogoProps) {
     <Link
       to="/"
       className={`inline-flex items-center gap-2.5 group select-none transition-opacity hover:opacity-90 ${className}`}
-      aria-label="ProjectPath Ana Sayfa"
+      aria-label="Mergen Ana Sayfa"
     >
       {/* Minimal geometric vector icon */}
       <div className="relative w-8 h-8 rounded-lg bg-[#171A20] dark:bg-[#171A20] border border-[#E3E7EC] dark:border-[#2A3038] flex items-center justify-center overflow-hidden transition-all duration-200 group-hover:border-[#2B660E] dark:group-hover:border-[#B7F36B]/60">
@@ -48,7 +48,7 @@ export function Logo({ className = '', iconOnly = false }: LogoProps) {
 
       {!iconOnly && (
         <span className="font-semibold tracking-tight text-lg text-[#111318] dark:text-[#E9EDF3] font-mono lowercase">
-          project<span className="text-[#2B660E] dark:text-[#B7F36B]">path</span>
+          mer<span className="text-[#2B660E] dark:text-[#B7F36B]">gen</span>
         </span>
       )}
     </Link>

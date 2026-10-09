@@ -116,8 +116,8 @@ export function UserDashboard() {
               </div>
               <p className="text-xs sm:text-sm text-[#68717D] dark:text-[#9CA3AF] mt-1 font-mono">
                 {isEn
-                  ? 'Manage your learning expeditions or climb a new project roadmap.'
-                  : 'Öğrenme haritalarını yönet veya yeni bir rota oluşturarak keşfe başla.'}
+                  ? 'The path climbing to your idea · Manage your project roadmaps.'
+                  : 'Fikrine tırmanan yol · Yol haritalarını yönet ve keşfe devam et.'}
               </p>
             </div>
           </div>

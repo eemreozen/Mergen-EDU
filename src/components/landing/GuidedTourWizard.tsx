@@ -130,13 +130,13 @@ export function GuidedTourWizard({ isOpen, onClose }: GuidedTourWizardProps) {
               </div>
               <div>
                 <h3 className="text-sm font-bold text-[#111318] dark:text-[#E9EDF3] flex items-center gap-2">
-                  <span>{isEn ? 'ProjectPath Guide Wizard' : 'ProjectPath Kullanım Sihirbazı'}</span>
+                  <span>{isEn ? 'Mergen Guide Wizard' : 'Mergen Kullanım Sihirbazı'}</span>
                   <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#2B660E]/10 dark:bg-[#B7F36B]/15 text-[#2B660E] dark:text-[#B7F36B]">
                     {currentStep + 1} / {steps.length}
                   </span>
                 </h3>
                 <p className="text-xs text-[#68717D] dark:text-[#9CA3AF]">
-                  {isEn ? 'Explore how ProjectPath guides your learning' : 'ProjectPath ile proje odaklı öğrenmeyi adım adım keşfet'}
+                  {isEn ? 'Explore how Mergen guides your learning' : 'Mergen ile proje odaklı öğrenmeyi adım adım keşfet'}
                 </p>
               </div>
             </div>

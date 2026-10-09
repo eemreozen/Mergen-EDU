@@ -1,12 +1,12 @@
 {
   "nav": {
-    "brand": "projectpath",
+    "brand": "mergen",
     "signIn": "Giriş Yap",
     "selectLanguage": "Dil Seçin",
     "toggleTheme": "Temayı Değiştir"
   },
   "loading": {
-    "slogan": "Fikrini. İnşa Et.",
+    "slogan": "Fikrine tırmanan yol",
     "subtitle": "Kişiselleştirilmiş geliştirme rotan hazırlanıyor..."
   },
   "hero": {
@@ -45,7 +45,7 @@
     "actionExport": "Rotayı Dışa Aktar"
   },
   "auth": {
-    "title": "ProjectPath'e Giriş Yap",
+    "title": "Mergen'e Giriş Yap",
     "subtitle": "Geliştirdiğin projeleri kaydet ve yol haritanda kaldığın yerden devam et.",
     "github": "GitHub ile Giriş Yap",
     "google": "Google ile Giriş Yap",
@@ -56,7 +56,7 @@
     "close": "Kapat"
   },
   "footer": {
-    "tagline": "Geliştiriciler için proje odaklı öğrenme platformu.",
+    "tagline": "Fikrine tırmanan yol. Geliştiriciler için proje odaklı öğrenme platformu.",
     "rights": "Tüm hakları saklıdır."
   }
 }

@@ -70,7 +70,7 @@ export function TeacherAdvisorDesk({ onApplyPrompt }: TeacherAdvisorDeskProps) {
           : 'Egzersiz hareketlerimi ve günlük beslenmemi analiz eden akıllı bir fitness asistanı geliştirmek istiyorum.'
       } else if (userText.includes('başla') || userText.includes('beginner') || userText.includes('start')) {
         reply = isEn
-          ? 'Do not worry about technical jargon! Describe what you want in simple words, and ProjectPath will prepare a gentle, bottom-to-top learning map starting from basecamp.'
+          ? 'Do not worry about technical jargon! Describe what you want in simple words, and Mergen will prepare a gentle, bottom-to-top learning map starting from basecamp.'
           : 'Hiç endişelenme! Hiçbir teknik terim bilmeden aklındaki fikri yazabilirsin. Sistem en temel adımlardan zirveye doğru sana özel bir tırmanış haritası çıkaracaktır.'
         promptToSuggest = isEn
           ? 'I want to build a real-time messaging application to chat with friends.'
@@ -214,7 +214,7 @@ export function TeacherAdvisorDesk({ onApplyPrompt }: TeacherAdvisorDeskProps) {
           <span className="w-2 h-2 rounded-full bg-[#2B660E] dark:bg-[#B7F36B]" />
           <span>{isEn ? 'Lab-Coat Mentor · Always online' : 'Önlüklü Rehber Öğretmen · Her zaman danışabilirsin'}</span>
         </div>
-        <span className="text-[10px] opacity-70">ProjectPath AI</span>
+        <span className="text-[10px] opacity-70">Mergen AI</span>
       </div>
     </div>
   )

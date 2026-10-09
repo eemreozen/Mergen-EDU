@@ -1,8 +1,8 @@
-# ProjectPath (Mergen-EDU)
+# Mergen (Mergen-EDU)
 
-> AI Destekli, Proje Odaklı Öğrenme ve Geliştirme Yol Haritası Platformu
+> **Fikrine tırmanan yol** — AI Destekli, Proje Odaklı Öğrenme ve Geliştirme Yol Haritası Platformu
 
-ProjectPath, geliştiricilerin gerçek projeler üreterek yazılım geliştirmeyi öğrenmelerini sağlayan modern ve minimalist bir platformdur. Kullanıcılar geliştirmek istedikleri proje fikrini tanımlar, platform ise onlar için aşamalı, pratik ve modüler bir öğrenme/geliştirme rotası oluşturur.
+Mergen, geliştiricilerin gerçek projeler üreterek yazılım geliştirmeyi öğrenmelerini sağlayan modern ve minimalist bir platformdur. Kullanıcılar geliştirmek istedikleri proje fikrini tanımlar, platform ise onlar için aşamalı, pratik ve modüler bir öğrenme/geliştirme rotası oluşturur.
 
 ---
 
@@ -19,8 +19,8 @@ ProjectPath, geliştiricilerin gerçek projeler üreterek yazılım geliştirmey
 
 ## 🎨 Tasarım Prensipleri
 
-- **Minimalist Developer SaaS:** Gereksiz degradelerden ve karmaşadan arındırılmış, tipografi odaklı şık arayüz.
-- **İmza Yükleme Deneyimi:** Metin içi ("Fikrini. İnşa Et.") soldan sağa yatay maskeleme ile doldurulan açılış animasyonu.
+- **Minimalist Developer SaaS:** Gereksiz karmaşadan arındırılmış, tipografi odaklı şık arayüz.
+- **İmza Yükleme Deneyimi:** Metin içi ("Fikrine tırmanan yol") soldan sağa yatay maskeleme ile doldurulan açılış animasyonu.
 - **Dahili Tema Desteği:** Sıfır parlama (flicker-free) ile Dark (`#0B0D10`) ve Light (`#F7F8FA`) mod geçişleri.
 - **Erişilebilirlik:** `prefers-reduced-motion` ve klavye kısayolları (`⌘+Enter`) desteği.
 

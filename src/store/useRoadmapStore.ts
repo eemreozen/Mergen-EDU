@@ -108,8 +108,8 @@ const defaultAdvisorMessages: AdvisorMessage[] = [
   {
     id: 'msg-1',
     sender: 'advisor',
-    textTr: 'Merhaba! Ben ProjectPath AI Öğrenme Danışmanınızım. AI Fitness projeniz ve Machine Learning alt haritanızla ilgili sorularınızı yanıtlayabilir veya yol haritanızı uyarlayabilirim.',
-    textEn: "Hello! I'm your ProjectPath AI Learning Advisor. I can assist you with your AI Fitness project, guide you through the ML submap, or adapt your learning milestones.",
+    textTr: 'Merhaba! Ben Mergen AI Öğrenme Danışmanınızım. AI Fitness projeniz ve Machine Learning alt haritanızla ilgili sorularınızı yanıtlayabilir veya yol haritanızı uyarlayabilirim.',
+    textEn: "Hello! I'm your Mergen AI Learning Advisor. I can assist you with your AI Fitness project, guide you through the ML submap, or adapt your learning milestones.",
     timestamp: 'Şimdi / Now',
   },
 ]

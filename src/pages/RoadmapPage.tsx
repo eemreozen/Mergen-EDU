@@ -25,7 +25,7 @@ export function RoadmapPage() {
       : 'Spring Boot ve React ile JWT kimlik doğrulamalı ve PostgreSQL destekli modern e-ticaret platformu.')
 
   const handleExport = () => {
-    const text = `ProjectPath Roadmap:\nProject: ${userIdea}\n\nStages:\n` +
+    const text = `Mergen Roadmap:\nProject: ${userIdea}\n\nStages:\n` +
       sampleRoadmapStages
         .map(
           s =>

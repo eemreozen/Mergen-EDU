@@ -123,10 +123,10 @@ export function HeroSection({
             {/* Wordmark & Tagline */}
             <div>
               <span className="font-mono font-bold tracking-tight text-2xl text-[#111318] dark:text-[#E9EDF3] lowercase">
-                project<span className="text-[#2B660E] dark:text-[#B7F36B]">path</span>
+                mer<span className="text-[#2B660E] dark:text-[#B7F36B]">gen</span>
               </span>
               <p className="text-xs font-mono text-[#68717D] dark:text-[#9CA3AF] mt-0.5 font-medium">
-                Fikrini. İnşa Et.
+                Fikrine tırmanan yol
               </p>
             </div>
 

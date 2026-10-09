@@ -1,12 +1,12 @@
 {
   "nav": {
-    "brand": "projectpath",
+    "brand": "mergen",
     "signIn": "Sign In",
     "selectLanguage": "Select Language",
     "toggleTheme": "Toggle Theme"
   },
   "loading": {
-    "slogan": "Fikrini. İnşa Et.",
+    "slogan": "Fikrine tırmanan yol",
     "subtitle": "Preparing your personalized development path..."
   },
   "hero": {
@@ -45,7 +45,7 @@
     "actionExport": "Export Roadmap"
   },
   "auth": {
-    "title": "Sign in to ProjectPath",
+    "title": "Sign in to Mergen",
     "subtitle": "Save your roadmaps and pick up where you left off.",
     "github": "Continue with GitHub",
     "google": "Continue with Google",
@@ -56,7 +56,7 @@
     "close": "Close"
   },
   "footer": {
-    "tagline": "Project-based learning platform for engineers.",
+    "tagline": "Fikrine tırmanan yol. Project-based learning platform for engineers.",
     "rights": "All rights reserved."
   }
 }

@@ -72,13 +72,13 @@ export function LoadingScreen({ onComplete, prefersReducedMotion = false }: Load
           className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#0B0D10] text-center select-none overflow-hidden px-6"
           role="status"
           aria-live="polite"
-          aria-label="ProjectPath yükleniyor"
+          aria-label="Mergen yükleniyor"
         >
           {/* Top minimal status bar */}
           <div className="absolute top-8 left-8 right-8 flex items-center justify-between text-xs font-mono text-[#4A5361] tracking-wider uppercase pointer-events-none">
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#B7F36B] animate-pulse" />
-              <span>PROJECTPATH // RUNTIME_INIT</span>
+              <span>MERGEN // RUNTIME_INIT</span>
             </div>
             <div className="hidden sm:block">
               <span>PROJE ODAKLI ÖĞRENME SİSTEMİ</span>
@@ -89,26 +89,26 @@ export function LoadingScreen({ onComplete, prefersReducedMotion = false }: Load
           <div className="relative max-w-5xl mx-auto pt-16 pb-6 overflow-visible">
             {/* 1. Base Layer: Dark, low-contrast text that marks the full shape */}
             <div
-              className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tighter leading-[1.2] select-none text-[#1A1F26] overflow-visible"
+              className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter leading-[1.2] select-none text-[#1A1F26] overflow-visible"
               aria-hidden="true"
             >
               <div className="flex flex-col sm:flex-row items-center justify-center sm:gap-4 md:gap-6 pt-2">
-                <span>Fikrini.</span>
-                <span>İnşa Et.</span>
+                <span>Fikrine</span>
+                <span>tırmanan yol</span>
               </div>
             </div>
 
             {/* 2. Reveal Layer: Progressive fill from left to right */}
             <div
-              className="absolute inset-0 pt-16 pb-6 text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tighter leading-[1.2] select-none pointer-events-none transition-none overflow-visible"
+              className="absolute inset-0 pt-16 pb-6 text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter leading-[1.2] select-none pointer-events-none transition-none overflow-visible"
               style={{
                 clipPath: `inset(0 ${100 - progress}% 0 0)`,
                 WebkitClipPath: `inset(0 ${100 - progress}% 0 0)`,
               }}
             >
               <div className="flex flex-col sm:flex-row items-center justify-center sm:gap-4 md:gap-6 pt-2">
-                <span className="text-[#E9EDF3]">Fikrini.</span>
-                <span className="text-[#B7F36B]">İnşa Et.</span>
+                <span className="text-[#E9EDF3]">Fikrine</span>
+                <span className="text-[#B7F36B]">tırmanan yol</span>
               </div>
             </div>
           </div>
