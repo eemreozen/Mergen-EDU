@@ -20,7 +20,7 @@ export function LoadingScreen({ onComplete, prefersReducedMotion = false }: Load
     }
 
     const startTime = performance.now()
-    const targetDuration = 1700 // ~1.7 seconds smooth progression
+    const targetDuration = 1800 // ~1.8 seconds smooth progression
 
     let animationFrameId: number
 
@@ -74,12 +74,6 @@ export function LoadingScreen({ onComplete, prefersReducedMotion = false }: Load
           aria-live="polite"
           aria-label="ProjectPath yükleniyor"
         >
-          {/* Subtle background ambient light */}
-          <div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-[#B7F36B] opacity-[0.035] blur-[140px] pointer-events-none rounded-full"
-            aria-hidden="true"
-          />
-
           {/* Top minimal status bar */}
           <div className="absolute top-8 left-8 right-8 flex items-center justify-between text-xs font-mono text-[#4A5361] tracking-wider uppercase pointer-events-none">
             <div className="flex items-center gap-2">
@@ -91,14 +85,14 @@ export function LoadingScreen({ onComplete, prefersReducedMotion = false }: Load
             </div>
           </div>
 
-          {/* Signature Typography Container */}
-          <div className="relative max-w-5xl mx-auto py-8">
+          {/* Signature Typography Container with ample top clearance so Turkish dots (İ, ş) are never cut */}
+          <div className="relative max-w-5xl mx-auto pt-16 pb-6 overflow-visible">
             {/* 1. Base Layer: Dark, low-contrast text that marks the full shape */}
             <div
-              className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tighter leading-none select-none text-[#1A1F26]"
+              className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tighter leading-[1.2] select-none text-[#1A1F26] overflow-visible"
               aria-hidden="true"
             >
-              <div className="flex flex-col sm:flex-row items-center justify-center sm:gap-4 md:gap-6">
+              <div className="flex flex-col sm:flex-row items-center justify-center sm:gap-4 md:gap-6 pt-2">
                 <span>Fikrini.</span>
                 <span>İnşa Et.</span>
               </div>
@@ -106,41 +100,84 @@ export function LoadingScreen({ onComplete, prefersReducedMotion = false }: Load
 
             {/* 2. Reveal Layer: Progressive fill from left to right */}
             <div
-              className="absolute inset-0 text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tighter leading-none select-none pointer-events-none transition-none"
+              className="absolute inset-0 pt-16 pb-6 text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tighter leading-[1.2] select-none pointer-events-none transition-none overflow-visible"
               style={{
                 clipPath: `inset(0 ${100 - progress}% 0 0)`,
                 WebkitClipPath: `inset(0 ${100 - progress}% 0 0)`,
               }}
             >
-              <div className="flex flex-col sm:flex-row items-center justify-center sm:gap-4 md:gap-6">
+              <div className="flex flex-col sm:flex-row items-center justify-center sm:gap-4 md:gap-6 pt-2">
                 <span className="text-[#E9EDF3]">Fikrini.</span>
                 <span className="text-[#B7F36B]">İnşa Et.</span>
               </div>
             </div>
-
-            {/* Micro scanline edge indicator following progress */}
-            {progress > 0 && progress < 100 && (
-              <div
-                className="absolute top-0 bottom-0 w-[2px] bg-[#B7F36B] shadow-[0_0_12px_#B7F36B] pointer-events-none transition-none opacity-70"
-                style={{
-                  left: `${progress}%`,
-                }}
-                aria-hidden="true"
-              />
-            )}
           </div>
 
-          {/* Progress numeric meter below typography */}
-          <div className="mt-8 flex flex-col items-center gap-2 text-center">
-            <div className="font-mono text-sm tracking-widest text-[#9CA3AF] flex items-center gap-3">
-              <span className="text-xs uppercase text-[#6B7280]">YOL HAZIRLANIYOR</span>
+          {/* 3. The Roadmap Path Under the Text - Reveals in exact synchronization */}
+          <div className="relative w-full max-w-2xl px-4 mt-2 mb-6">
+            {/* Base Dimmed Path */}
+            <svg
+              viewBox="0 0 600 40"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-full h-8 sm:h-10 text-[#1A1F26]"
+              aria-hidden="true"
+            >
+              <path
+                d="M 20,20 Q 150,34 300,16 T 580,20"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeDasharray="4 4"
+              />
+              <circle cx="20" cy="20" r="5" fill="#0B0D10" stroke="currentColor" strokeWidth="2.5" />
+              <circle cx="160" cy="25" r="4" fill="#0B0D10" stroke="currentColor" strokeWidth="2" />
+              <circle cx="300" cy="16" r="4.5" fill="#0B0D10" stroke="currentColor" strokeWidth="2" />
+              <circle cx="440" cy="22" r="4" fill="#0B0D10" stroke="currentColor" strokeWidth="2" />
+              <circle cx="580" cy="20" r="6" fill="#0B0D10" stroke="currentColor" strokeWidth="2.5" />
+            </svg>
+
+            {/* Revealed Accent Path (Opens concurrently with text) */}
+            <div
+              className="absolute inset-0 px-4 transition-none pointer-events-none"
+              style={{
+                clipPath: `inset(0 ${100 - progress}% 0 0)`,
+                WebkitClipPath: `inset(0 ${100 - progress}% 0 0)`,
+              }}
+            >
+              <svg
+                viewBox="0 0 600 40"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-full h-8 sm:h-10 text-[#B7F36B]"
+                aria-hidden="true"
+              >
+                <path
+                  d="M 20,20 Q 150,34 300,16 T 580,20"
+                  stroke="#B7F36B"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                />
+                <circle cx="20" cy="20" r="5" fill="#B7F36B" />
+                <circle cx="160" cy="25" r="4" fill="#B7F36B" />
+                <circle cx="300" cy="16" r="5" fill="#B7F36B" />
+                <circle cx="440" cy="22" r="4" fill="#B7F36B" />
+                <circle cx="580" cy="20" r="6" fill="#B7F36B" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Progress numeric meter below path */}
+          <div className="flex flex-col items-center gap-2 text-center">
+            <div className="font-mono text-xs sm:text-sm tracking-widest text-[#9CA3AF] flex items-center gap-3">
+              <span className="text-[11px] uppercase text-[#6B7280]">YOL OLUŞTURULUYOR</span>
               <span className="text-[#B7F36B] font-semibold">
                 {progress.toString().padStart(3, '0')}%
               </span>
             </div>
           </div>
 
-          {/* Quick skip button for instant developer access */}
+          {/* Quick skip button */}
           <button
             type="button"
             onClick={handleSkip}

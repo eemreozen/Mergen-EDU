@@ -5,6 +5,9 @@ import { useTranslation } from 'react-i18next'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { sampleRoadmapStages } from '@/lib/roadmapData'
 import { RoadmapStageCard } from '@/features/roadmap/RoadmapStageCard'
+import { Logo } from '@/components/shared/Logo'
+import { LanguageSelector } from '@/components/shared/LanguageSelector'
+import { ThemeToggle } from '@/components/shared/ThemeToggle'
 
 export function RoadmapPage() {
   const { t, i18n } = useTranslation()
@@ -44,20 +47,27 @@ export function RoadmapPage() {
       transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
       className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12"
     >
-      {/* Back button & Eyebrow */}
-      <div className="flex items-center justify-between gap-4 mb-8">
-        <button
-          type="button"
-          onClick={() => navigate('/')}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF] dark:bg-[#171A20] text-xs font-medium text-[#68717D] dark:text-[#9CA3AF] hover:text-[#111318] dark:hover:text-[#E9EDF3] hover:border-[#CBD5E1] dark:hover:border-[#3E4752] transition-colors cursor-pointer"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>{t('roadmap.backButton')}</span>
-        </button>
+      {/* Top Header Row on Roadmap page */}
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF] dark:bg-[#171A20] text-xs font-medium text-[#68717D] dark:text-[#9CA3AF] hover:text-[#111318] dark:hover:text-[#E9EDF3] hover:border-[#CBD5E1] dark:hover:border-[#3E4752] transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>{t('roadmap.backButton')}</span>
+          </button>
+          <Logo iconOnly className="hidden sm:inline-flex" />
+        </div>
 
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#2B660E]/20 dark:border-[#B7F36B]/20 bg-[#2B660E]/5 dark:bg-[#B7F36B]/5 text-[11px] font-mono uppercase tracking-wider text-[#2B660E] dark:text-[#B7F36B] font-semibold">
-          <Sparkles className="w-3 h-3" />
-          <span>{t('roadmap.previewBadge')}</span>
+        <div className="flex items-center gap-2.5">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#2B660E]/20 dark:border-[#B7F36B]/20 bg-[#2B660E]/5 dark:bg-[#B7F36B]/5 text-[11px] font-mono uppercase tracking-wider text-[#2B660E] dark:text-[#B7F36B] font-semibold">
+            <Sparkles className="w-3 h-3" />
+            <span>{t('roadmap.previewBadge')}</span>
+          </div>
+          <LanguageSelector />
+          <ThemeToggle />
         </div>
       </div>
 
