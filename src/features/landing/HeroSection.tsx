@@ -93,52 +93,29 @@ export function HeroSection({
 
   return (
     <>
-      <section className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 min-h-[85vh] flex flex-col justify-between pt-6 pb-0 overflow-visible">
+      <section className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 min-h-[85vh] flex flex-col justify-between pt-8 sm:pt-12 pb-0 overflow-visible">
         
-        {/* 1. TOP CENTER: Wizard Banner */}
-        <motion.div
-          id="tour-wizard-box"
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="w-full max-w-xl mx-auto mb-6 p-2.5 sm:p-3 rounded-2xl border border-[#2B660E]/30 dark:border-[#B7F36B]/30 bg-[#FFFFFF]/90 dark:bg-[#171A20]/90 shadow-md backdrop-blur-md flex items-center justify-between gap-3 text-left"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#2B660E] dark:bg-[#B7F36B] text-white dark:text-[#0B0D10] flex items-center justify-center font-bold shadow-xs shrink-0">
-              <Wand2 className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#2B660E] dark:text-[#B7F36B] flex items-center gap-1">
-                <Sparkles className="w-3 h-3" />
-                <span>{isEn ? 'START THE WIZARD' : 'SİHİRBAZI BAŞLAT'}</span>
-              </div>
-              <div className="text-xs sm:text-sm font-semibold text-[#111318] dark:text-[#E9EDF3]">
-                {isEn
-                  ? 'Confused? Learn how to use ProjectPath in 30 seconds'
-                  : 'Kafan mı karıştı? Nasıl kullanacağını öğren'}
-              </div>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setIsTourOpen(true)}
-            className="px-3.5 py-1.5 rounded-xl bg-[#111318] dark:bg-[#E9EDF3] text-white dark:text-[#0B0D10] hover:bg-[#2B660E] dark:hover:bg-[#B7F36B] text-xs font-bold transition-all shrink-0 cursor-pointer shadow-xs active:scale-95"
-          >
-            {isEn ? 'Start Tour →' : 'Turu Başlat →'}
-          </button>
-        </motion.div>
-
-        {/* 2. SYMMETRICAL 3-COLUMN WORKSPACE: LEFT (Logo) — CENTER (Input Box) — RIGHT (Sign In & Advisor) */}
+        {/* SYMMETRICAL 3-COLUMN WORKSPACE: LEFT (Wizard + Logo) — CENTER (Input Box) — RIGHT (Sign In + Preferences + Advisor) */}
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center pb-2">
           
-          {/* LEFT COLUMN: Enlarged Logo & Brand identity (Cols 1-3) */}
+          {/* LEFT COLUMN: Small Wizard Button + Logo & Brand identity (Cols 1-3) */}
           <motion.div
             initial={{ opacity: 0, x: -16 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.45 }}
             className="lg:col-span-3 flex flex-col items-center lg:items-start text-center lg:text-left space-y-3"
           >
+            {/* Küçük Sihirbazı Başlat Butonu (Logonun üstünde) */}
+            <button
+              id="tour-wizard-box"
+              type="button"
+              onClick={() => setIsTourOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#2B660E]/30 dark:border-[#B7F36B]/30 bg-[#FFFFFF] dark:bg-[#171A20] hover:bg-[#2B660E]/10 dark:hover:bg-[#B7F36B]/15 text-[#2B660E] dark:text-[#B7F36B] text-xs font-semibold shadow-xs transition-all active:scale-95 cursor-pointer"
+            >
+              <Wand2 className="w-3.5 h-3.5" />
+              <span>{isEn ? 'Start Wizard' : 'Sihirbazı Başlat'}</span>
+            </button>
+
             {/* Enlarged Geometric Logo Card */}
             <div className="relative group w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-[#FFFFFF] dark:bg-[#171A20] border-2 border-[#E3E7EC] dark:border-[#2A3038] hover:border-[#2B660E] dark:hover:border-[#B7F36B] shadow-2xl flex items-center justify-center transition-all duration-300">
               <svg
@@ -172,7 +149,7 @@ export function HeroSection({
             </div>
           </motion.div>
 
-          {/* CENTER COLUMN: Main Project Idea Input + Language & Theme Underneath (Cols 4-9) */}
+          {/* CENTER COLUMN: Main Project Idea Input + Inspiration Chips (Cols 4-9) */}
           <div className="lg:col-span-6 flex flex-col items-center text-center">
             
             {/* Main Headline */}
@@ -242,16 +219,6 @@ export function HeroSection({
               </div>
             </motion.div>
 
-            {/* DİL DEĞİŞTİRME VE KARANLIK MOD (Ortadaki yazı yazılacak yerin tam altına konuldu) */}
-            <div className="mt-3.5 flex items-center justify-center gap-3 p-2 px-4 rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF]/85 dark:bg-[#171A20]/85 backdrop-blur-sm shadow-xs">
-              <span className="text-[11px] font-mono text-[#68717D] dark:text-[#9CA3AF]">
-                {isEn ? 'Preferences:' : 'Tercihler:'}
-              </span>
-              <LanguageSelector />
-              <div className="h-4 w-[1px] bg-[#E3E7EC] dark:bg-[#2A3038]" />
-              <ThemeToggle />
-            </div>
-
             {/* Non-Technical Quick Inspiration Chips */}
             <div id="tour-inspiration-chips" className="mt-4 w-full max-w-xl text-left">
               <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
@@ -298,14 +265,14 @@ export function HeroSection({
             </div>
           </div>
 
-          {/* RIGHT COLUMN: GİRİŞ YAP KUTUSU (Üstte) & ÖNLÜKLÜ DANIŞMAN (Altta, tıklayınca chat açılır) (Cols 10-12) */}
+          {/* RIGHT COLUMN: GİRİŞ YAP KUTUSU (Üstte) & TERCİHLER (Altında) & ÖNLÜKLÜ DANIŞMAN (En altta) (Cols 10-12) */}
           <motion.div
             initial={{ opacity: 0, x: 16 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.45 }}
-            className="lg:col-span-3 flex flex-col items-center lg:items-end justify-between h-full space-y-6"
+            className="lg:col-span-3 flex flex-col items-center lg:items-end justify-between h-full space-y-4"
           >
-            {/* GİRİŞ YAP BUTONU (Danışmanın/Sağ tarafın tam üzerine koyuldu) */}
+            {/* GİRİŞ YAP BUTONU */}
             <div className="w-full max-w-[220px] p-3 rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF] dark:bg-[#171A20] shadow-md text-left flex flex-col gap-2">
               <div className="text-[11px] font-mono text-[#68717D] dark:text-[#9CA3AF]">
                 {isEn ? 'Already a member?' : 'Daha önce geldin mi?'}
@@ -317,6 +284,18 @@ export function HeroSection({
               >
                 {t('nav.signIn')}
               </button>
+            </div>
+
+            {/* TERCİHLER KISMI (Giriş yapın tam altında) */}
+            <div className="w-full max-w-[220px] p-2.5 px-3 rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF] dark:bg-[#171A20] shadow-sm flex items-center justify-between">
+              <span className="text-[11px] font-mono text-[#68717D] dark:text-[#9CA3AF]">
+                {isEn ? 'Preferences:' : 'Tercihler:'}
+              </span>
+              <div className="flex items-center gap-1.5">
+                <LanguageSelector />
+                <div className="h-3.5 w-[1px] bg-[#E3E7EC] dark:bg-[#2A3038]" />
+                <ThemeToggle />
+              </div>
             </div>
 
             {/* ÖNLÜKLÜ REHBER ÖĞRETMEN ÇİZİMİ (Altta ayaklarıyla basan, tıklandığında chat açılır) */}
