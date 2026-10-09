@@ -3,12 +3,20 @@ import { MessageSquare, Sparkles } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 interface TeacherAdvisorFigureProps {
-  onClick: () => void
+  onClick?: () => void
+  size?: 'md' | 'lg'
+  showBubble?: boolean
 }
 
-export function TeacherAdvisorFigure({ onClick }: TeacherAdvisorFigureProps) {
+export function TeacherAdvisorFigure({
+  onClick,
+  size = 'lg',
+  showBubble = true,
+}: TeacherAdvisorFigureProps) {
   const { i18n } = useTranslation()
   const isEn = i18n.language.startsWith('en')
+
+  const sizeClasses = size === 'lg' ? 'w-48 h-64 sm:w-56 sm:h-72' : 'w-36 h-48 sm:w-40 sm:h-52'
 
   return (
     <div
@@ -17,31 +25,31 @@ export function TeacherAdvisorFigure({ onClick }: TeacherAdvisorFigureProps) {
       onClick={onClick}
     >
       {/* 1. Animated Speech Bubble floating above teacher's head */}
-      <motion.div
-        animate={{ y: [0, -5, 0] }}
-        transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
-        className="mb-1.5 px-3.5 py-2 rounded-2xl border border-[#2B660E]/40 dark:border-[#B7F36B]/40 bg-[#FFFFFF] dark:bg-[#171A20] shadow-xl text-left flex items-center gap-2.5 max-w-[260px] pointer-events-auto group-hover:scale-105 transition-transform"
-      >
-        <div className="w-6 h-6 rounded-lg bg-[#2B660E]/15 dark:bg-[#B7F36B]/20 text-[#2B660E] dark:text-[#B7F36B] flex items-center justify-center shrink-0">
-          <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-        </div>
-        <div>
-          <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#2B660E] dark:text-[#B7F36B] flex items-center gap-1">
-            <span>{isEn ? 'Mentor Teacher' : 'Önlüklü Rehber'}</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#2B660E] dark:bg-[#B7F36B]" />
+      {showBubble && (
+        <motion.div
+          animate={{ y: [0, -5, 0] }}
+          transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
+          className="mb-1 px-3.5 py-1.5 rounded-2xl border border-[#2B660E]/40 dark:border-[#B7F36B]/40 bg-[#FFFFFF] dark:bg-[#171A20] shadow-xl text-left flex items-center gap-2 max-w-[240px] pointer-events-auto group-hover:scale-105 transition-transform"
+        >
+          <div className="w-5 h-5 rounded-lg bg-[#2B660E]/15 dark:bg-[#B7F36B]/20 text-[#2B660E] dark:text-[#B7F36B] flex items-center justify-center shrink-0">
+            <Sparkles className="w-3 h-3 animate-pulse" />
           </div>
-          <div className="text-xs font-semibold text-[#111318] dark:text-[#E9EDF3] leading-snug">
-            {isEn
-              ? 'Got an idea? Click me, let’s plan it together! 💬'
-              : 'Fikrin mi var? Tıkla, birlikte planlayalım! 💬'}
+          <div>
+            <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#2B660E] dark:text-[#B7F36B] flex items-center gap-1">
+              <span>{isEn ? 'Mentor Teacher' : 'Önlüklü Rehber'}</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2B660E] dark:bg-[#B7F36B]" />
+            </div>
+            <div className="text-[11px] font-semibold text-[#111318] dark:text-[#E9EDF3] leading-snug">
+              {isEn ? 'Click me to brainstorm! 💬' : 'Tıkla, birlikte planlayalım! 💬'}
+            </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      )}
 
       {/* 2. SVG Line-Art Illustration of the Teacher Wearing an Apron/Lab Coat (Önlük)
              The feet are drawn precisely at the bottom edge (y=210) so they stand
              flush on the footer horizontal border line! */}
-      <div className="relative w-36 h-48 sm:w-40 sm:h-52 flex items-end justify-center">
+      <div className={`relative ${sizeClasses} flex items-end justify-center`}>
         <svg
           viewBox="0 0 160 210"
           fill="none"

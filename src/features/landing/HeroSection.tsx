@@ -3,29 +3,23 @@ import { ArrowRight, Compass, Sparkles, Wand2 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { AuthModal } from '@/components/shared/AuthModal'
-import { LanguageSelector } from '@/components/shared/LanguageSelector'
-import { ThemeToggle } from '@/components/shared/ThemeToggle'
 import { OnboardingModal } from '@/components/assessment/OnboardingModal'
 import { GuidedTourWizard } from '@/components/landing/GuidedTourWizard'
-import { TeacherAdvisorFigure } from '@/components/landing/TeacherAdvisorFigure'
+import { TeacherAdvisorDesk } from '@/components/landing/TeacherAdvisorDesk'
 
 interface HeroSectionProps {
   externalIdea?: string
   onIdeaChange?: (idea: string) => void
-  onOpenAdvisor?: () => void
 }
 
 export function HeroSection({
   externalIdea,
   onIdeaChange,
-  onOpenAdvisor,
 }: HeroSectionProps) {
   const { t, i18n } = useTranslation()
   const isEn = i18n.language.startsWith('en')
 
   const [localIdea, setLocalIdea] = useState('')
-  const [isAuthOpen, setIsAuthOpen] = useState(false)
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false)
   const [isTourOpen, setIsTourOpen] = useState(false)
 
@@ -60,7 +54,7 @@ export function HeroSection({
     }
   }
 
-  // Non-technical, human, goal-oriented starter ideas
+  // Accessible, non-technical human project suggestions
   const starterIdeas = [
     {
       label: isEn ? 'Smart Fitness Coach' : 'Akıllı Fitness Koçu',
@@ -93,79 +87,63 @@ export function HeroSection({
 
   return (
     <>
-      <section className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 min-h-[86vh] flex flex-col justify-between items-center pt-6 pb-0 overflow-visible">
+      <section className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 min-h-[82vh] flex flex-col justify-between pt-4 pb-0 overflow-visible">
         
-        {/* TOP SECTION: Wizard Banner & Headline */}
-        <div className="w-full flex flex-col items-center">
-          
-          {/* 1. "Sihirbazı Başlat" Box (Prompted by user: Kafan mı karıştı? Nasıl kullanacağını öğren) */}
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="w-full max-w-xl mx-auto mb-6 p-3 sm:p-4 rounded-3xl border border-[#2B660E]/30 dark:border-[#B7F36B]/30 bg-gradient-to-r from-[#2B660E]/5 via-[#FFFFFF]/90 to-[#2B660E]/10 dark:from-[#B7F36B]/10 dark:via-[#171A20] dark:to-[#B7F36B]/5 shadow-lg backdrop-blur-md flex items-center justify-between gap-3 text-left"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-[#2B660E] dark:bg-[#B7F36B] text-white dark:text-[#0B0D10] flex items-center justify-center font-bold shadow-md shrink-0">
-                <Wand2 className="w-5 h-5 animate-pulse" />
+        {/* 1. TOP PROMINENT WIZARD BANNER */}
+        <motion.div
+          id="tour-wizard-box"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
+          className="w-full max-w-2xl mx-auto mb-6 p-3 sm:p-4 rounded-3xl border border-[#2B660E]/30 dark:border-[#B7F36B]/30 bg-gradient-to-r from-[#2B660E]/5 via-[#FFFFFF]/90 to-[#2B660E]/10 dark:from-[#B7F36B]/10 dark:via-[#171A20] dark:to-[#B7F36B]/5 shadow-lg backdrop-blur-md flex items-center justify-between gap-3 text-left"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-[#2B660E] dark:bg-[#B7F36B] text-white dark:text-[#0B0D10] flex items-center justify-center font-bold shadow-md shrink-0">
+              <Wand2 className="w-5 h-5 animate-pulse" />
+            </div>
+            <div>
+              <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#2B660E] dark:text-[#B7F36B] flex items-center gap-1.5">
+                <Sparkles className="w-3 h-3" />
+                <span>{isEn ? 'START THE WIZARD' : 'SİHİRBAZI BAŞLAT'}</span>
               </div>
-              <div>
-                <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#2B660E] dark:text-[#B7F36B] flex items-center gap-1.5">
-                  <Sparkles className="w-3 h-3" />
-                  <span>{isEn ? 'START THE WIZARD' : 'SİHİRBAZI BAŞLAT'}</span>
-                </div>
-                <div className="text-xs sm:text-sm font-semibold text-[#111318] dark:text-[#E9EDF3]">
-                  {isEn
-                    ? 'Confused? Learn how to use ProjectPath in 30 seconds'
-                    : 'Kafan mı karıştı? Nasıl kullanacağını öğren'}
-                </div>
+              <div className="text-xs sm:text-sm font-semibold text-[#111318] dark:text-[#E9EDF3]">
+                {isEn
+                  ? 'Confused? Learn how to use ProjectPath in 30 seconds'
+                  : 'Kafan mı karıştı? Nasıl kullanacağını öğren'}
               </div>
             </div>
+          </div>
 
-            <button
-              type="button"
-              onClick={() => setIsTourOpen(true)}
-              className="px-3.5 py-2 rounded-xl bg-[#111318] dark:bg-[#E9EDF3] text-white dark:text-[#0B0D10] hover:bg-[#2B660E] dark:hover:bg-[#B7F36B] text-xs font-bold transition-all shrink-0 cursor-pointer shadow-md active:scale-95"
-            >
-              {isEn ? 'Start Tour →' : 'Turu Başlat →'}
-            </button>
-          </motion.div>
-
-          {/* 2. Main Title (No "kendi yolunu oluştur" eyebrow as requested) */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.05 }}
-            className="text-center mb-6"
+          <button
+            type="button"
+            onClick={() => setIsTourOpen(true)}
+            className="px-3.5 py-2 rounded-xl bg-[#111318] dark:bg-[#E9EDF3] text-white dark:text-[#0B0D10] hover:bg-[#2B660E] dark:hover:bg-[#B7F36B] text-xs font-bold transition-all shrink-0 cursor-pointer shadow-md active:scale-95"
           >
-            <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-[#111318] dark:text-[#E9EDF3] leading-tight">
-              <span>{t('hero.titleLine1')} </span>
-              <span className="text-[#2B660E] dark:text-[#B7F36B]">{t('hero.titleLine2')}</span>
-            </h1>
-          </motion.div>
+            {isEn ? 'Start Tour →' : 'Turu Başlat →'}
+          </button>
+        </motion.div>
 
-          {/* 3. CENTER AREA: Enlarged Logo Perfectly Centered Above/In-Line with Text Input Box */}
-          <div className="w-full max-w-2xl flex flex-col items-center">
+        {/* 2. BALANCED TWO-COLUMN RESPONSIVE WORKSPACE (NO VERTICAL PILE-UP) */}
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-end pb-0">
+          
+          {/* LEFT COLUMN: Main Project Idea Composer (Cols 1-7) */}
+          <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
             
-            {/* Enlarged Geometric Logo (Placed right in the center above the input box) */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.45, delay: 0.1 }}
-              className="flex flex-col items-center text-center mb-4"
-            >
-              <div className="relative group w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-[#FFFFFF] dark:bg-[#171A20] border-2 border-[#E3E7EC] dark:border-[#2A3038] hover:border-[#2B660E] dark:hover:border-[#B7F36B] shadow-2xl flex items-center justify-center transition-all duration-300">
+            {/* Headline and Enlarged Logo in line */}
+            <div className="w-full flex flex-col sm:flex-row items-center sm:items-start gap-4 mb-4">
+              
+              {/* Enlarged Geometric Logo */}
+              <div className="relative group w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#FFFFFF] dark:bg-[#171A20] border-2 border-[#E3E7EC] dark:border-[#2A3038] hover:border-[#2B660E] dark:hover:border-[#B7F36B] shadow-xl flex items-center justify-center shrink-0 transition-all duration-300">
                 <svg
                   viewBox="0 0 32 32"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
-                  className="w-12 h-12 sm:w-14 sm:h-14 transition-transform duration-300 group-hover:scale-105"
+                  className="w-10 h-10 sm:w-12 sm:h-12 transition-transform duration-300 group-hover:scale-105"
                   aria-hidden="true"
                 >
                   <circle cx="7" cy="24" r="3" fill="currentColor" className="text-[#9CA3AF] dark:text-[#64748B]" />
                   <circle cx="16" cy="8" r="3.5" fill="#2B660E" className="dark:fill-[#B7F36B]" />
                   <circle cx="25" cy="20" r="3" fill="currentColor" className="text-[#9CA3AF] dark:text-[#64748B]" />
-                  
                   <path
                     d="M9 22L14.5 10.5"
                     stroke="currentColor"
@@ -181,28 +159,29 @@ export function HeroSection({
                     className="dark:stroke-[#B7F36B]"
                   />
                 </svg>
-
-                {/* Ambient micro accent corner dot */}
-                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#2B660E] dark:bg-[#B7F36B] border-2 border-white dark:border-[#171A20]" />
+                <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[#2B660E] dark:bg-[#B7F36B] border-2 border-white dark:border-[#171A20]" />
               </div>
 
-              {/* Wordmark and Slogan */}
-              <div className="mt-2.5">
-                <span className="font-mono font-bold tracking-tight text-xl text-[#111318] dark:text-[#E9EDF3] lowercase">
-                  project<span className="text-[#2B660E] dark:text-[#B7F36B]">path</span>
-                </span>
-                <p className="text-[11px] font-mono text-[#68717D] dark:text-[#9CA3AF]">
-                  Fikrini. İnşa Et.
+              {/* Title & Tagline */}
+              <div>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-[#111318] dark:text-[#E9EDF3] leading-tight">
+                  <span>{t('hero.titleLine1')} </span>
+                  <span className="text-[#2B660E] dark:text-[#B7F36B]">{t('hero.titleLine2')}</span>
+                </h1>
+                <p className="text-xs sm:text-sm font-mono text-[#68717D] dark:text-[#9CA3AF] mt-1">
+                  {isEn
+                    ? 'State your project idea. Conquer skills through a bottom-to-top expedition.'
+                    : 'Aklındaki projeyi yaz. Aşağıdan yukarıya tırmanan haritayla inşa ederek öğren.'}
                 </p>
               </div>
-            </motion.div>
+            </div>
 
-            {/* 4. The Central Project Idea Input Box */}
+            {/* The Project Idea Input Box */}
             <motion.div
               id="tour-idea-input"
-              initial={{ opacity: 0, y: 14 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: 0.15 }}
+              transition={{ duration: 0.4 }}
               className="w-full"
             >
               <div className="relative rounded-3xl border-2 border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF] dark:bg-[#171A20] shadow-2xl p-4 sm:p-5 text-left transition-all duration-200 focus-within:border-[#2B660E] dark:focus-within:border-[#B7F36B] focus-within:ring-4 focus-within:ring-[#2B660E]/10 dark:focus-within:ring-[#B7F36B]/15">
@@ -250,7 +229,7 @@ export function HeroSection({
                 </div>
               </div>
 
-              {/* 5. Non-Technical Quick Inspiration Pills */}
+              {/* Non-Technical Quick Inspiration Pills */}
               <div id="tour-inspiration-chips" className="mt-4 text-left">
                 <p className="text-[11px] font-mono uppercase tracking-wider text-[#9CA3AF] dark:text-[#64748B] mb-2">
                   {t('hero.quickSuggestionsTitle')}
@@ -273,85 +252,38 @@ export function HeroSection({
                 </div>
               </div>
 
-              {/* Quick Controls Bar: Sign In, Language, Dark/Light Mode */}
-              <div className="mt-5 p-2.5 rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] bg-[#FFFFFF]/80 dark:bg-[#171A20]/80 backdrop-blur-sm flex flex-wrap items-center justify-between gap-3 text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-mono text-[#68717D] dark:text-[#9CA3AF]">
-                    {isEn ? 'Already a member?' : 'Daha önce giriş yaptın mı?'}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setIsAuthOpen(true)}
-                    className="px-2.5 py-1 rounded-lg font-semibold bg-[#111318] dark:bg-[#E9EDF3] text-white dark:text-[#0B0D10] hover:bg-[#2A3038] dark:hover:bg-white transition-colors cursor-pointer"
-                  >
-                    {t('nav.signIn')}
-                  </button>
-                </div>
+              {/* Discreet Demo Links at bottom of column */}
+              <div className="mt-4 flex flex-wrap items-center gap-3 text-xs font-mono text-[#9CA3AF] dark:text-[#64748B]">
+                <button
+                  type="button"
+                  onClick={handleStartFitnessDemo}
+                  className="hover:text-[#111318] dark:hover:text-[#E9EDF3] transition-colors cursor-pointer underline-offset-4 hover:underline"
+                >
+                  <span>{isEn ? '⚡️ Run Demo: AI Fitness App' : '⚡️ Demo Senaryosu: AI Fitness Uygulaması'}</span>
+                </button>
 
-                <div className="flex items-center gap-3">
-                  <LanguageSelector />
-                  <div className="h-4 w-[1px] bg-[#E3E7EC] dark:bg-[#2A3038]" />
-                  <ThemeToggle />
-                </div>
+                <span>·</span>
+
+                <Link
+                  to="/canvas"
+                  className="hover:text-[#111318] dark:hover:text-[#E9EDF3] transition-colors inline-flex items-center gap-1 underline-offset-4 hover:underline"
+                >
+                  <Compass className="w-3.5 h-3.5" />
+                  <span>{isEn ? 'Direct to Canvas →' : 'Doğrudan Kanvasa Git →'}</span>
+                </Link>
               </div>
             </motion.div>
           </div>
-        </div>
 
-        {/* BOTTOM SECTION: Connecting Expedition Path & The Lab-Coat Teacher Standing on the Footer Line */}
-        <div className="w-full relative flex flex-col items-center mt-8">
-          
-          {/* Gentle SVG Expedition Path winding down from workspace toward the teacher */}
-          <div className="w-full max-w-sm h-12 flex items-center justify-center pointer-events-none opacity-40">
-            <svg
-              viewBox="0 0 240 48"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-full h-full text-[#2B660E] dark:text-[#B7F36B]"
-            >
-              <path
-                d="M120 0 C 120 20, 160 25, 120 48"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeDasharray="4 4"
-                strokeLinecap="round"
-              />
-              <circle cx="120" cy="46" r="3" fill="currentColor" />
-            </svg>
-          </div>
-
-          {/* Discreet, subtle text-only links for Demo & Canvas (Moved from top to bottom as requested) */}
-          <div className="mb-2 flex flex-wrap items-center justify-center gap-4 text-xs font-mono text-[#9CA3AF] dark:text-[#64748B]">
-            <button
-              type="button"
-              onClick={handleStartFitnessDemo}
-              className="hover:text-[#111318] dark:hover:text-[#E9EDF3] transition-colors cursor-pointer underline-offset-4 hover:underline"
-            >
-              <span>{isEn ? '⚡️ Run Demo Scenario: AI Fitness' : '⚡️ Demo Senaryosu: AI Fitness Uygulaması'}</span>
-            </button>
-
-            <span>·</span>
-
-            <Link
-              to="/canvas"
-              className="hover:text-[#111318] dark:hover:text-[#E9EDF3] transition-colors inline-flex items-center gap-1 underline-offset-4 hover:underline"
-            >
-              <Compass className="w-3.5 h-3.5" />
-              <span>{isEn ? 'Direct to Canvas →' : 'Doğrudan Kanvasa Git →'}</span>
-            </Link>
-          </div>
-
-          {/* TEACHER ADVISOR CHARACTER (Standing with feet flush on the bottom line!) */}
-          <div className="relative translate-y-[2px]">
-            <TeacherAdvisorFigure
-              onClick={onOpenAdvisor || (() => setIsTourOpen(true))}
+          {/* RIGHT COLUMN: Enlarged Teacher Mentor & Integrated Live Chat Desk (Cols 8-12) */}
+          <div className="lg:col-span-5 flex flex-col items-center lg:items-end justify-end h-full">
+            <TeacherAdvisorDesk
+              onApplyPrompt={(prompt) => setIdea(prompt)}
             />
           </div>
+
         </div>
       </section>
-
-      {/* Auth Modal */}
-      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
 
       {/* Onboarding Knowledge Assessment Modal */}
       <OnboardingModal isOpen={isOnboardingOpen} onClose={() => setIsOnboardingOpen(false)} />
