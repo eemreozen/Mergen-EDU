@@ -8,7 +8,7 @@ import re
 import time
 from collections import OrderedDict
 from dataclasses import dataclass
-from urllib.parse import urlsplit, urlunsplit
+from urllib.parse import quote, urlsplit, urlunsplit
 from xml.etree import ElementTree
 
 import httpx
@@ -154,7 +154,20 @@ class WebResourceService:
                     matches = relevant_results(parse_readings(response.content, limit=15), context)
                     if matches:
                         return matches
-                return []
+                # Structured encyclopedic search is a keyless fallback when a
+                # general search engine returns only portals/shops. No hand-picked
+                # links and no fetching pages returned by either provider.
+                response = await client.get("https://en.wikipedia.org/w/api.php", params={
+                    "action": "query", "list": "search", "format": "json", "srlimit": 10,
+                    "srsearch": context.fallback_query or title,
+                })
+                response.raise_for_status()
+                articles = [SearchResult(item["title"],
+                    "https://en.wikipedia.org/wiki/" + quote(item["title"].replace(" ", "_")),
+                    "article", "Wikipedia", item.get("snippet", ""))
+                    for item in response.json().get("query", {}).get("search", [])
+                    if item.get("ns") == 0 and item.get("title")]
+                return relevant_results(articles, context)
 
             async def videos():
                 response = await client.get(
@@ -184,8 +197,8 @@ class WebResourceService:
                 self.cache.popitem(last=False)
         return resources, status
 
-    async def for_topic(self, node_id, title, locale="tr", fallback=(), *, skills=(), summary=""):
-        context = topic_context(title, skills, summary)
+    async def for_topic(self, node_id, title, locale="tr", fallback=(), *, skills=(), summary="", resource_query=""):
+        context = topic_context(title, skills, summary, resource_query)
         key = (context, "en" if locale.startswith("en") else "tr")
         if not context.anchors:
             return ReferenceView(resources=list(fallback), status="unavailable")

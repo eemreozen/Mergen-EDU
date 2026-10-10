@@ -101,6 +101,7 @@ export type NodeView = {
   status: "locked" | "available" | "in_progress" | "completed" | "needs_review";
   skills: Array<string>;
   estimatedHours: number;
+  resourceQuery?: string;
   prerequisites?: Array<string>;
   lesson?: string;
   whyNeeded?: string;

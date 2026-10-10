@@ -1,5 +1,5 @@
 import type { Edge, Node } from '@xyflow/react'
-import { createRouter, type Point } from './routing.ts'
+import { createRouter, routeCrossings, type Point } from './routing.ts'
 import type { ExportBundle, MapView, NodeView } from '@/api/types'
 
 export type LearningNodeData = { node: NodeView; stepNumber: number; mapTitle: string; adaptive: boolean; recommended: boolean; activate: (id: string) => void }
@@ -67,14 +67,22 @@ function arrange(map: MapView) {
   }
   // Defensive fallback for an invalid imported graph; the backend rejects cycles.
   for (const node of map.nodes) if (!order.includes(node.id)) order.push(node.id)
-  const depth = Math.max(0, ...earliest.values())
   const ranks = new Map(earliest)
-  // Place short prerequisite chains just before their consumer, rather than
-  // stretching every independent starting point across the entire canvas.
-  for (const id of [...order].reverse()) {
-    const children = outgoing.get(id)!.filter(child => earliest.get(child)! > earliest.get(id)!)
-    if (children.length) ranks.set(id, Math.max(earliest.get(id)!, Math.min(...children.map(child => ranks.get(child)!)) - 1))
-    else if (incoming.get(id)!.length) ranks.set(id, depth)
+  // Compact only independent prerequisite chains toward their first merge.
+  // Moving an internal fork forward creates artificial skip-level connections.
+  for (const root of order.filter(id => !incoming.get(id)!.length)) {
+    const chain = [root]
+    let current = root
+    while (outgoing.get(current)!.length === 1) {
+      const next = outgoing.get(current)![0]
+      if (incoming.get(next)!.length !== 1) {
+        const shift = earliest.get(next)! - earliest.get(current)! - 1
+        if (shift > 0) for (const id of chain) ranks.set(id, earliest.get(id)! + shift)
+        break
+      }
+      if (chain.includes(next)) break
+      chain.push(next); current = next
+    }
   }
   const rows = new Map<number, string[]>()
   for (const id of order) {
@@ -134,8 +142,6 @@ export function layoutMaps(bundle: ExportBundle, activate: (id: string) => void,
     const next = remaining.findIndex(m => maps.some(parent => parent.id === m.parentMapId))
     maps.push(...remaining.splice(next < 0 ? 0 : next, 1))
   }
-  let bottom = 0
-  let top = 120
   let branchIndex = 0
   const positioned = new Map<string, { x: number; y: number }>()
   for (const map of maps) {
@@ -143,8 +149,39 @@ export function layoutMaps(bundle: ExportBundle, activate: (id: string) => void,
     const anchorId = map.targetNodeId || map.parentNodeId || ''
     const anchor = positioned.get(anchorId)
     const offsetX = map === root ? 100 : (anchor?.x ?? 100) + COLUMN
-    const above = map !== root && branchIndex++ % 2 === 1
-    const offsetY = map === root ? 120 : above ? top - layout.height - 100 : bottom + 100
+    let offsetY = 120
+    if (map !== root) {
+      const preferAbove = branchIndex++ % 2 === 1
+      const localPoints = [...layout.positions.values()]
+      const left = offsetX - 28
+      const right = offsetX + Math.max(...localPoints.map(p => p.x)) + WIDTH + 28
+      // Only nearby columns determine the branch lane. A distant tall fork
+      // must not push this branch hundreds of pixels away from its anchor.
+      const neighbors = nodes.filter(n => n.position.x + WIDTH > left && n.position.x < right)
+      const low = Math.max(anchor?.y ?? 120, ...neighbors.map(n => n.position.y + HEIGHT))
+      const high = Math.min(anchor?.y ?? 120, ...neighbors.map(n => n.position.y))
+      const localTop = Math.min(...localPoints.map(p => p.y))
+      const candidates = [
+        { above: false, y: low + 72 - localTop },
+        { above: true, y: high - 72 - layout.height },
+      ]
+      const occupied = edges.filter(e => !e.data?.branch).map(e => {
+        const source = positioned.get(e.source)!, target = positioned.get(e.target)!
+        return [[source.x+136,source.y+32],[source.x+240,source.y+32],
+          [target.x-20,target.y+32],[target.x+84,target.y+32]] as Point[]
+      })
+      const first = localPoints[0]
+      const score = (candidate: typeof candidates[number]) => {
+        if (!anchor || !first) return candidate.above === preferAbove ? 0 : 1
+        const end: Point = [offsetX+first.x+84,candidate.y+first.y+32]
+        const gutter = anchor.x + WIDTH + 28
+        const connector: Point[] = [[anchor.x+136,anchor.y+32],[gutter,anchor.y+32],[gutter,end[1]],end]
+        return routeCrossings(connector,occupied)*10000 + Math.abs(end[1]-anchor.y-32)
+          + (candidate.above === preferAbove ? 0 : ROW * 2)
+      }
+      candidates.sort((a,b) => score(a)-score(b))
+      offsetY = candidates[0].y
+    }
     for (const node of map.nodes) {
       const local = layout.positions.get(node.id)!
       const position = { x: offsetX + local.x, y: offsetY + local.y }
@@ -153,19 +190,30 @@ export function layoutMaps(bundle: ExportBundle, activate: (id: string) => void,
         data: { node, stepNumber: layout.steps.get(node.id)!, mapTitle: map.title,
           adaptive: map.kind === 'adaptive', recommended: node.id === recommendation, activate } })
     }
-    bottom = Math.max(bottom, offsetY + layout.height)
-    top = Math.min(top, offsetY)
     for (const edge of map.edges) {
+      // A -> C adds no visible information when A -> B -> C already exists.
+      // Keep the saved dependencies intact; reduce only the rendered graph.
+      if (edge.kind === 'requires') {
+        const seen = new Set<string>([edge.source])
+        const queue = [edge.source]
+        while (queue.length) {
+          const id = queue.shift()!
+          for (const next of map.edges) {
+            if (next === edge || next.kind !== 'requires' || next.source !== id || seen.has(next.target)) continue
+            seen.add(next.target); queue.push(next.target)
+          }
+        }
+        if (seen.has(edge.target)) continue
+      }
       const source = positioned.get(edge.source)
       const target = positioned.get(edge.target)
       if (!source || !target) continue
-      const long = target.x - source.x > COLUMN + 1 || target.x <= source.x
       edges.push({ ...edge, type: 'learningRoute', sourceHandle: 'out', targetHandle: 'in',
         data: { isCompleted: map.nodes.find(n => n.id === edge.source)?.status === 'completed',
           isRemedial: map.kind === 'adaptive', isActive: edge.target === recommendation,
           optional: edge.kind === 'supports',
-          // Skip-level routes use a clear lane above this map.
-          gutterY: long ? offsetY - 52 - (layout.steps.get(edge.source) ?? 0) * 8 : undefined },
+          // The router chooses the nearest free corridor for skip-level links.
+        },
       })
     }
     if (anchor) {
@@ -174,12 +222,16 @@ export function layoutMaps(bundle: ExportBundle, activate: (id: string) => void,
       const entries = map.nodes.filter(node => !requiredTargets.has(node.id))
       for (const first of entries) edges.push({ id: `branch-${map.id}-${first.id}`, source: anchorId, target: first.id,
         sourceHandle: 'out', targetHandle: 'in', type: 'learningRoute',
-        data: { isRemedial: true, branch: true, gutterX: anchor.x + WIDTH + 65 } })
+        data: { isRemedial: true, branch: true, gutterX: anchor.x + WIDTH + 28 } })
     }
   }
   // Route only after every map has been placed: later branches are obstacles too.
-  const route = createRouter(nodes.map(n => ({ ...n.position, width: WIDTH, height: HEIGHT })))
-  for (const edge of edges) {
+  const obstacles = nodes.map(n => ({ ...n.position, width: WIDTH, height: HEIGHT }))
+  const occupied: Point[][] = []
+  const route = createRouter(obstacles)
+  const branchRoute = createRouter(obstacles, occupied)
+  // Ordinary links establish the occupied corridors before branch connectors.
+  for (const edge of [...edges].sort((a,b) => Number(!!a.data?.branch)-Number(!!b.data?.branch))) {
     const source = positioned.get(edge.source)!, target = positioned.get(edge.target)!
     const start: Point = [source.x + 136, source.y + 32], end: Point = [target.x + 84, target.y + 32]
     const data = edge.data as { gutterX?: number; gutterY?: number; points?: Point[] }
@@ -189,7 +241,8 @@ export function layoutMaps(bundle: ExportBundle, activate: (id: string) => void,
       : data.gutterY !== undefined
         ? [start, [exit, start[1]], [exit, data.gutterY], [entry, data.gutterY], [entry, end[1]], end]
         : [start, [exit, start[1]], [entry, end[1]], end]
-    data.points = route(start, end, preferred)
+    data.points = edge.data?.branch ? branchRoute(start, end, preferred) : route(start, end, preferred)
+    occupied.push(data.points)
   }
   return { nodes, edges }
 }

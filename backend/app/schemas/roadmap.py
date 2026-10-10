@@ -28,6 +28,7 @@ class NodeDraft(Schema):
     summary: str = Field(min_length=1, max_length=500)
     skills: list[str] = Field(min_length=1, max_length=5)
     estimated_hours: float = Field(gt=0, le=500)
+    resource_query: str = Field(default="", max_length=160)
 
 
 class EdgeDraft(Schema):
@@ -44,6 +45,18 @@ class RoadmapDraft(Schema):
 
 
 class RootRoadmapDraft(RoadmapDraft):
+    @model_validator(mode="before")
+    @classmethod
+    def decode_generation_slots(cls, value):
+        if isinstance(value, dict) and isinstance(value.get("nodes"), dict):
+            slots = value["nodes"]
+            keys = {slot: node.get("key", slot) for slot, node in slots.items()}
+            value = {**value, "nodes": [node for _, node in sorted(slots.items())],
+                     "edges": [{**edge, "source": keys.get(edge.get("source"), edge.get("source")),
+                                "target": keys.get(edge.get("target"), edge.get("target"))}
+                               for edge in value.get("edges", [])]}
+        return value
+
     nodes: list[NodeDraft] = Field(min_length=12, max_length=24)
 
 
@@ -71,6 +84,7 @@ class NodeView(Schema):
     status: NodeStatus
     skills: list[str]
     estimated_hours: float
+    resource_query: str = ""
     prerequisites: list[str] = Field(default_factory=list)
     lesson: str = ""
     why_needed: str = ""

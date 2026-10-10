@@ -88,7 +88,8 @@ async def test_root_roadmap_uses_small_schema_but_validates_full_contract():
         assert len(result.nodes) >= 12
         schema = requests[0]["generationConfig"]["responseJsonSchema"]
         assert "minItems" not in schema["properties"]["nodes"]
-        assert "Minimum items: 12" in schema["properties"]["nodes"]["description"]
+        assert schema["properties"]["nodes"]["type"] == "object"
+        assert len(schema["properties"]["nodes"]["required"]) == 12
         assert schema["$defs"]["NodeDraft"]["properties"]["type"]["enum"]
         assert "title" in schema["$defs"]["NodeDraft"]["required"]
         assert "maxLength" not in schema["$defs"]["NodeDraft"]["properties"]["title"]
@@ -264,5 +265,21 @@ async def test_only_initial_project_analysis_uses_intake_model():
             await gateway.generate_structured(operation, "system", {}, ProjectAnalysis)
         assert "gemini-3.5-flash-lite:generateContent" in requests[0]
         assert all("gemini-3.8-flash:generateContent" in url for url in requests[1:])
+    finally:
+        await gateway.close()
+
+
+async def test_required_root_slots_decode_to_public_node_array():
+    draft = fixture("roadmap", {"project": {"primary_domain": "web"}})
+    expected = draft["nodes"][:12]
+    draft["nodes"] = {f"stage{i:02d}": node for i, node in enumerate(expected, 1)}
+    draft["edges"] = [{"source": "stage01", "target": "stage02", "kind": "requires"}]
+    gateway = make_gateway(lambda _: reply(json.dumps(draft)), retries=0)
+    try:
+        result = await gateway.generate_structured("roadmap", "system", {}, RootRoadmapDraft)
+        assert [node.key for node in result.nodes] == [node['key'] for node in expected]
+        assert isinstance(result.model_dump()['nodes'], list)
+        assert result.edges[0].source == expected[0]['key']
+        assert result.edges[0].target == expected[1]['key']
     finally:
         await gateway.close()

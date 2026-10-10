@@ -59,3 +59,14 @@ npm run lint
 Backend'i `backend/README.md` adımlarıyla 8000 portunda, frontend'i `cd frontend && npm run dev` ile başlatın. `/learn` gerçek kaydedilmiş projeleri listeler. Ana sayfada fikir girişi proje analizi ve keşif sorularına yönlendirir. Vite `/api` isteklerini 8000 portuna iletir. Dağıtımda aynı origin reverse proxy veya `VITE_API_BASE_URL` gerekir. API anahtarı yalnız `backend/.env` içindeki `LLM_API_KEY` alanına yazılır.
 
 `/canvas?demo=1` eski örnek kanvastır. Yeni akış `/learn` üzerindedir: ayrıntılı keşif → uzun roadmap → bilgi testi / ders → eksik becerilere özel yan dal → ana hedefe dönüş. `npm run test:learning` ana koordinatların korunmasını ve sıradaki durağın seçimini doğrular.
+
+### Mevcut haritaları yeniden üretme
+
+Backend dizininde `PYTHONPATH=. .venv/bin/python scripts/regenerate_roadmaps.py --all`
+komutu mevcut aktif projelerin ana haritalarını gerçek Gemini ile yeniden üretir.
+Tek proje için `--project <id>` kullanılabilir. Eski haritalar, alt dallar ve test
+geçmişi “Önceki sürüm” projesinde korunur; aktif proje URL’si değişmez. Model veya
+doğrulama hatasında o projenin mevcut haritası korunur. Eski sürümler sonraki
+`--all` çalışmalarına dahil edilmez. Yeni alt haritalar ilgili düğüm açıldığında
+yeni ana haritanın bağlamıyla üretilir. Her AI düğümündeki `resourceQuery`,
+konuya özel doküman/video araması içindir; arama sonuçları ayrıca filtrelenir.

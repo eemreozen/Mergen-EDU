@@ -296,3 +296,53 @@ def test_sql_skills_include_curated_official_documentation():
     from app.services.resource_service import node_resources
     resources = node_resources(SimpleNamespace(id="sql-node", skills=["database.sql", "database.migration"]))
     assert any(r.url == "https://www.postgresql.org/docs/current/tutorial-sql.html" and r.verified for r in resources)
+
+
+def test_game_design_rejects_play_portals_and_requires_instructional_content():
+    from app.services.resource_relevance import relevant_results, topic_context
+    from app.services.web_resource_service import SearchResult
+    context = topic_context("Oyun Tasarimi ve Kurallari", ("gamedev.design",))
+    results = [
+        SearchResult("Ücretsiz Oyunlar - Online Oyun Oyna", "https://example.com/oyun", "article", "example.com"),
+        SearchResult("Oyunlar ve Oyun Oyna", "https://example.com/games", "article", "example.com"),
+        SearchResult("Game design services and pricing", "https://example.com/game-design", "article", "example.com"),
+        SearchResult("Oyun Tasarım Dokümanı (GDD) Hazırlama Rehberi", "https://example.com/gdd-guide", "article", "example.com"),
+        SearchResult("Game mechanics explained", "https://example.com/mechanics-guide", "youtube", "YouTube"),
+    ]
+    assert relevant_results(results, context) == [results[3], results[4]]
+    assert "game design" in context.query
+
+
+def test_topic_match_does_not_admit_non_learning_pages():
+    from app.services.resource_relevance import relevant_results, topic_context
+    from app.services.web_resource_service import SearchResult
+    for topic in ["Python", "React", "Docker"]:
+        result = SearchResult(f"Buy {topic} products", f"https://example.com/{topic.lower()}", "article", "example.com")
+        assert not relevant_results([result], topic_context(topic))
+
+
+def test_generated_query_is_used_for_precise_search_without_operators():
+    from app.services.resource_relevance import relevant_results, topic_context
+    from app.services.web_resource_service import SearchResult
+    context = topic_context("Oyun", ("gamedev.design",), resource_query="game design mechanics rules prototyping")
+    assert context.query == "game design mechanics rules prototyping"
+    assert relevant_results([SearchResult("Game mechanics explained", "https://example.com/mechanics-guide", "article", "example.com")], context)
+    assert not relevant_results([SearchResult("Free online games", "https://example.com/games", "article", "example.com")], context)
+    assert ':' not in topic_context("Python", resource_query="site:example.com Python tutorial").query
+
+
+async def test_irrelevant_web_search_falls_back_to_automatic_encyclopedia_search():
+    def handler(request):
+        if request.url.host == "en.wikipedia.org":
+            return httpx.Response(200, json={"query": {"search": [
+                {"ns": 0, "title": "Game design", "snippet": "Game mechanics and rules"},
+                {"ns": 0, "title": "Car prices", "snippet": "Unrelated"},
+            ]}})
+        if request.url.host == "www.youtube.com":
+            return httpx.Response(200, text=video_html([video(title="Game design tutorial")]))
+        return httpx.Response(200, content=b'<rss><channel><item><title>Play free games online</title><link>https://example.com/games</link></item></channel></rss>')
+    service = WebResourceService(transport=httpx.MockTransport(handler))
+    result = await service.for_topic("game", "Oyun", resource_query="turn based strategy game design mechanics")
+    assert result.status == "complete"
+    assert any(r.provider == "Wikipedia" and r.title == "Game design" for r in result.resources)
+    assert all("Car prices" != r.title and "Play free" not in r.title for r in result.resources)

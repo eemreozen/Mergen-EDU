@@ -35,7 +35,7 @@ const optionLabels: Record<string, string> = {
   mobile: 'Mobil uygulama', web: 'Web uygulaması', desktop: 'Masaüstü uygulaması',
   react_native: 'React Native', flutter: 'Flutter', native: 'Platforma özel geliştirme',
   train_model: 'Kendi modelimi eğitmek', use_api: 'Hazır AI servisinden yararlanmak', api: 'Hazır AI servisinden yararlanmak',
-  none: 'Henüz bilmiyorum', not_sure: 'Henüz karar vermedim',
+  other: 'Diğer — kısaca açıklayayım', none: 'Henüz bilmiyorum', not_sure: 'Henüz karar vermedim',
 }
 
 function DiscoveryForm({ discovery, busy, answer }: { discovery: DiscoveryView; busy: boolean; answer: (id: string, value: string | string[], extra?: DiscoveryAnswer[]) => Promise<boolean> }) {
@@ -43,6 +43,7 @@ function DiscoveryForm({ discovery, busy, answer }: { discovery: DiscoveryView; 
   const initial = discovery.nextQuestion?.id || discovery.questions[0]?.id || ''
   const [currentId, setCurrentId] = useState(initial)
   const [drafts, setDrafts] = useState<Record<string, string | string[]>>({})
+  const [otherDrafts, setOtherDrafts] = useState<Record<string, string>>({})
   const technologyQuestion = discovery.questions.find(q => q.targetField === 'knownTechnologies' && q.required === false)
   const [technologies, setTechnologies] = useState((discovery.answers.find(a => a.questionId === technologyQuestion?.id)?.value as string) || '')
   const question = requiredQuestions.find(q => q.id === currentId) || discovery.nextQuestion || requiredQuestions[0]
@@ -59,15 +60,21 @@ function DiscoveryForm({ discovery, busy, answer }: { discovery: DiscoveryView; 
     if (next) setCurrentId(next.id)
   }
   const saved = discovery.answers.find(a => a.questionId === question.id)?.value
-  const value = drafts[question.id] ?? saved ?? (question.type === 'multi_choice' ? [] : '')
+  const normalize = (choice: string) => choice.startsWith('other:') ? 'other' : choice
+  const savedChoices = Array.isArray(saved) ? saved : typeof saved === 'string' ? [saved] : []
+  const savedOther = savedChoices.find(choice => choice.startsWith('other:'))?.slice(6) || ''
+  const value = drafts[question.id] ?? (Array.isArray(saved) ? saved.map(normalize) : typeof saved === 'string' ? normalize(saved) : undefined) ?? (question.type === 'multi_choice' ? [] : '')
+  const otherText = otherDrafts[question.id] ?? savedOther
+  const wantsOther = question.type !== 'short_text' && (Array.isArray(value) ? value.includes('other') : value === 'other')
   const completed = requiredQuestions.filter(q => q.completed).length
-  const canSubmit = Array.isArray(value) ? value.length > 0 : value.trim().length > 0
+  const canSubmit = (Array.isArray(value) ? value.length > 0 : value.trim().length > 0) && (!wantsOther || !!otherText.trim())
   const save = async (selected: string | string[]) => {
     const next = requiredQuestions.find(q => !q.completed && q.id !== question.id)
     const extra = technologyQuestion && question.targetField === 'experienceLevel' && technologies.trim()
       ? [{ questionId: technologyQuestion.id, value: technologies.trim() }] : []
-    const saved = await answer(question.id, selected, extra)
-    if (saved && next) setCurrentId(next.id)
+    const encode = (choice: string) => question.type !== 'short_text' && choice === 'other' ? `other:${otherText.trim()}` : choice
+    const saved = await answer(question.id, Array.isArray(selected) ? selected.map(encode) : encode(selected), extra)
+    if (saved) setCurrentId(next?.id || '')
   }
   const submit = (event: React.FormEvent) => { event.preventDefault(); void save(value) }
   const canRecommend = activeSection === 'project' && (question.type === 'short_text' || question.options?.includes('recommend'))
@@ -86,7 +93,7 @@ function DiscoveryForm({ discovery, busy, answer }: { discovery: DiscoveryView; 
         <span className="block text-xs text-slate-500 mt-1">{section.questions.filter(q => q.completed).length} / {section.questions.length} cevap</span>
       </button>)}
     </nav>
-    <p className="text-xs text-slate-500">{activeSection === 'advisor' ? 'Teknoloji seçimini ve öğrenme yolunu biz önereceğiz.' : 'Emin değilsen önerimizle başlayabilirsin.'}</p>
+    <p className="text-xs text-slate-500">{activeSection === 'advisor' ? 'Teknoloji seçimini ve öğrenme yolunu biz önereceğiz.' : 'Projenin yönünü netleştirelim. Sana uymayan şık varsa Diğer’i seç.'}</p>
     <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"><div className="h-full bg-[#75a94b] transition-all" style={{ width: `${completed / requiredQuestions.length * 100}%` }} /></div>
     <h2 className="text-2xl font-bold tracking-tight leading-snug">{question.text}</h2>
     {question.type === 'short_text' ? <textarea className={`${input} min-h-24`} value={value as string} maxLength={2000} required disabled={busy} onChange={e => setDrafts(d => ({ ...d, [question.id]: e.target.value }))} aria-label={question.text} placeholder="Bir cümle yeterli…" />
@@ -96,6 +103,7 @@ function DiscoveryForm({ discovery, busy, answer }: { discovery: DiscoveryView; 
           <input type={question.type === 'multi_choice' ? 'checkbox' : 'radio'} name={question.id} value={option} checked={chosen} disabled={busy} onChange={() => setDrafts(d => ({ ...d, [question.id]: Array.isArray(value) ? chosen ? value.filter(v => v !== option) : [...value.filter(v => v !== 'recommend'), option] : option }))} />{labelFor(option)}
         </label>
       })}</div>}
+    {wantsOther && <textarea className={`${input} min-h-20`} value={otherText} maxLength={1000} required disabled={busy} onChange={event => setOtherDrafts(d => ({ ...d, [question.id]: event.target.value }))} aria-label="Diğer seçeneğinin açıklaması" placeholder="Ne düşündüğünü kısaca anlat…" />}
     {technologyQuestion && question.targetField === 'experienceLevel' && <details className="text-xs text-slate-500"><summary className="cursor-pointer">Bildiğin teknolojileri ekle (isteğe bağlı)</summary><input className={`${input} mt-3`} value={technologies} maxLength={2000} disabled={busy} onChange={event => setTechnologies(event.target.value)} aria-label="Bildiğin teknolojiler" placeholder="Örn. Python, HTML — boş bırakabilirsin" /></details>}
     <div className="flex justify-between gap-3"><button type="button" className={secondary} disabled={busy || index === 0} onClick={() => setCurrentId(sectionQuestions[index - 1].id)}><ArrowLeft size={15} />Önceki</button>
       <button type="submit" className={primary} disabled={!canSubmit || busy}>{busy ? <LoaderCircle size={16} className="animate-spin" /> : <ArrowRight size={16} />}Devam et</button></div>

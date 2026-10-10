@@ -34,4 +34,22 @@ def generation_schema(response_model):
             result["description"] = " ".join([value.get("description", ""), *hints]).strip()
         return result
 
-    return simplify(schema)
+    result = simplify(schema)
+    node_schema = result.get("$defs", {}).get("NodeDraft")
+    if node_schema:
+        node_schema["required"] = [*node_schema.get("required", []), "resourceQuery"]
+        node_schema["properties"]["resourceQuery"].pop("default", None)
+    if response_model.__name__ == "RootRoadmapDraft":
+        # This provider ignores described array minima and rejects bounded arrays
+        # for this nested schema. Required object slots enforce 12 real AI stages
+        # without inventing extra lessons locally or padding a short response.
+        item = result["properties"]["nodes"]["items"]
+        slots = {f"stage{i:02d}": item.copy() for i in range(1, 21)}
+        for endpoint in ("source", "target"):
+            result["$defs"]["EdgeDraft"]["properties"][endpoint]["enum"] = list(slots)
+        result["properties"]["nodes"] = {
+            "type": "object", "properties": slots,
+            "required": list(slots)[:12], "additionalProperties": False,
+            "description": "Produce stages 01-12; stages 13-20 are optional for a larger project.",
+        }
+    return result

@@ -2,7 +2,7 @@
 import re
 import unicodedata
 from dataclasses import dataclass
-from urllib.parse import unquote
+from urllib.parse import unquote, urlsplit
 
 
 def normalized(value):
@@ -13,6 +13,7 @@ def normalized(value):
 STOP = set("ve ile icin bir bu nasil nedir the and for with using intro introduction tutorial documentation guide konu anlatimi ogrenme temelleri temel basics fundamentals proje project gelistirme gelistirilmesi uygulama kurulum kurulumu sistemi system development learning beginner advanced temel ilk yapisi olusturma ve or to of in on a an".split())
 SHORT = {"ai", "ml", "go", "js", "ui", "ux", "c", "r"}
 ALIASES = (
+    (("oyun tasar", "game design", "game mechanics", "oyun mekanik"), ("game design", "game mechanics", "oyun tasarimi", "oyun mekanikleri", "gdd")),
     (("iliskisel", "relational"), ("relational", "database", "sql")),
     (("veritab", "database", "postgres", "mysql", "sqlite", "sql"), ("database", "sql", "postgresql", "mysql", "sqlite", "veritabani")),
     (("goruntu isleme", "image processing", "opencv"), ("opencv", "image processing", "goruntu isleme")),
@@ -38,7 +39,17 @@ class TopicContext:
     fallback_query: str = ""
 
 
-def topic_context(title, skills=(), summary=""):
+def topic_context(title, skills=(), summary="", resource_query=""):
+    # A generated search phrase describes the lesson rather than its UI label.
+    # Treat it as text, never as a URL, provider instruction or search operator.
+    resource_query = " ".join(re.findall(r"[\w+#-]+", resource_query, re.UNICODE))[:160]
+    if resource_query:
+        generated = topic_context(resource_query, (), "")
+        phrases = [term for term in generated.anchors if " " in term]
+        # Long precise queries can return poor search rankings. Retry one short
+        # quoted topic phrase; keep the original relevance gate unchanged.
+        fallback = f'"{phrases[0]}"' if phrases else " ".join(tokens(resource_query)[:3])
+        return TopicContext(resource_query, generated.anchors, fallback)
     title_words = tokens(title)
     skill_words = tokens(" ".join(skills))
     # Summaries are only a fallback for opaque or generic titles. Do not search
@@ -49,7 +60,7 @@ def topic_context(title, skills=(), summary=""):
         if any(re.search(r"\b" + re.escape(trigger), text) for trigger in triggers):
             aliases.extend(terms)
     anchors = tuple(dict.fromkeys([*title_words, *skill_words, *aliases]))
-    generic = {"veri", "data", "model", "models", "web", "api", "service", "servis", "design", "tasarimi", "integration", "entegrasyon", "management", "yonetimi", "test", "testing", "mimarisi", "mantigi"}
+    generic = {"veri", "data", "model", "models", "web", "api", "service", "servis", "design", "tasarimi", "integration", "entegrasyon", "management", "yonetimi", "test", "testing", "mimarisi", "mantigi", "oyun", "oyunlar", "game", "games", "kurallari", "rules"}
     specific = tuple(term for term in anchors if term not in generic)
     if specific:
         anchors = specific
@@ -76,6 +87,13 @@ def relevant_results(results, context, limit=3):
         # in the title or URL, and never accept tutorial/guide alone as relevance.
         url_hits = [term for term in context.anchors if contains(normalized(unquote(result.url)), term)]
         if not hits and not url_hits:
+            continue
+        # Topic overlap alone also admits shops, play portals and landing pages.
+        # Require visible instructional intent, not a claim in the search snippet.
+        visible = normalized(f"{result.title} {unquote(result.url)}")
+        educational = r"\b(tutorial[a-z]*|guide[a-z]*|documentation|docs|learn[a-z]*|lesson[a-z]*|course[a-z]*|explained|introduction|handbook|manual|reference|ders[a-z]*|egitim[a-z]*|rehber[a-z]*|dokuman[a-z]*|anlatim[a-z]*|ogren[a-z]*|nedir|nasil|hazirlama|mekanik[a-z]*|mechanics|gdd)\b"
+        encyclopedia = result.provider == "Wikipedia" and urlsplit(result.url).hostname == "en.wikipedia.org"
+        if not encyclopedia and not re.search(educational, visible):
             continue
         score = len(hits) * 4 + len(supporting) + (2 if result.type == "documentation" else 0)
         scored.append((-score, index, result))

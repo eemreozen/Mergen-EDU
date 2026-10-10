@@ -35,18 +35,16 @@ class DiscoveryView(Schema):
     ready_for_roadmap: bool
 
 
-class FollowupQuestion(Schema):
-    text: str
-    target_field: str
-    parent_question_id: str
-
-
-class FollowupPlan(Schema):
-    questions: list[FollowupQuestion] = Field(max_length=2)
-
-
 class ProjectDiscoveryQuestion(Schema):
     text: str = Field(min_length=10, max_length=400)
     type: Literal["single_choice", "multi_choice", "short_text"]
     options: list[str] = Field(default_factory=list, max_length=8)
     target_field: str = Field(pattern=r"^[a-zA-Z][a-zA-Z0-9_]{1,60}$")
+
+
+class FollowupQuestion(ProjectDiscoveryQuestion):
+    parent_question_id: str | None = None
+
+
+class FollowupPlan(Schema):
+    questions: list[FollowupQuestion] = Field(max_length=3)

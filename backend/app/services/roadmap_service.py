@@ -71,6 +71,7 @@ async def map_view(db, roadmap):
                 map_id=node.map_id,
                 title=node.title,
                 summary=node.summary,
+                resource_query=node.resource_query,
                 type="submap" if roadmap.kind == "root" and broad_topic(node) else node.type,
                 status=node.status,
                 skills=node.skills,

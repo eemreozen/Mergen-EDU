@@ -46,62 +46,16 @@ async def create_project(db, user_id, request, gateway):
     questions = select_questions(analysis.primary_domain, analysis.secondary_domains, request.locale)
     used_fields = {q.target_field for q in questions}
     for index, question in enumerate(analysis.discovery_questions):
-        # Do not turn a verbose or technical model response into mandatory work
-        # for a beginner. The planner can recommend the missing decision instead.
-        text = question.text.casefold()
-        if len(question.text) > 120 or any(
-            term in text
-            for term in (
-                "teknoloji",
-                "framework",
-                "kütüphane",
-                "programlama dili",
-                "oyun motor",
-                "hangi dil",
-                "nasıl öğren",
-                "technology",
-                "technologies",
-                "tech stack",
-                "programming language",
-                "game engine",
-                "how to learn",
-                "learning style",
-                "deneyim",
-                "seviy",
-                "experience",
-                "weekly",
-                "haftada",
-                "haftalık",
-                "bütçe",
-                "budget",
-                "deadline",
-                "teslim tarihi",
-                "başarı ölç",
-                "success criter",
-                "hangi platform",
-            )
-        ):
-            continue
-        if any(len(option) > 80 for option in question.options):
-            continue
-        if not question.target_field.startswith("projectDetail") or question.target_field in used_fields:
-            continue
-        if question.type != "short_text" and len(set(question.options)) < 2:
-            from app.errors import AppError
+        from app.services.discovery_quality import question_data
 
-            raise AppError("AI_INVALID_OUTPUT", "Proje keşif soruları tutarsız.", 502, True)
+        prepared = question_data(question, used_fields)
         identifier = f"project-detail-{index}"
         questions.append(
             DiscoveryQuestion(
                 id=identifier,
                 question_id=identifier,
                 section="project",
-                **{
-                    **question.model_dump(),
-                    "options": list(dict.fromkeys([*question.options, "recommend"]))
-                    if question.type != "short_text"
-                    else [],
-                },
+                **prepared,
             )
         )
         used_fields.add(question.target_field)
@@ -117,8 +71,9 @@ async def create_project(db, user_id, request, gateway):
         discovery_data={
             "questions": [q.model_dump() for q in questions],
             "answers": [],
-            "followupsGenerated": True,
-            "intakeVersion": 2,
+            "followupsGenerated": not analysis.discovery_questions and not analysis.uncertain_decisions,
+            "discoveryRounds": 0,
+            "intakeVersion": 3,
             "planningDefaults": {
                 "goal": analysis.project_type
                 if analysis.project_type in {"prototype", "mvp", "production_ready"}

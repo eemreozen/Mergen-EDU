@@ -37,10 +37,10 @@ async def references(node_id: str, request: Request, db: Db, user: UserId):
     roadmap = await owned_map(db, node.map_id, user)
     project = await owned_project(db, roadmap.project_id, user)
     title, locale, fallback = node.title, project.locale, node_resources(node)
-    skills, summary = tuple(node.skills), node.summary
+    skills, summary, query = tuple(node.skills), node.summary, node.resource_query
     # Release SQLite's write lock before making external requests.
     await db.commit()
-    return await request.app.state.resource_search.for_topic(node_id, title, locale, fallback, skills=skills, summary=summary)
+    return await request.app.state.resource_search.for_topic(node_id, title, locale, fallback, skills=skills, summary=summary, resource_query=query)
 
 
 @router.post("/nodes/{node_id}/learn", response_model=MapView)

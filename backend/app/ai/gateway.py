@@ -127,7 +127,10 @@ class AIGateway:
                 )
                 if attempt == self.settings.llm_retries:
                     raise AppError("AI_TIMEOUT", "AI isteği zaman aşımına uğradı.", 504, True) from None
-            except (ValidationError, ValueError):
+            except (ValidationError, ValueError) as exc:
+                issues = [{"path": ".".join(map(str, issue["loc"])), "type": issue["type"]}
+                          for issue in exc.errors(include_input=False, include_url=False)] if isinstance(exc, ValidationError) else [{"type": "empty_or_invalid_json"}]
+                logger.warning("ai_operation=%s validation_issues=%s", operation, issues)
                 if attempt == self.settings.llm_retries:
                     raise AppError("AI_INVALID_OUTPUT", "AI yanıtı sözleşmeye uymuyor.", 502, True) from None
             except RateLimitError:

@@ -35,8 +35,12 @@ def test_legacy_questions_get_sections_without_changing_answers():
 
 
 async def test_advisor_then_project_questions_block_early_roadmap(client, app, project_id, monkeypatch):
-    async def no_followup(*args):
-        raise AssertionError("Short intake must not ask extra questions")
+    calls = []
+
+    async def no_followup(operation, system, payload, schema):
+        assert operation == "discovery"
+        calls.append(payload)
+        return schema(questions=[])
 
     monkeypatch.setattr(app.state.gateway, "generate_structured", no_followup)
     discovery = (await client.get(f"/api/v1/projects/{project_id}/discovery")).json()
@@ -58,6 +62,7 @@ async def test_advisor_then_project_questions_block_early_roadmap(client, app, p
     )
     assert response.status_code == 200, response.text
     second = response.json()
+    assert calls == []
     assert second["nextQuestion"]["section"] == "project"
     assert not second["readyForRoadmap"]
     assert (await client.post(f"/api/v1/projects/{project_id}/roadmap/generate")).status_code == 409
@@ -67,6 +72,7 @@ async def test_advisor_then_project_questions_block_early_roadmap(client, app, p
     )
     assert final.status_code == 200, final.text
     assert final.json()["readyForRoadmap"]
+    assert len(calls) == 1
 
 
 async def test_clear_idea_needs_only_two_profile_answers(client, app, monkeypatch):
@@ -78,6 +84,7 @@ async def test_clear_idea_needs_only_two_profile_answers(client, app, monkeypatc
     async def clear_idea(operation, system, payload, schema):
         result = await original(operation, system, payload, schema)
         result.discovery_questions = []
+        result.uncertain_decisions = []
         return result
 
     monkeypatch.setattr(app.state.gateway, "generate_structured", clear_idea)
@@ -107,7 +114,7 @@ async def test_clear_idea_needs_only_two_profile_answers(client, app, monkeypatc
         assert {a["question_id"] for a in project.discovery_data["answers"]} == {"experience", "hours"}
 
 
-async def test_technical_or_verbose_questions_are_not_shown(client, app, monkeypatch):
+async def test_invalid_questions_cannot_silently_skip_discovery(client, app, monkeypatch):
     original = app.state.gateway.generate_structured
 
     async def poor_questions(operation, system, payload, schema):
@@ -120,10 +127,8 @@ async def test_technical_or_verbose_questions_are_not_shown(client, app, monkeyp
     created = await client.post(
         "/api/v1/projects", json={"idea": "Bir yemek tarifi uygulaması geliştirmek istiyorum."}
     )
-    assert created.status_code == 201, created.text
-    view = (await client.get(f"/api/v1/projects/{created.json()['id']}/discovery")).json()
-    assert len([q for q in view["questions"] if q["required"]]) == 2
-    assert not any(q["section"] == "project" for q in view["questions"])
+    assert created.status_code == 502, created.text
+    assert created.json()["error"]["code"] == "AI_INVALID_OUTPUT"
 
 
 def test_unknown_technology_is_not_recorded_as_a_skill():

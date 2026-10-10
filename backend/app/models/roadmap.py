@@ -37,6 +37,7 @@ class RoadmapNode(Base):
     key: Mapped[str]
     type: Mapped[str]
     title: Mapped[str]
+    resource_query: Mapped[str] = mapped_column(default="", server_default="")
     summary: Mapped[str]
     status: Mapped[str] = mapped_column(default="locked")
     skills: Mapped[list] = mapped_column(JsonType)

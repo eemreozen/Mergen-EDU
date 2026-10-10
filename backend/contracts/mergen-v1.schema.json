@@ -558,6 +558,11 @@
           "title": "Estimatedhours",
           "type": "number"
         },
+        "resourceQuery": {
+          "default": "",
+          "title": "Resourcequery",
+          "type": "string"
+        },
         "prerequisites": {
           "items": {
             "type": "string"

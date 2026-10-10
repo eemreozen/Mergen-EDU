@@ -15,14 +15,28 @@ export function crossesBox([ax, ay]: Point, [bx, by]: Point, box: Obstacle, padd
   return true
 }
 
-export function createRouter(obstacles: Obstacle[]) {
+// Shared endpoints and overlapping departure trunks are junctions, not crossings.
+export function crossesRoute(a: Point, b: Point, c: Point, d: Point) {
+  const side = (p: Point, q: Point, r: Point) => (q[0]-p[0])*(r[1]-p[1])-(q[1]-p[1])*(r[0]-p[0])
+  return side(a,b,c)*side(a,b,d) < -0.001 && side(c,d,a)*side(c,d,b) < -0.001
+}
+
+export function routeCrossings(points: Point[], occupied: Point[][]) {
+  let count = 0
+  for (let i=1; i<points.length; i++) for (const route of occupied) for (let j=1; j<route.length; j++) {
+    if (crossesRoute(points[i-1],points[i],route[j-1],route[j])) count++
+  }
+  return count
+}
+
+export function createRouter(obstacles: Obstacle[], occupied: Point[][] = []) {
   const crossing = (a: Point, b: Point) => obstacles.some(box => crossesBox(a, b, box))
   return (start: Point, end: Point, preferred: Point[]): Point[] => {
     // The endpoints sit inside their own nodes; the middle route starts in
     // the column gaps, beyond both node bounds and the rounded-corner margin.
     const from: Point = [start[0] + 104, start[1]], to: Point = [end[0] - 104, end[1]]
     const middle = preferred.slice(1, -1)
-    if (middle.length && middle.every((point, i) => !i || !crossing(middle[i - 1], point))) return preferred
+    if (!routeCrossings(preferred, occupied) && middle.length && middle.every((point, i) => !i || !crossing(middle[i - 1], point))) return preferred
     const xs = [...new Set([from[0], to[0], ...obstacles.flatMap(b => [b.x - 28, b.x + b.width + 28])])].sort((a,b) => a-b)
     const ys = [...new Set([from[1], to[1], ...obstacles.flatMap(b => [b.y - 28, b.y + b.height + 28])])].sort((a,b) => a-b)
     const source = ys.indexOf(from[1]) * xs.length + xs.indexOf(from[0])
@@ -49,7 +63,7 @@ export function createRouter(obstacles: Obstacle[]) {
       const near = [x > 0 ? current-1 : -1, x < xs.length-1 ? current+1 : -1, y > 0 ? current-xs.length : -1, y < ys.length-1 ? current+xs.length : -1]
       for (const next of near) {
         if (next < 0 || closed.has(next) || crossing(point(current),point(next))) continue
-        const cost = costs.get(current)! + distance(point(current),point(next)) + 0.01
+        const cost = costs.get(current)! + distance(point(current),point(next)) + routeCrossings([point(current),point(next)], occupied) * 10000 + 0.01
         if (cost >= (costs.get(next) ?? Infinity)) continue
         costs.set(next,cost); previous.set(next,current)
         open.push({id:next, score:cost+distance(point(next),to)})

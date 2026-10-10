@@ -141,3 +141,40 @@ const obstacle = {x:130,y:0,width:40,height:100}
 const detour = createRouter([obstacle])([0,50],[300,50],[[0,50],[104,50],[196,50],[300,50]])
 assert.ok(detour.length > 4, 'An obstructed direct route must detour')
 console.log('Alternating branches and collision-free routes around all node bounds — passed')
+
+// Redundant dependencies used to draw huge overhead loops on a simple fork.
+const redundant = structuredClone(original)
+const rm = redundant.maps.find(m => !m.parentMapId)
+rm.nodes = Array.from({length: 5}, (_, i) => ({...rm.nodes[0], id:`simple-${i}`}))
+rm.edges = [[0,1],[1,2],[1,3],[2,4],[0,3],[1,4]].map(([s,t],i) => ({id:`simple-edge-${i}`,source:`simple-${s}`,target:`simple-${t}`,kind:'requires'}))
+redundant.maps = [rm]
+const reduced = layoutMaps(redundant,activate)
+assert.equal(reduced.edges.length,4)
+assert.equal(rm.edges.length,6, 'Reduction must not mutate saved dependencies')
+checkRoutes(reduced)
+for (const edge of reduced.edges) {
+ const source = reduced.nodes.find(n=>n.id===edge.source), target = reduced.nodes.find(n=>n.id===edge.target)
+ assert.ok(edge.data.points.every(p => p[1] >= Math.min(source.position.y,target.position.y)+32 && p[1] <= Math.max(source.position.y,target.position.y)+32), 'An unobstructed fork must not loop above the map')
+}
+console.log('Redundant dependency reduction and compact fork routes — passed')
+
+// A remediation branch must not drop through the descending arm of a merge.
+const mergeBranch = structuredClone(original)
+const mergeRoot = mergeBranch.maps.find(m => !m.parentMapId)
+mergeRoot.nodes = ['hazard','save','test','publish'].map(id => ({...mergeRoot.nodes[0],id,mapId:mergeRoot.id}))
+mergeRoot.edges = [['hazard','test'],['save','test'],['test','publish']].map(([source,target],i)=>({id:`merge-${i}`,source,target,kind:'requires'}))
+mergeBranch.maps = [mergeRoot, { ...structuredClone(branch), id:'hazard-gap', parentMapId:mergeRoot.id,targetNodeId:'hazard',
+ nodes:['hazard-basics','hazard-practice'].map(id=>({...mergeRoot.nodes[0],id,mapId:'hazard-gap'})),
+ edges:[{id:'hazard-practice-edge',source:'hazard-basics',target:'hazard-practice',kind:'requires'}]}]
+const mergeGraph = layoutMaps(mergeBranch,activate)
+checkGeometry(mergeBranch)
+checkRoutes(mergeGraph)
+const { routeCrossings } = await import('../src/features/learning/routing.ts')
+const connector = mergeGraph.edges.find(e=>e.data.branch)
+const mainRoutes = mergeGraph.edges.filter(e=>!e.data.branch && !e.data.isRemedial).map(e=>e.data.points)
+assert.equal(routeCrossings(connector.data.points,mainRoutes),0,'Branch connector must not cross the main merge')
+const anchorPosition = mergeGraph.nodes.find(n=>n.id==='hazard').position
+const childPosition = mergeGraph.nodes.find(n=>n.id==='hazard-basics').position
+assert.ok(childPosition.y < anchorPosition.y,'Use the open upper side of a descending main path')
+assert.ok(Math.abs(childPosition.y-anchorPosition.y) < 400,'Keep the branch close to its actual anchor')
+console.log('Local branch lanes avoid crossing the main merge — passed')

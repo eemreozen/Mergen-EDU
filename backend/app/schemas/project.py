@@ -22,7 +22,7 @@ class ProjectAnalysis(Schema):
     project_type: str
     required_skills: list[str]
     uncertain_decisions: list[str]
-    discovery_questions: list[ProjectDiscoveryQuestion] = Field(default_factory=list, max_length=2)
+    discovery_questions: list[ProjectDiscoveryQuestion] = Field(default_factory=list, max_length=5)
     mvp_suggestions: list[str]
 
 
