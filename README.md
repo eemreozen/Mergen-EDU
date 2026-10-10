@@ -8,12 +8,20 @@ Mergen, geliştiricilerin gerçek projeler üreterek yazılım geliştirmeyi ö�
 
 ## 🚀 Teknolojiler
 
+### Frontend
 - **Çekirdek:** React 19 + TypeScript + Vite 8
 - **Tasarım:** Tailwind CSS v4 (Özel Dark & Light Tema Paleti)
 - **Animasyon & Geçişler:** Motion for React (`motion/react`)
 - **İkon Seti:** Lucide React
 - **Çoklu Dil Desteği:** `react-i18next` (🇹🇷 Türkçe & 🇬🇧 English)
 - **Yönlendirme:** `react-router-dom`
+- **Harita & Graf:** `@xyflow/react`
+
+### Backend
+- **Framework & Çekirdek:** Python 3.12+ + FastAPI + Pydantic v2
+- **Paket Yöneticisi:** [uv](https://github.com/astral-sh/uv) (`uv.lock`)
+- **Veritabanı & ORM:** SQLAlchemy 2.x (Async) + aiosqlite / asyncpg + Alembic
+- **Yapay Zeka Entegrasyonu:** Google GenAI SDK (`gemini-3.5-flash-lite`, `gemini-3.8-flash`) & OpenAI SDK
 
 ---
 
@@ -26,33 +34,71 @@ Mergen, geliştiricilerin gerçek projeler üreterek yazılım geliştirmeyi ö�
 
 ---
 
----
-
 ## 📂 Proje Yapısı
 
 - **`frontend/`**: React 19 + TypeScript + Vite 8 tabanlı web kullanıcı arayüzü.
-- **`backend/`**: Yapay zeka servisleri, yol haritası motoru ve backend mimarisi.
+- **`backend/`**: FastAPI, veritabanı, AI sağlayıcıları ve yol haritası motoru.
 
 ---
 
 ## 💻 Kurulum ve Çalıştırma
 
-### Frontend (Web)
+Projeyi yerel ortamda çalıştırmak için **Backend** ve **Frontend** servislerini ayrı terminallerde başlatın.
+
+### 1. Backend (FastAPI + Python)
+
+Backend için paket yöneticisi olarak **uv** ve Python 3.12+ gereklidir.
+
+```bash
+cd backend
+
+# 1. Bağımlılıkları yükleyin
+uv sync --locked
+
+# 2. Ortam değişkenlerini hazırlayın (.env oluşturun)
+# Linux / macOS:
+cp .env.example .env
+# Windows (CMD):
+copy .env.example .env
+
+# 3. Veritabanı tablolarını oluşturun (Migration)
+uv run alembic upgrade head
+
+# 4. Backend sunucusunu başlatın
+uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+> **API & Dokümantasyon:**
+> - Backend URL: `http://127.0.0.1:8000`
+> - Swagger Dokümantasyonu: `http://127.0.0.1:8000/docs`
+> - Sağlık Kontrolü: `http://127.0.0.1:8000/health`
+>
+> **Yapay Zeka Yapılandırması (`backend/.env`):**
+> - Gerçek AI üretimi için `LLM_API_KEY=` kısmına Gemini API anahtarınızı tanımlayın.
+> - API anahtarı olmadan deterministik verilerle test etmek için `DEMO_FIXTURES=true` yapabilirsiniz.
+
+---
+
+### 2. Frontend (React + Vite)
+
 ```bash
 cd frontend
 
-# Bağımlılıkları yükleyin
+# 1. Bağımlılıkları yükleyin
 npm install
 
-# Geliştirme sunucusunu başlatın
+# 2. Geliştirme sunucusunu başlatın
 npm run dev
 
-# Prodüksiyon derlemesini alın
-npm run build
-
-# Kod kalitesi kontrolü (Linter)
-npm run lint
+# Diğer komutlar:
+npm run build         # Prodüksiyon derlemesi
+npm run lint          # Kod kalitesi kontrolü (Linter)
+npm run test:learning # Öğrenme akışı testi
 ```
+
+> **Arayüz:**
+> - Frontend URL: `http://localhost:5173`
+> - Vite geliştirme sunucusu `/api` isteklerini otomatik olarak arka uçtaki `http://127.0.0.1:8000` servisine yönlendirir (proxy).
 
 ## Canlı öğrenme ekranı
 
