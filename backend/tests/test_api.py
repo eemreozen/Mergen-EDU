@@ -20,7 +20,10 @@ async def test_project_and_export(client, project_id):
 
 async def test_discovery(client, project_id):
     questions = (await client.get(f"/api/v1/projects/{project_id}/discovery")).json()["questions"]
-    assert {"mobile_stack", "ai_strategy"} <= {q["id"] for q in questions}
+    assert {"experience", "hours"} == {
+        q["id"] for q in questions if q["section"] == "advisor" and q["required"]
+    }
+    assert not {"mobile_stack", "ai_strategy", "preferred_stack"} & {q["id"] for q in questions}
     await finish_discovery(client, project_id)
     project = (await client.get(f"/api/v1/projects/{project_id}")).json()
     assert project["status"] == "ready_for_roadmap"

@@ -43,8 +43,8 @@ export function Bibliography({ nodeId, title }: { nodeId: string; title: string 
     <div aria-live="polite">
       {loading && <p className="flex items-center gap-2 text-slate-500"><LoaderCircle size={16} className="animate-spin" aria-hidden="true" />Konuyla ilgili kaynaklar aranıyor…</p>}
       {error && <p className="text-rose-600 dark:text-rose-300">{error}</p>}
-      {!loading && result?.status === 'unavailable' && <p className="text-slate-500">Web aramasından şu anda sonuç alınamadı. Varsa mevcut kaynakları aşağıda inceleyebilirsin.</p>}
-      {!loading && result?.status === 'partial' && <p className="text-slate-500">Bazı kaynaklar bulunamadı. Mevcut bağlantıları inceleyebilir veya aramayı yeniden deneyebilirsin.</p>}
+      {!loading && result?.status === 'unavailable' && <p className="text-slate-500">Bu konu için yeterince ilgili arama sonucu bulunamadı veya arama servisine ulaşılamadı. Varsa seçilmiş kaynakları aşağıda inceleyebilirsin.</p>}
+      {!loading && result?.status === 'partial' && <p className="text-slate-500">Yalnızca konuyla eşleşen sonuçlar gösteriliyor. Diğer kaynaklar için aramayı yeniden deneyebilirsin.</p>}
     </div>
     {!loading && result && <div className="grid gap-5 sm:grid-cols-2">
       <div className="space-y-3"><h4 className="flex items-center gap-2 font-medium"><BookOpen size={16} aria-hidden="true" />Makale ve dokümanlar</h4>

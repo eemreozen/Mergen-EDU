@@ -6,7 +6,9 @@ from app.schemas.discovery import DiscoveryQuestion
 
 def select_questions(primary, secondary, locale="tr"):
     result = []
-    for domain in dict.fromkeys(["core", primary, *secondary]):
+    # Product/technology decisions belong to the recommendation, not a generic
+    # questionnaire. Keep domain templates for legacy records, not new intake.
+    for domain in ["core"]:
         path = Path(__file__).parent / "domains" / f"{domain}.json"
         for item in json.loads(path.read_text()):
             if locale == "en":
@@ -17,10 +19,10 @@ def select_questions(primary, secondary, locale="tr"):
 
 ENGLISH = {
     "goal": "What should the first version deliver?",
-    "experience": "What is your current experience with building this project?",
-    "technologies": "Which technologies can you already use for this project? You can say you are starting from scratch.",
+    "experience": "Where should we start?",
+    "technologies": "Add technologies you already know, if any",
     "platform": "Which platform should the first version run on?",
-    "hours": "How many hours per week can you spend building this project?",
+    "hours": "How much time can you spend each week?",
     "preferred_stack": "Is there a technology you want or need to use? You can leave the choice to us.",
     "constraints": "Do you have a delivery deadline or budget limit for the first version? If not, say flexible.",
     "mobile_stack": "Which mobile stack do you prefer?",

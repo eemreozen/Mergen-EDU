@@ -1,74 +1,26 @@
 [
   {
-    "id": "goal",
-    "text": "İlk sürümde hangi çıktıya ulaşmak istiyorsun?",
-    "type": "single_choice",
-    "targetField": "goal",
-    "options": [
-      "prototype",
-      "mvp",
-      "production_ready"
-    ],
-    "required": true
-  },
-  {
-    "id": "platform",
-    "text": "Projenin ilk sürümü hangi platformda çalışmalı?",
-    "type": "single_choice",
-    "targetField": "platform",
-    "options": [
-      "web",
-      "mobile",
-      "desktop",
-      "backend_api",
-      "cli",
-      "undecided"
-    ],
-    "required": true
-  },
-  {
     "id": "experience",
-    "text": "Bu projeyi geliştirirken mevcut seviyen hangisine yakın?",
+    "text": "Nereden başlayalım?",
     "type": "single_choice",
     "targetField": "experienceLevel",
-    "options": [
-      "beginner",
-      "basic",
-      "intermediate",
-      "advanced"
-    ],
-    "required": true
-  },
-  {
-    "id": "technologies",
-    "text": "Bu projede kullanabilecek kadar bildiğin teknolojiler hangileri? Henüz bilmiyorsan bunu yazabilirsin.",
-    "type": "short_text",
-    "targetField": "knownTechnologies",
-    "options": [],
-    "required": true
-  },
-  {
-    "id": "preferred_stack",
-    "text": "Projede kullanmak istediğin veya kullanman gereken bir teknoloji var mı? Yoksa öneriyi bize bırakabilirsin.",
-    "type": "short_text",
-    "targetField": "preferredStack",
-    "options": [],
+    "options": ["beginner", "basic", "intermediate", "advanced"],
     "required": true
   },
   {
     "id": "hours",
-    "text": "Bu projeyi geliştirmeye haftada kaç saat ayırabilirsin?",
-    "type": "short_text",
+    "text": "Haftada ne kadar zaman ayırabilirsin?",
+    "type": "single_choice",
     "targetField": "weeklyHours",
-    "options": [],
+    "options": ["3", "6", "10", "15", "5"],
     "required": true
   },
   {
-    "id": "constraints",
-    "text": "İlk sürüm için teslim tarihi veya bütçe sınırın var mı? Yoksa “esnek” yazabilirsin.",
+    "id": "technologies",
+    "text": "Bildiğin teknolojiler varsa ekle",
     "type": "short_text",
-    "targetField": "deliveryConstraints",
+    "targetField": "knownTechnologies",
     "options": [],
-    "required": true
+    "required": false
   }
 ]

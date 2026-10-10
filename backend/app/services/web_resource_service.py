@@ -15,6 +15,7 @@ import httpx
 
 from app.schemas.resources import ReferenceView
 from app.schemas.roadmap import ResourceView
+from app.services.resource_relevance import relevant_results, topic_context
 
 
 @dataclass(frozen=True)
@@ -23,6 +24,7 @@ class SearchResult:
     url: str
     type: str
     provider: str
+    description: str = ""
 
 
 def public_url(value: str) -> str | None:
@@ -46,7 +48,7 @@ def public_url(value: str) -> str | None:
         return None
 
 
-def parse_readings(body: bytes) -> list[SearchResult]:
+def parse_readings(body: bytes, limit=3) -> list[SearchResult]:
     root = ElementTree.fromstring(body)
     if root.tag != "rss":
         raise ValueError("Unexpected search response")
@@ -71,15 +73,15 @@ def parse_readings(body: bytes) -> list[SearchResult]:
             else "article"
         )
         seen.add(url)
-        results.append(SearchResult(title[:300], url, kind, host))
-    return sorted(results, key=lambda result: result.type != "documentation")[:3]
+        results.append(SearchResult(title[:300], url, kind, host, item.findtext("description", "")[:1000]))
+    return sorted(results, key=lambda result: result.type != "documentation")[:limit]
 
 
 def youtube_text(value: dict) -> str:
     return value.get("simpleText", "") or "".join(run.get("text", "") for run in value.get("runs", []))
 
 
-def parse_videos(body: str) -> list[SearchResult]:
+def parse_videos(body: str, limit=3) -> list[SearchResult]:
     match = re.search(r'(?:var\s+ytInitialData|window\["ytInitialData"\]|ytInitialData)\s*=\s*', body)
     if not match:
         raise ValueError("YouTube search data missing")
@@ -92,7 +94,7 @@ def parse_videos(body: str) -> list[SearchResult]:
     seen = set()
 
     def visit(value):
-        if len(results) == 3:
+        if len(results) >= limit:
             return
         if isinstance(value, dict):
             video = value.get("videoRenderer")
@@ -130,7 +132,8 @@ class WebResourceService:
         self.pending = {}
 
     async def _search(self, key):
-        title, locale = key
+        context, locale = key
+        title = context.query
         async with httpx.AsyncClient(
             timeout=self.timeout,
             transport=self.transport,
@@ -138,17 +141,20 @@ class WebResourceService:
         ) as client:
 
             async def readings():
-                response = await client.get(
-                    "https://www.bing.com/search",
-                    params={
-                        "q": f"{title} tutorial documentation",
-                        "format": "rss",
-                        "setlang": locale,
-                        "cc": "TR" if locale == "tr" else "US",
-                    },
-                )
-                response.raise_for_status()
-                return parse_readings(response.content)
+                queries = [title]
+                if context.fallback_query and context.fallback_query.casefold() != title.casefold():
+                    queries.append(context.fallback_query)
+                for query in queries:
+                    response = await client.get(
+                        "https://www.bing.com/search",
+                        params={"q": f"{query} tutorial documentation", "format": "rss",
+                                "setlang": locale, "cc": "TR" if locale == "tr" else "US"},
+                    )
+                    response.raise_for_status()
+                    matches = relevant_results(parse_readings(response.content, limit=15), context)
+                    if matches:
+                        return matches
+                return []
 
             async def videos():
                 response = await client.get(
@@ -160,7 +166,7 @@ class WebResourceService:
                     },
                 )
                 response.raise_for_status()
-                return parse_videos(response.text)
+                return relevant_results(parse_videos(response.text, limit=15), context)
 
             async def bounded(search):
                 async with asyncio.timeout(self.timeout):
@@ -178,8 +184,11 @@ class WebResourceService:
                 self.cache.popitem(last=False)
         return resources, status
 
-    async def for_topic(self, node_id, title, locale="tr", fallback=()):
-        key = (" ".join(title.split()), "en" if locale.startswith("en") else "tr")
+    async def for_topic(self, node_id, title, locale="tr", fallback=(), *, skills=(), summary=""):
+        context = topic_context(title, skills, summary)
+        key = (context, "en" if locale.startswith("en") else "tr")
+        if not context.anchors:
+            return ReferenceView(resources=list(fallback), status="unavailable")
         cached = self.cache.get(key)
         if cached and cached[0] > time.monotonic():
             self.cache.move_to_end(key)
@@ -203,6 +212,11 @@ class WebResourceService:
             )
             for result in results
         ]
-        if not any(r.type != "youtube" for r in resources):
-            resources = [*fallback, *resources]
+        # The curated skill-matched catalogue takes priority over web ranking.
+        # Preserve its verification metadata when the same URL is rediscovered.
+        unique = {}
+        for resource in [*fallback, *resources]:
+            if public_url(resource.url):
+                unique.setdefault(resource.url, resource)
+        resources = list(unique.values())
         return ReferenceView(resources=resources, status=status)

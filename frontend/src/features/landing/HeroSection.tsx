@@ -96,8 +96,8 @@ export function HeroSection({
           </h1>
           <p className="text-xs sm:text-sm text-[#68717D] dark:text-[#9CA3AF] mt-2 font-mono">
             {isEn
-              ? 'State your project idea. Climb your tailored learning roadmap.'
-              : 'Aklındaki projeyi yaz, tırmanış haritanı keşfet.'}
+              ? 'Share your idea, and get a roadmap showing what to learn and why.'
+              : 'Fikrini yaz, neyi neden öğrenmen gerektiğini gösteren yol haritanı oluşturalım.'}
           </p>
         </div>
 
@@ -222,6 +222,15 @@ export function HeroSection({
             className="lg:col-span-2 flex flex-col items-center justify-center gap-2.5 lg:-translate-y-9"
           >
             <button
+              id="tour-wizard-box"
+              type="button"
+              onClick={() => setIsTourOpen(true)}
+              className="w-full max-w-[170px] inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[#2B660E]/25 dark:border-[#B7F36B]/25 bg-[#FFFFFF] dark:bg-[#171A20] hover:bg-[#2B660E]/10 dark:hover:bg-[#B7F36B]/15 text-[#2B660E] dark:text-[#B7F36B] text-sm font-semibold transition-colors active:scale-[0.99] cursor-pointer whitespace-nowrap"
+            >
+              <Wand2 className="w-4 h-4" />
+              <span>{isEn ? 'Start Wizard' : 'Sihirbazı Başlat'}</span>
+            </button>
+            <button
               type="button"
               onClick={() => setIsAuthOpen(true)}
               className="w-full max-w-[170px] px-4 py-2.5 rounded-xl text-sm font-semibold bg-[#111318] dark:bg-[#E9EDF3] text-white dark:text-[#0B0D10] hover:bg-[#2B660E] dark:hover:bg-[#B7F36B] transition-colors cursor-pointer"
@@ -230,15 +239,7 @@ export function HeroSection({
             </button>
             <LanguageSelector />
             <ThemeToggle />
-            <button
-              id="tour-wizard-box"
-              type="button"
-              onClick={() => setIsTourOpen(true)}
-              className="mt-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[#2B660E]/25 dark:border-[#B7F36B]/25 bg-[#FFFFFF] dark:bg-[#171A20] hover:bg-[#2B660E]/10 dark:hover:bg-[#B7F36B]/15 text-[#2B660E] dark:text-[#B7F36B] text-sm font-semibold transition-colors active:scale-[0.99] cursor-pointer whitespace-nowrap"
-            >
-              <Wand2 className="w-4 h-4" />
-              <span>{isEn ? 'Start Wizard' : 'Sihirbazı Başlat'}</span>
-            </button>
+
           </motion.div>
 
         </div>

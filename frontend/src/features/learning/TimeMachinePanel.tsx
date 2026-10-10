@@ -1,13 +1,14 @@
-import { ArrowLeft, ArrowRight, CheckCircle2, Clock3, History, LoaderCircle, Sparkles, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CheckCircle2, Clock3, History, LoaderCircle, Sparkles } from 'lucide-react'
 import { useState } from 'react'
+import { FloatingPanel } from './FloatingPanel'
 import { api } from '@/api/client'
 import type { MemoryChallenge, MemoryResult, TimeMachine } from '@/api/memory-types'
 
 const primary = 'rounded-xl bg-[#2B660E] dark:bg-[#B7F36B] text-white dark:text-[#0B0D10] px-4 py-3 text-sm font-semibold disabled:opacity-40 inline-flex items-center justify-center gap-2 cursor-pointer'
 const card = 'rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] p-5'
 
-export function TimeMachinePanel({ data, loadingError, disabled, close, refresh }: {
-  data: TimeMachine | null; loadingError: string; disabled: boolean; close: () => void; refresh: () => Promise<void>
+export function TimeMachinePanel({ open, data, loadingError, disabled, close, refresh }: {
+  open: boolean; data: TimeMachine | null; loadingError: string; disabled: boolean; close: () => void; refresh: () => Promise<void>
 }) {
   const [tab, setTab] = useState<'practice' | 'history'>('practice')
   const [challenge, setChallenge] = useState<MemoryChallenge | null>(null)
@@ -34,17 +35,14 @@ export function TimeMachinePanel({ data, loadingError, disabled, close, refresh 
   const back = () => { setChallenge(null); setResult(null); setError('') }
   const blocked = busy || disabled
   const reviews = [...(data?.reviews || [])].sort((a, b) => Number(b.due) - Number(a.due))
-  return <div className="fixed inset-0 z-[70]">
-    <button className="absolute inset-0 bg-black/25 backdrop-blur-[2px]" onClick={close} aria-label="Zaman Makinesi penceresini kapat" />
-    <aside role="dialog" aria-modal="true" aria-label="Zaman Makinesi" className="absolute right-0 top-0 bottom-0 w-[560px] max-w-full bg-white dark:bg-[#111318] border-l border-[#E3E7EC] dark:border-[#2A3038] shadow-2xl flex flex-col">
-      <header className="p-6 border-b border-[#E3E7EC] dark:border-[#2A3038]">
-        <div className="flex items-start justify-between gap-4"><div><p className="text-[10px] font-mono uppercase tracking-[0.2em] text-[#68717D] mb-2">Öğrendiklerin seninle gelsin</p><h2 className="text-2xl font-bold flex items-center gap-3"><History className="text-[#6B963F]" />Zaman Makinesi</h2></div><button onClick={close} aria-label="Zaman Makinesini kapat" className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"><X size={19} /></button></div>
+  return <FloatingPanel open={open} title="Zaman Makinesi" icon={<History size={17} />} close={close} width={440} height={530} anchor="memory">
+      <div className="p-4 border-b border-[#E3E7EC] dark:border-[#2A3038]">
         <p className="mt-3 text-sm leading-relaxed text-[#68717D] dark:text-[#9CA3AF]">Başa dönmeden, kısa bir hatırlamayla devam et. Bu tekrarlar tamamladığın durakları veya mevcut ilerlemeni değiştirmez.</p>
         {!challenge && <div role="tablist" aria-label="Zaman Makinesi sekmeleri" className="mt-5 grid grid-cols-2 gap-2 rounded-xl bg-[#F0F2F5] dark:bg-[#1A1F26] p-1">
           {(['practice', 'history'] as const).map(key => <button key={key} role="tab" id={`memory-tab-${key}`} aria-controls={`memory-${key}`} aria-selected={tab === key} onClick={() => setTab(key)} className={`rounded-lg p-2.5 text-xs font-semibold cursor-pointer ${tab === key ? 'bg-white dark:bg-[#2A3038] shadow-sm' : 'text-[#68717D]'}`}>{key === 'practice' ? `Kısa tekrarlar${data?.dueCount ? ` · ${data.dueCount}` : ''}` : `Geçmiş yanlışlar${data ? ` · ${data.wrongQuestions.length}` : ''}`}</button>)}
         </div>}
-      </header>
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
+      </div>
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {(error || loadingError) && <div role="alert" className="rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-300/30 p-4 text-sm space-y-2"><p>{error || loadingError}</p>{loadingError && <button onClick={() => void perform(refresh)} disabled={blocked} className="underline">Yeniden yükle</button>}</div>}
         {busy && <p role="status" className="flex items-center gap-2 text-xs text-[#68717D]"><LoaderCircle size={15} className="animate-spin" />{challenge && selection !== null && !result ? 'Yanıtın kontrol ediliyor…' : 'Kısa tekrar hazırlanıyor…'}</p>}
         {!data && !loadingError && <p className="text-sm text-[#68717D]">Geçmişin yükleniyor…</p>}
@@ -69,6 +67,5 @@ export function TimeMachinePanel({ data, loadingError, disabled, close, refresh 
         </section>}
       </div>
       <footer className="p-4 border-t border-[#E3E7EC] dark:border-[#2A3038] text-[11px] text-[#68717D] text-center">Hatırlamak için küçük bir mola. İlerlemen olduğu yerde kalır.</footer>
-    </aside>
-  </div>
+  </FloatingPanel>
 }

@@ -45,6 +45,11 @@ def video_html(items=None):
 
 
 def success(request):
+    query = request.url.params.get("q", request.url.params.get("search_query", ""))
+    if "React" in query:
+        if request.url.host == "www.bing.com":
+            return httpx.Response(200, content=READINGS.replace(b"Python", b"React").replace(b"python", b"react"))
+        return httpx.Response(200, text=video_html([video(title="React hooks tutorial")]))
     if request.url.host == "www.bing.com":
         return httpx.Response(200, content=READINGS)
     return httpx.Response(200, text=video_html())
@@ -204,3 +209,90 @@ async def test_existing_documents_remain_available_when_search_fails(client, app
     assert response.status_code == 200
     assert response.json()["status"] == "unavailable"
     assert response.json()["resources"][0]["url"] == "https://docs.python.org/3/tutorial/"
+
+
+def test_unrelated_first_results_are_removed_before_limiting():
+    from app.services.resource_relevance import relevant_results, topic_context
+    from app.services.web_resource_service import SearchResult
+
+    context = topic_context("İlişkisel Veritabanları", ("database.relational", "sql.joins"))
+    wrong = [SearchResult("ZX fiyatları", "https://example.com/zx", "article", "example.com")]
+    valid = SearchResult("SQL JOIN tutorial", "https://example.com/sql-joins", "documentation", "example.com")
+    assert relevant_results(wrong * 5 + [valid], context) == [valid]
+    assert "database" in context.query and "sql" in context.query
+    assert not relevant_results([SearchResult("ZX review", "https://www.youtube.com/watch?v=abcdefghijk", "youtube", "YouTube")], context)
+
+
+async def test_search_filters_both_providers_and_uses_skills_without_ai():
+    requests = []
+    def handler(request):
+        requests.append(request)
+        if request.url.host == "www.bing.com":
+            return httpx.Response(200, content=b'<rss><channel><item><title>ZX prices</title><link>https://example.com/zx</link></item><item><title>Relational database SQL tutorial</title><link>https://example.com/sql</link></item></channel></rss>')
+        return httpx.Response(200, text=video_html([video(title="ZX review"), video("lmnopqrstuv", "SQL relational databases explained")]))
+    service = WebResourceService(transport=httpx.MockTransport(handler))
+    result = await service.for_topic("database-node", "ZX", skills=("database.relational",))
+    assert len(result.resources) == 2
+    assert all("ZX" not in resource.title for resource in result.resources)
+    assert "database" in requests[0].url.params["q"]
+    assert result.status == "complete"
+
+
+async def test_all_irrelevant_results_report_unavailable_and_do_not_cache():
+    service = WebResourceService(transport=httpx.MockTransport(success))
+    result = await service.for_topic("node", "İlişkisel Veritabanları", skills=("sql.joins",))
+    assert result.status == "unavailable" and not result.resources
+    assert not service.cache
+
+
+async def test_same_title_different_skills_has_separate_context_cache():
+    service = WebResourceService(transport=httpx.MockTransport(success))
+    assert (await service.for_topic("one", "Temeller", skills=("python.basics",))).status == "complete"
+    assert (await service.for_topic("two", "Temeller", skills=("sql.joins",))).status == "unavailable"
+
+
+def test_topic_relevance_across_languages_and_no_generic_tutorial_match():
+    from app.services.resource_relevance import relevant_results, topic_context
+    from app.services.web_resource_service import SearchResult
+    for title, skills, resource in [
+        ("Görüntü işleme", ("opencv.basics",), "OpenCV image processing tutorial"),
+        ("Kimlik doğrulama", ("auth.jwt",), "OAuth authentication guide"),
+        ("Python döngüleri", ("python.loops",), "Python loops explained"),
+        ("React bileşenleri", ("react.components",), "React components tutorial"),
+    ]:
+        context = topic_context(title, skills)
+        assert relevant_results([SearchResult(resource, "https://example.com/learn", "article", "example.com")], context)
+        assert not relevant_results([SearchResult("Best tutorial guide", "https://example.com/tutorial", "article", "example.com")], context)
+
+
+def test_database_does_not_match_indonesian_verification_or_generic_data():
+    from app.services.resource_relevance import relevant_results, topic_context
+    from app.services.web_resource_service import SearchResult
+    context = topic_context("İlişkisel Veritabanları ve Veri Aktarımı", ("database.sql", "database.migration"))
+    wrong = [SearchResult("Badge verifikasi pada channel", "https://example.com/verification", "article", "example.com"), SearchResult("Data about car prices", "https://example.com/data", "article", "example.com")]
+    assert not relevant_results(wrong, context)
+
+
+async def test_empty_relevance_retries_with_skill_query():
+    queries = []
+    def handler(request):
+        if request.url.host == "www.youtube.com":
+            return httpx.Response(200, text=video_html([video(title="SQL tutorial")]))
+        query = request.url.params["q"]
+        queries.append(query)
+        if len(queries) == 1:
+            return httpx.Response(200, content=b'<rss><channel><item><title>Unrelated prices</title><link>https://example.com/prices</link></item></channel></rss>')
+        return httpx.Response(200, content=b'<rss><channel><item><title>SQL database migration guide</title><link>https://example.com/sql</link></item></channel></rss>')
+    service = WebResourceService(transport=httpx.MockTransport(handler))
+    result = await service.for_topic("node", "İlişkisel Veritabanları ve Veri Aktarımı", skills=("database.sql", "database.migration"))
+    assert result.status == "complete"
+    assert len(queries) == 2 and queries[1] == "database sql migration tutorial documentation"
+    assert len(result.resources) == 2
+
+
+def test_sql_skills_include_curated_official_documentation():
+    from types import SimpleNamespace
+
+    from app.services.resource_service import node_resources
+    resources = node_resources(SimpleNamespace(id="sql-node", skills=["database.sql", "database.migration"]))
+    assert any(r.url == "https://www.postgresql.org/docs/current/tutorial-sql.html" and r.verified for r in resources)

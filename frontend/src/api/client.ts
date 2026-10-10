@@ -1,4 +1,4 @@
-import type { ExportBundle, ProjectView, DiscoveryView, MapView, NodeView, AssessmentView } from './types'
+import type { ExportBundle, ProjectView, DiscoveryView, DiscoveryAnswer, MapView, NodeView, AssessmentView } from './types'
 import type { MemoryChallenge, MemoryResult, TimeMachine } from './memory-types'
 import type { ReferenceView } from './resource-types'
 
@@ -47,7 +47,7 @@ export const api = {
   projects: () => request<ProjectView[]>('/projects'),
   createProject: (idea: string, locale = 'tr') => request<ProjectView>('/projects', 'POST', { idea, locale }),
   exportProject: (id: string) => request<ExportBundle>(`/projects/${id}/export`),
-  answer: (id: string, questionId: string, value: string | string[]) => request<DiscoveryView>(`/projects/${id}/discovery/answers`, 'POST', { answers: [{ questionId, value }] }),
+  answer: (id: string, questionId: string, value: string | string[], extra: DiscoveryAnswer[] = []) => request<DiscoveryView>(`/projects/${id}/discovery/answers`, 'POST', { answers: [{ questionId, value }, ...extra] }),
   generate: (id: string) => request<MapView>(`/projects/${id}/roadmap/generate`, 'POST'),
   submap: (id: string) => request<MapView>(`/nodes/${id}/submap`, 'POST'),
   learn: (id: string) => request<MapView>(`/nodes/${id}/learn`, 'POST'),

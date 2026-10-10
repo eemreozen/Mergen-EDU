@@ -345,7 +345,7 @@ Gerçek LLM akışının ve canlı PostgreSQL'in doğrulanması ilgili ortam/ana
 
 ## Etkileşimli öğrenme akışı
 
-Proje analizi aynı AI çağrısında projeye özel 4–6 ayrıntılı soru üretir; profil sorularıyla birlikte keşif tamamlanır. Ana yol haritası 12–24 anlamlı düğüm içerir. `/learn?project=ID` ekranı sıradaki erişilebilir düğümü vurgular. Her durakta tanı testi veya sıfırdan öğrenme seçilir. Tanı testi ders içeriğini ayrıca üretmez. Test, ders ve dal üretimleri önbelleğe alınır.
+Proje analizi aynı AI çağrısında, fikirde gerçekten eksik bilgi varsa en fazla iki kısa ürün sorusu üretir. İki kısa başlangıç sorusu deneyim ve haftalık süreyi toplar; teknoloji seçimini sistem önerir. Ana yol haritası 12–24 anlamlı düğüm içerir. `/learn?project=ID` ekranı sıradaki erişilebilir düğümü vurgular. Her durakta tanı testi veya sıfırdan öğrenme seçilir. Tanı testi ders içeriğini ayrıca üretmez. Test, ders ve dal üretimleri önbelleğe alınır.
 
 Yanlış soruların becerileri 2–10 düğümlük ayrı bir öğrenme dalına dönüşür. `learn` bütün hedef becerilerini kapsar. Dal ana kanvasta yana yerleşir; bitince kullanıcı asıl hedefte tekrar test edilir. Dal içinde başarısız test yeni dal zinciri açmaz. Proje görevleri ayrıca çıktı kanıtı ister. Tarayıcı oturum kimliği `X-Demo-Session` ile saklanır; gerçek hesap kimlik doğrulaması değildir.
 
@@ -366,13 +366,17 @@ Canvas üzerindeki Zaman Makinesi geçmiş yanlış soruları, verilen yanıtı,
 Yeni düğümün testinde daha önce tamamlanmış bir düğümün aynı becerisi yanlış cevaplanırsa bu eski beceri kısa pekiştirmeye yönlendirilir; bu beceri için yeniden uzun bir öğrenme dalı üretilmez. Yeni beceri açıkları mevcut adaptif dal akışını kullanır. Kısa tekrarlar engelleyici değildir; asıl düğümün testi yine geçilmelidir. Veriler `memory_reviews` ve `memory_checks` tablolarında kalıcıdır; kurulumda `alembic upgrade head` çalıştırın.
 
 
-Keşif ekranı iki bölümden oluşur: sabit ve alana göre seçilen `advisor` soruları,
-ardından ürün fikrine özel `project` soruları. Sabit çekirdek yedi karar toplar:
-ilk sürümün olgunluğu, platform, deneyim, kullanılabilen teknolojiler, tercih edilen
-teknoloji, haftalık süre ve teslim/bütçe kısıtları. Roadmap tüm gerekli cevaplardan
-sonra üretilir. Projeye özel sorular ilk proje analizi çağrısında kaydedilir; bölüm
-geçişi yeni AI çağrısı yapmaz. Eski projelerin cevapları korunur, mevcut soru kimlikleri
-üzerinden bölüm bilgisi geriye uyumlu olarak sunulur. Yeni soru seti yeni projelerde kullanılır.
+Yeni projelerde keşif iki kısa bölümden oluşur: `advisor` yalnız deneyim ve haftalık
+süreyi sorar; bilinen teknolojiler ilk soruda isteğe bağlı eklenir. Alana göre teknik
+tercih soruları kullanılmaz. `project` en fazla iki kısa ürün sorusu içerir; fikir
+zaten açıksa sıfır soru olabilir. Seçenekler somut ürün davranışlarıdır. Kullanıcı
+“Önerinle ilerle” seçeneğiyle kararı planlayıcıya bırakabilir. Uzun veya teknoloji
+tercihi isteyen AI soruları gösterilmez. Teknik seçimler önerilir, önemli varsayımlar
+roadmap açıklamasında belirtilir. Varsayılan kapsam küçük çalışan ilk sürümdür;
+özgün fikirdeki açık gereksinimler önceliklidir. Önerilen varsayılanlar kullanıcı
+cevabı olarak kaydedilmez. Bölüm geçişi veya öneri seçimi yeni AI çağrısı yapmaz ve
+otomatik takip soruları üretilmez. Eski projelerin mevcut soru/cevapları korunur;
+kısaltılmış soru seti yeni projelerde kullanılır.
 
 Alt harita ve adaptif dal üretiminde hedef durağın açıklaması/becerileri ile üst
 haritalardaki diğer durakların başlık ve becerileri gönderilir. Diğer duraklar yeni

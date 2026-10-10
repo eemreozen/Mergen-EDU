@@ -182,6 +182,7 @@ async def generate_root(db, project_id, user_id, gateway):
         SYSTEM,
         {
             "project": project.analysis,
+            "originalIdea": project.original_idea,
             "locale": project.locale,
             "discovery": answer_fields(project),
             "learnerProfile": (await learner_profile(db, project)).model_dump(),

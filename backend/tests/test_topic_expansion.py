@@ -45,6 +45,19 @@ def test_deterministic_curriculum(topic, choices, technology):
     assert all(n.type == "learning" for n in draft.nodes)
 
 
+def test_stack_from_idea_is_respected_without_a_stack_question():
+    project = SimpleNamespace(
+        title="Tarifler",
+        original_idea="Django ile tarif uygulaması",
+        analysis={"goal": "Tarif kaydetme"},
+        locale="tr",
+    )
+    draft = expand_topic(
+        "backend", project, {"goal": "mvp", "experienceLevel": "beginner", "weeklyHours": "5"}
+    )
+    assert "Django" in draft.nodes[0].title
+
+
 async def test_saved_backend_expands_without_ai_and_is_cached(client, app, project_id, monkeypatch):
     await finish_discovery(client, project_id)
     root = (await client.post(f"/api/v1/projects/{project_id}/roadmap/generate")).json()

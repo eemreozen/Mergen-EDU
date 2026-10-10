@@ -36,10 +36,15 @@ def expand_topic(topic, project, discovery):
     # Discovery is authoritative; analysis may contain alternative suggestions.
     choices = json.dumps(discovery, ensure_ascii=False).casefold()
     analysis = json.dumps(project.analysis, ensure_ascii=False).casefold()
+    explicit_choices = {
+        key: discovery[key]
+        for key in ("preferredStack", "stack", "database", "mobileStack", "engine")
+        if discovery.get(key) and discovery[key] not in {"recommend", "undecided", "none"}
+    }
     context = (
-        json.dumps(discovery["preferredStack"], ensure_ascii=False).casefold()
-        if discovery.get("preferredStack")
-        else choices or analysis
+        json.dumps(explicit_choices, ensure_ascii=False).casefold()
+        if explicit_choices
+        else (project.original_idea.casefold() + " " + analysis)
     )
     goal = project.title
     product = project.analysis.get("goal", project.original_idea)[:220]

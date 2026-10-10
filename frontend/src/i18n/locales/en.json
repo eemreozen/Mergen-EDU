@@ -10,8 +10,8 @@
     "subtitle": "Preparing your personalized development path..."
   },
   "hero": {
-    "titleLine1": "Start with an idea.",
-    "titleLine2": "Learn by building.",
+    "titleLine1": "Build your project",
+    "titleLine2": "and understand every step.",
     "description": "Describe what you want to create. Progress along a custom expedition roadmap built for hands-on learning.",
     "inputPlaceholder": "For example: I want to build a simple online store to showcase and sell homemade crafts...",
     "submitButton": "Generate Roadmap",

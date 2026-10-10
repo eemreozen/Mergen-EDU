@@ -44,6 +44,7 @@ async def generate_submap(db, node_id, user_id, gateway):
         SYSTEM,
         {
             "project": project.analysis,
+            "originalIdea": project.original_idea,
             "locale": project.locale,
             "node": {"title": node.title, "summary": node.summary, "skills": node.skills},
             "branchScope": scope,

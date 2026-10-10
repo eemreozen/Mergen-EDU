@@ -1,4 +1,5 @@
 import type { Edge, Node } from '@xyflow/react'
+import { createRouter, type Point } from './routing.ts'
 import type { ExportBundle, MapView, NodeView } from '@/api/types'
 
 export type LearningNodeData = { node: NodeView; stepNumber: number; mapTitle: string; adaptive: boolean; recommended: boolean; activate: (id: string) => void }
@@ -34,10 +35,12 @@ export function recommendedNode(bundle: ExportBundle, mapId?: string): NodeView 
 }
 
 // Deterministic layered DAG layout. Progress and additional maps never move the root.
-const COLUMN = 350
-const ROW = 156
-const WIDTH = 270
-const HEIGHT = 80
+const COLUMN = 360
+const ROW = 210
+export const STOP_WIDTH = 220
+export const STOP_HEIGHT = 144
+const WIDTH = STOP_WIDTH
+const HEIGHT = STOP_HEIGHT
 
 function arrange(map: MapView) {
   const ids = new Set(map.nodes.map(n => n.id))
@@ -95,21 +98,19 @@ function arrange(map: MapView) {
     }
   }
   const columns = Math.max(1, ...[...rows.values()].map(row => row.length))
-  // Bend the whole route, not just graphs containing a single column. A brief
-  // fork must not turn every later single-node row into a straight vertical line.
-  // All nodes in a rank share the bend, preserving parallel-track separation.
-  const bendWidth = 700
-  const bend = (rank: number) => (1 - Math.cos(rank * Math.PI / 4)) * bendWidth / 2
+  // A repeated rise and fall echoes the logo while progress always moves right.
+  // Parallel prerequisites retain separate lanes at every rank.
+  const bend = (rank: number) => (1 + Math.cos(rank * Math.PI / 2)) * 64
   const positions = new Map<string, { x: number; y: number }>()
   const steps = new Map<string, number>()
   let step = 0
   for (const [rank, row] of rankedRows) {
     row.forEach((id, i) => {
-      positions.set(id, { x: bend(rank) + (i + (columns - row.length) / 2) * COLUMN, y: rank * ROW })
+      positions.set(id, { x: rank * COLUMN, y: bend(rank) + (i + (columns - row.length) / 2) * ROW })
       steps.set(id, ++step)
     })
   }
-  return { positions, steps, ranks, width: Math.max(0, ...[...positions.values()].map(p => p.x)) + WIDTH }
+  return { positions, steps, ranks, height: Math.max(0, ...[...positions.values()].map(p => p.y)) + HEIGHT }
 }
 
 export function layoutMaps(bundle: ExportBundle, activate: (id: string) => void, activeMapId?: string) {
@@ -133,15 +134,17 @@ export function layoutMaps(bundle: ExportBundle, activate: (id: string) => void,
     const next = remaining.findIndex(m => maps.some(parent => parent.id === m.parentMapId))
     maps.push(...remaining.splice(next < 0 ? 0 : next, 1))
   }
-  let nextBranchX = 0
-  let rootRight = 0
+  let bottom = 0
+  let top = 120
+  let branchIndex = 0
   const positioned = new Map<string, { x: number; y: number }>()
   for (const map of maps) {
     const layout = arrange(map)
     const anchorId = map.targetNodeId || map.parentNodeId || ''
     const anchor = positioned.get(anchorId)
-    const offsetX = map === root ? 100 : Math.max(rootRight + 180, nextBranchX)
-    const offsetY = map === root ? 120 : (anchor?.y ?? 120) + ROW
+    const offsetX = map === root ? 100 : (anchor?.x ?? 100) + COLUMN
+    const above = map !== root && branchIndex++ % 2 === 1
+    const offsetY = map === root ? 120 : above ? top - layout.height - 100 : bottom + 100
     for (const node of map.nodes) {
       const local = layout.positions.get(node.id)!
       const position = { x: offsetX + local.x, y: offsetY + local.y }
@@ -150,19 +153,19 @@ export function layoutMaps(bundle: ExportBundle, activate: (id: string) => void,
         data: { node, stepNumber: layout.steps.get(node.id)!, mapTitle: map.title,
           adaptive: map.kind === 'adaptive', recommended: node.id === recommendation, activate } })
     }
-    if (map === root) rootRight = offsetX + layout.width
-    else nextBranchX = offsetX + layout.width + 180
+    bottom = Math.max(bottom, offsetY + layout.height)
+    top = Math.min(top, offsetY)
     for (const edge of map.edges) {
       const source = positioned.get(edge.source)
       const target = positioned.get(edge.target)
       if (!source || !target) continue
-      const long = target.y - source.y > ROW + 1 || target.y <= source.y
+      const long = target.x - source.x > COLUMN + 1 || target.x <= source.x
       edges.push({ ...edge, type: 'learningRoute', sourceHandle: 'out', targetHandle: 'in',
         data: { isCompleted: map.nodes.find(n => n.id === edge.source)?.status === 'completed',
           isRemedial: map.kind === 'adaptive', isActive: edge.target === recommendation,
           optional: edge.kind === 'supports',
-          // Long routes travel in the gap beside labels, never through nodes.
-          gutterX: long ? source.x + WIDTH + 28 : undefined },
+          // Skip-level routes use a clear lane above this map.
+          gutterY: long ? offsetY - 52 - (layout.steps.get(edge.source) ?? 0) * 8 : undefined },
       })
     }
     if (anchor) {
@@ -171,8 +174,22 @@ export function layoutMaps(bundle: ExportBundle, activate: (id: string) => void,
       const entries = map.nodes.filter(node => !requiredTargets.has(node.id))
       for (const first of entries) edges.push({ id: `branch-${map.id}-${first.id}`, source: anchorId, target: first.id,
         sourceHandle: 'out', targetHandle: 'in', type: 'learningRoute',
-        data: { isRemedial: true, branch: true, gutterX: offsetX - 65 } })
+        data: { isRemedial: true, branch: true, gutterX: anchor.x + WIDTH + 65 } })
     }
+  }
+  // Route only after every map has been placed: later branches are obstacles too.
+  const route = createRouter(nodes.map(n => ({ ...n.position, width: WIDTH, height: HEIGHT })))
+  for (const edge of edges) {
+    const source = positioned.get(edge.source)!, target = positioned.get(edge.target)!
+    const start: Point = [source.x + 136, source.y + 32], end: Point = [target.x + 84, target.y + 32]
+    const data = edge.data as { gutterX?: number; gutterY?: number; points?: Point[] }
+    const exit = start[0] + 104, entry = end[0] - 104
+    const preferred: Point[] = data.gutterX !== undefined
+      ? [start, [exit, start[1]], [data.gutterX, start[1]], [data.gutterX, end[1]], [entry, end[1]], end]
+      : data.gutterY !== undefined
+        ? [start, [exit, start[1]], [exit, data.gutterY], [entry, data.gutterY], [entry, end[1]], end]
+        : [start, [exit, start[1]], [entry, end[1]], end]
+    data.points = route(start, end, preferred)
   }
   return { nodes, edges }
 }

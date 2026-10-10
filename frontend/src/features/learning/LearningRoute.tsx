@@ -1,23 +1,36 @@
-import { BaseEdge, getBezierPath, type EdgeProps } from '@xyflow/react'
+import { BaseEdge, type EdgeProps } from '@xyflow/react'
 import { useTheme } from '@/hooks/useTheme'
 
-export function LearningRoute(props: EdgeProps) {
-  const { isDark } = useTheme()
-  const { sourceX: sx, sourceY: sy, targetX: tx, targetY: ty, data } = props
-  const route = data as { gutterX?: number; optional?: boolean; isCompleted?: boolean; isRemedial?: boolean; isActive?: boolean }
-  let path: string
-  if (route.gutterX !== undefined) {
-    const x = route.gutterX
-    const y1 = sy + 28
-    const y2 = ty - 28
-    // Dedicated vertical gutter and horizontal row gaps preserve readable labels.
-    path = `M ${sx} ${sy} L ${sx} ${y1 - 10} Q ${sx} ${y1} ${sx + Math.sign(x - sx) * 10} ${y1} L ${x - Math.sign(x - sx) * 10} ${y1} Q ${x} ${y1} ${x} ${y1 + Math.sign(y2 - y1) * 10} L ${x} ${y2 - Math.sign(y2 - y1) * 10} Q ${x} ${y2} ${x + Math.sign(tx - x) * 10} ${y2} L ${tx - Math.sign(tx - x) * 10} ${y2} Q ${tx} ${y2} ${tx} ${y2 + 10} L ${tx} ${ty}`
-  } else {
-    [path] = getBezierPath({ ...props, curvature: 0.35 })
+// Rounded polylines: diagonal joins in the column gaps, clear bypasses for
+// distant dependencies. Labels below the junction remain unobstructed.
+function roundedPath(points: number[][]) {
+  let path = `M ${points[0][0]} ${points[0][1]}`
+  for (let i = 1; i < points.length - 1; i++) {
+    const [x, y] = points[i]
+    const previous = points[i - 1], next = points[i + 1]
+    const before = Math.hypot(x - previous[0], y - previous[1])
+    const after = Math.hypot(next[0] - x, next[1] - y)
+    if (!before || !after) continue
+    const radius = Math.min(16, before / 2, after / 2)
+    path += ` L ${x + (previous[0] - x) * radius / before} ${y + (previous[1] - y) * radius / before} Q ${x} ${y} ${x + (next[0] - x) * radius / after} ${y + (next[1] - y) * radius / after}`
   }
-  const color = route.isRemedial ? '#D99B27' : route.isActive || route.isCompleted
-    ? isDark ? '#B7F36B' : '#5E8A3D' : isDark ? '#45505C' : '#C3CCD5'
-  return <BaseEdge path={path} style={{ stroke: color, strokeWidth: route.isActive ? 2.5 : 1.8,
-    strokeDasharray: route.optional || route.isRemedial ? '5 6' : undefined,
-    opacity: route.optional ? 0.5 : 0.85 }} />
+  return `${path} L ${points.at(-1)![0]} ${points.at(-1)![1]}`
+}
+
+export function LearningRoute({ sourceX: sx, sourceY: sy, targetX: tx, targetY: ty, data }: EdgeProps) {
+  const { isDark } = useTheme()
+  const route = data as { points?: number[][]; gutterX?: number; gutterY?: number; optional?: boolean; isCompleted?: boolean; isRemedial?: boolean; isActive?: boolean }
+  const exit = sx + 104, entry = tx - 104
+  const points = route.gutterX !== undefined
+    ? [[sx, sy], [route.gutterX, sy], [route.gutterX, ty], [tx, ty]]
+    : route.gutterY !== undefined
+      ? [[sx, sy], [exit, sy], [exit, route.gutterY], [entry, route.gutterY], [entry, ty], [tx, ty]]
+      : [[sx, sy], [exit, sy], [entry, ty], [tx, ty]]
+  const color = route.isRemedial ? (isDark ? '#D5AD62' : '#C5A36A') : route.isActive || route.isCompleted
+    ? isDark ? '#B7F36B' : '#2B660E' : isDark ? '#485361' : '#BEC6D0'
+  const routed = route.points ?? points
+  if (!routed.length) return null
+  return <BaseEdge path={roundedPath(routed)} style={{ stroke: color, strokeWidth: route.optional ? 2 : 4,
+    strokeLinecap: 'round', strokeLinejoin: 'round', strokeDasharray: route.optional ? '4 8' : undefined,
+    opacity: route.optional ? 0.45 : 0.85 }} />
 }

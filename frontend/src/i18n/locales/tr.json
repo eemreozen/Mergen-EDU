@@ -10,8 +10,8 @@
     "subtitle": "Kişiselleştirilmiş geliştirme rotan hazırlanıyor..."
   },
   "hero": {
-    "titleLine1": "Bir fikirle başla.",
-    "titleLine2": "Bir projeyle öğren.",
+    "titleLine1": "Projeni",
+    "titleLine2": "ne yaptığını anlayarak geliştir.",
     "description": "Geliştirmek istediğin projeyi anlat. Sana özel oluşturulan yol haritasıyla öğrenerek ilerle.",
     "inputPlaceholder": "Örneğin: Kendi kıyafetlerimi satabileceğim şık bir online mağaza açmak istiyorum...",
     "submitButton": "Yol Haritamı Oluştur",

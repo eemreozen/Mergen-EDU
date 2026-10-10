@@ -39,7 +39,12 @@ def discovery_view(project):
 def answer_fields(project):
     values = {a["question_id"]: a["value"] for a in project.discovery_data["answers"]}
     return {
-        q["target_field"]: values[q["id"]] for q in project.discovery_data["questions"] if q["id"] in values
+        **project.discovery_data.get("planningDefaults", {}),
+        **{
+            q["target_field"]: values[q["id"]]
+            for q in project.discovery_data["questions"]
+            if q["id"] in values
+        },
     }
 
 

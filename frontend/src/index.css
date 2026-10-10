@@ -79,3 +79,27 @@ code, pre, .font-mono {
     scroll-behavior: auto !important;
   }
 }
+
+/* Quiet canvas texture on the landing page; one moving layer, no JS loop. */
+.landing-dot-backdrop {
+  mask-image: linear-gradient(to bottom, #000 0%, #000 72%, transparent 100%);
+}
+
+.landing-dot-grid {
+  background-image: radial-gradient(circle, rgba(95, 116, 94, 0.36) 1.15px, transparent 1.4px);
+  background-size: 34px 34px;
+  animation: landing-dot-drift 32s linear infinite;
+}
+
+.dark .landing-dot-grid {
+  background-image: radial-gradient(circle, rgba(158, 179, 145, 0.34) 1.15px, transparent 1.4px);
+}
+
+@keyframes landing-dot-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(34px, 34px, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-dot-grid { animation: none; }
+}

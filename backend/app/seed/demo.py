@@ -21,12 +21,20 @@ def fixture(operation, payload):
             requiredSkills=["programming.basics"],
             uncertainDecisions=["stack"],
             discoveryQuestions=[
-                dict(text=text, type="short_text", options=[], targetField=field)
-                for text, field in [
-                    ("Bu uygulamanın ilk kullanıcıları kimler olacak?", "projectDetailAudience"),
-                    ("İlk sürümde mutlaka çalışması gereken üç özellik nedir?", "projectDetailFeatures"),
-                    ("Hangi verileri kullanacaksın ve bu veriler hazır mı?", "projectDetailData"),
-                    ("Projenin başarılı olduğunu nasıl anlayacaksın?", "projectDetailSuccess"),
+                dict(text=text, type="single_choice", options=options, targetField=field)
+                for text, options, field in [
+                    (
+                        "İlk sürümü kim kullanacak?",
+                        ["Yalnız ben", "Küçük bir kullanıcı grubu"],
+                        "projectDetailAudience",
+                    ),
+                    (
+                        "Antrenman planını kim hazırlasın?"
+                        if "fitness" in idea
+                        else "İlk içerikler nereden gelecek?",
+                        ["Ben ekleyeceğim", "Uygulama önersin"],
+                        "projectDetailFeatures",
+                    ),
                 ]
             ],
             mvpSuggestions=["Küçük çalışan prototip"],

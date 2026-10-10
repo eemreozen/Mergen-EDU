@@ -1,10 +1,10 @@
 import '@xyflow/react/dist/style.css'
 import { Background, ReactFlow, ReactFlowProvider, type ReactFlowInstance, type Node } from '@xyflow/react'
-import { ArrowLeft, ArrowRight, BookOpen, BrainCircuit, CheckCircle2, Compass, History, LoaderCircle, Send, Sparkles, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, BadgeCheck, BookOpen, BrainCircuit, CheckCircle2, Compass, History, LoaderCircle, Send, Sparkles, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { api } from '@/api/client'
-import type { AssessmentView, DiscoveryView, ExportBundle, NodeView } from '@/api/types'
+import type { AssessmentView, DiscoveryAnswer, DiscoveryView, ExportBundle, NodeView } from '@/api/types'
 import type { TimeMachine } from '@/api/memory-types'
 import { HeroSection } from '@/features/landing/HeroSection'
 import { TeacherAdvisorFigure } from '@/components/landing/TeacherAdvisorFigure'
@@ -16,6 +16,8 @@ import { LearningStop } from './LearningStop'
 import { layoutMaps, recommendedNode, type LearningNodeData } from './layout'
 import { TimeMachinePanel } from './TimeMachinePanel'
 import { Bibliography } from './Bibliography'
+import { FloatingPanel } from './FloatingPanel'
+import { KnowledgePanel } from './KnowledgePanel'
 
 const panel = 'rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] bg-white dark:bg-[#171A20]'
 const primary = 'rounded-xl bg-[#2B660E] dark:bg-[#B7F36B] text-white dark:text-[#0B0D10] px-4 py-3 text-sm font-semibold disabled:opacity-40 inline-flex justify-center items-center gap-2 cursor-pointer'
@@ -36,14 +38,17 @@ const optionLabels: Record<string, string> = {
   none: 'Henüz bilmiyorum', not_sure: 'Henüz karar vermedim',
 }
 
-function DiscoveryForm({ discovery, busy, answer }: { discovery: DiscoveryView; busy: boolean; answer: (id: string, value: string | string[]) => Promise<boolean> }) {
+function DiscoveryForm({ discovery, busy, answer }: { discovery: DiscoveryView; busy: boolean; answer: (id: string, value: string | string[], extra?: DiscoveryAnswer[]) => Promise<boolean> }) {
+  const requiredQuestions = discovery.questions.filter(q => q.required !== false)
   const initial = discovery.nextQuestion?.id || discovery.questions[0]?.id || ''
   const [currentId, setCurrentId] = useState(initial)
   const [drafts, setDrafts] = useState<Record<string, string | string[]>>({})
-  const question = discovery.questions.find(q => q.id === currentId) || discovery.nextQuestion || discovery.questions[0]
+  const technologyQuestion = discovery.questions.find(q => q.targetField === 'knownTechnologies' && q.required === false)
+  const [technologies, setTechnologies] = useState((discovery.answers.find(a => a.questionId === technologyQuestion?.id)?.value as string) || '')
+  const question = requiredQuestions.find(q => q.id === currentId) || discovery.nextQuestion || requiredQuestions[0]
   if (!question) return null
-  const advisorQuestions = discovery.questions.filter(q => q.section !== 'project')
-  const projectQuestions = discovery.questions.filter(q => q.section === 'project')
+  const advisorQuestions = requiredQuestions.filter(q => q.section !== 'project')
+  const projectQuestions = requiredQuestions.filter(q => q.section === 'project')
   const advisorPending = advisorQuestions.some(q => q.required !== false && !q.completed)
   const activeSection = question.section || 'advisor'
   const sectionQuestions = activeSection === 'advisor' ? advisorQuestions : projectQuestions
@@ -55,38 +60,46 @@ function DiscoveryForm({ discovery, busy, answer }: { discovery: DiscoveryView; 
   }
   const saved = discovery.answers.find(a => a.questionId === question.id)?.value
   const value = drafts[question.id] ?? saved ?? (question.type === 'multi_choice' ? [] : '')
-  const completed = discovery.questions.filter(q => q.completed).length
+  const completed = requiredQuestions.filter(q => q.completed).length
   const canSubmit = Array.isArray(value) ? value.length > 0 : value.trim().length > 0
-  const submit = async (event: React.FormEvent) => {
-    event.preventDefault()
-    const next = discovery.questions.find(q => !q.completed && q.id !== question.id)
-    const saved = await answer(question.id, value)
+  const save = async (selected: string | string[]) => {
+    const next = requiredQuestions.find(q => !q.completed && q.id !== question.id)
+    const extra = technologyQuestion && question.targetField === 'experienceLevel' && technologies.trim()
+      ? [{ questionId: technologyQuestion.id, value: technologies.trim() }] : []
+    const saved = await answer(question.id, selected, extra)
     if (saved && next) setCurrentId(next.id)
   }
-  return <form onSubmit={submit} className={`${panel} !rounded-3xl shadow-2xl p-8 space-y-6`}>
-    <div className="flex items-center justify-between text-xs text-slate-500"><span>PROJENİ BİRLİKTE NETLEŞTİRELİM</span><span>{completed} / {discovery.questions.length} cevap</span></div>
-    <nav aria-label="Soru bölümleri" className="grid grid-cols-2 gap-3">
-      {([{ id: 'advisor', title: 'Özel danışman soruları', questions: advisorQuestions }, { id: 'project', title: 'Projeye özel sorular', questions: projectQuestions }] as const).map(section => <button
+  const submit = (event: React.FormEvent) => { event.preventDefault(); void save(value) }
+  const canRecommend = activeSection === 'project' && (question.type === 'short_text' || question.options?.includes('recommend'))
+  const labelFor = (option: string) => {
+    if (question.targetField === 'experienceLevel') return ({ beginner: 'İlk projem olacak', basic: 'Örnekleri takip ederek kod yazdım', intermediate: 'Küçük bir proje geliştirdim', advanced: 'Projeleri kendi başıma geliştirebiliyorum' } as Record<string, string>)[option] || optionLabels[option] || option
+    if (question.targetField === 'weeklyHours') return ({ '3': 'Haftada 2–3 saat', '6': 'Haftada 4–6 saat', '10': 'Haftada 7–10 saat', '15': 'Haftada 10 saatten fazla', '5': 'Emin değilim — 5 saatle planlayalım' } as Record<string, string>)[option] || `${option} saat`
+    return optionLabels[option] || option
+  }
+  return <form onSubmit={submit} className={`${panel} !rounded-3xl shadow-2xl p-6 space-y-5`}>
+    <div className="flex items-center justify-between text-xs text-slate-500"><span>KÜÇÜK BİR BAŞLANGIÇ</span><span>{completed} / {requiredQuestions.length}</span></div>
+    <nav aria-label="Soru bölümleri" className={`grid ${projectQuestions.length ? 'grid-cols-2' : 'grid-cols-1'} gap-3`}>
+      {([{ id: 'advisor', title: 'Başlangıcın', questions: advisorQuestions }, { id: 'project', title: 'Projeye özel', questions: projectQuestions }] as const).filter(section => section.questions.length).map(section => <button
         key={section.id} type="button" aria-pressed={activeSection === section.id} disabled={busy || (section.id === 'project' && advisorPending) || !section.questions.length}
-        onClick={() => selectSection(section.id)} className={`rounded-2xl border p-4 text-left transition-colors disabled:opacity-50 ${activeSection === section.id ? 'border-[#75a94b] bg-[#75a94b]/10' : 'border-slate-200 dark:border-slate-700 hover:border-[#75a94b]'}`}>
-        <span className="block text-xs text-slate-500 mb-1">{section.id === 'advisor' ? '1. Projeyi planla' : '2. Ayrıntıları netleştir'}</span>
-        <span className="block text-sm font-semibold">{section.title}</span>
-        <span className="block text-xs text-slate-500 mt-2">{section.questions.filter(q => q.completed).length} / {section.questions.length} cevap</span>
+        onClick={() => selectSection(section.id)} className={`rounded-2xl border p-3 text-left transition-colors disabled:opacity-50 ${activeSection === section.id ? 'border-[#75a94b] bg-[#75a94b]/10' : 'border-slate-200 dark:border-slate-700 hover:border-[#75a94b]'}`}>
+        <span className="block text-sm font-semibold">{section.id === 'advisor' ? '1.' : '2.'} {section.title}</span>
+        <span className="block text-xs text-slate-500 mt-1">{section.questions.filter(q => q.completed).length} / {section.questions.length} cevap</span>
       </button>)}
     </nav>
-    <p className="text-xs text-slate-500">{activeSection === 'advisor' ? 'Roadmap’in kapsamını, başlangıç seviyesini ve çalışma planını belirliyoruz.' : 'AI danışmanın, proje fikrine özel kararları bu sorularla netleştiriyor.'}</p>
-    <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"><div className="h-full bg-[#75a94b] transition-all" style={{ width: `${completed / discovery.questions.length * 100}%` }} /></div>
-    <div><span className="text-xs text-[#557440] dark:text-[#B7F36B]">Soru {index + 1} / {sectionQuestions.length}</span><h2 className="text-2xl font-bold tracking-tight mt-2 leading-snug">{question.text}</h2></div>
-    {question.type === 'short_text' ? <textarea className={`${input} min-h-28`} value={value as string} maxLength={2000} required disabled={busy} onChange={e => setDrafts(d => ({ ...d, [question.id]: e.target.value }))} aria-label={question.text} placeholder="Kendi cümlelerinle anlatabilirsin…" />
-      : <div className="space-y-2">{(question.options ?? []).map(option => {
+    <p className="text-xs text-slate-500">{activeSection === 'advisor' ? 'Teknoloji seçimini ve öğrenme yolunu biz önereceğiz.' : 'Emin değilsen önerimizle başlayabilirsin.'}</p>
+    <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"><div className="h-full bg-[#75a94b] transition-all" style={{ width: `${completed / requiredQuestions.length * 100}%` }} /></div>
+    <h2 className="text-2xl font-bold tracking-tight leading-snug">{question.text}</h2>
+    {question.type === 'short_text' ? <textarea className={`${input} min-h-24`} value={value as string} maxLength={2000} required disabled={busy} onChange={e => setDrafts(d => ({ ...d, [question.id]: e.target.value }))} aria-label={question.text} placeholder="Bir cümle yeterli…" />
+      : <div className="space-y-2">{(question.options ?? []).filter(option => option !== 'recommend').map(option => {
         const chosen = Array.isArray(value) ? value.includes(option) : value === option
         return <label key={option} className={`flex items-center gap-3 rounded-xl border p-3 cursor-pointer text-sm ${chosen ? 'border-[#75a94b] bg-[#75a94b]/10' : 'border-slate-200 dark:border-slate-700'}`}>
-          <input type={question.type === 'multi_choice' ? 'checkbox' : 'radio'} name={question.id} value={option} checked={chosen} disabled={busy} onChange={() => setDrafts(d => ({ ...d, [question.id]: Array.isArray(value) ? chosen ? value.filter(v => v !== option) : [...value, option] : option }))} />{optionLabels[option] || option}
+          <input type={question.type === 'multi_choice' ? 'checkbox' : 'radio'} name={question.id} value={option} checked={chosen} disabled={busy} onChange={() => setDrafts(d => ({ ...d, [question.id]: Array.isArray(value) ? chosen ? value.filter(v => v !== option) : [...value.filter(v => v !== 'recommend'), option] : option }))} />{labelFor(option)}
         </label>
       })}</div>}
+    {technologyQuestion && question.targetField === 'experienceLevel' && <details className="text-xs text-slate-500"><summary className="cursor-pointer">Bildiğin teknolojileri ekle (isteğe bağlı)</summary><input className={`${input} mt-3`} value={technologies} maxLength={2000} disabled={busy} onChange={event => setTechnologies(event.target.value)} aria-label="Bildiğin teknolojiler" placeholder="Örn. Python, HTML — boş bırakabilirsin" /></details>}
     <div className="flex justify-between gap-3"><button type="button" className={secondary} disabled={busy || index === 0} onClick={() => setCurrentId(sectionQuestions[index - 1].id)}><ArrowLeft size={15} />Önceki</button>
-      <button type="submit" className={primary} disabled={!canSubmit || busy}>{busy ? <LoaderCircle size={16} className="animate-spin" /> : <ArrowRight size={16} />}Cevabı kaydet ve devam et</button></div>
-    <p className="text-xs text-slate-500">Cevapların projene kaydedilir. Yol haritası, hedeflerine ve ayırabileceğin zamana göre hazırlanır.</p>
+      <button type="submit" className={primary} disabled={!canSubmit || busy}>{busy ? <LoaderCircle size={16} className="animate-spin" /> : <ArrowRight size={16} />}Devam et</button></div>
+    {canRecommend && <button type="button" className={secondary + ' w-full'} disabled={busy} onClick={() => void save(question.type === 'multi_choice' ? ['recommend'] : 'recommend')}><Sparkles size={15} />Önerinle ilerle</button>}
   </form>
 }
 
@@ -105,6 +118,7 @@ function Workspace() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [showSupports, setShowSupports] = useState(false)
   const [memoryOpen, setMemoryOpen] = useState(false)
+  const [knowledgeOpen, setKnowledgeOpen] = useState(false)
   const [memory, setMemory] = useState<TimeMachine | null>(null)
   const [memoryError, setMemoryError] = useState('')
   const [lesson, setLesson] = useState<NodeView | null>(null)
@@ -136,7 +150,7 @@ function Workspace() {
   const completed = root?.nodes.filter(n => n.status === 'completed').length || 0
   const focus = useCallback((id: string) => {
     const node = flow.current?.getNode(id)
-    if (node) void flow.current?.setCenter(node.position.x + 120, node.position.y + 240, { zoom: 0.95, duration: 450 })
+    if (node) void flow.current?.setCenter(node.position.x + 300, node.position.y + 100, { zoom: 0.95, duration: 450 })
   }, [])
 
   useEffect(() => {
@@ -163,12 +177,13 @@ function Workspace() {
     const escape = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return
       if (memoryOpen) setMemoryOpen(false)
+      else if (knowledgeOpen) setKnowledgeOpen(false)
       else if (advisorOpen) setAdvisorOpen(false)
       else setSelectedId(null)
     }
     window.addEventListener('keydown', escape)
     return () => window.removeEventListener('keydown', escape)
-  }, [advisorOpen, memoryOpen])
+  }, [advisorOpen, memoryOpen, knowledgeOpen])
 
   useEffect(() => {
     if (!projectId || !bundle?.maps?.length) return
@@ -183,10 +198,14 @@ function Workspace() {
     try { setMemory(await api.timeMachine(projectId!)); setMemoryError('') }
     catch (err) { setMemoryError(err instanceof Error ? err.message : 'Geçmiş yüklenemedi.') }
   }
-  const openMemory = () => { setSelectedId(null); setAdvisorOpen(false); setMemoryOpen(true) }
+  const openMemory = () => { setSelectedId(null); setMemoryOpen(true) }
 
   useEffect(() => {
-    const timer = window.setTimeout(() => void flow.current?.fitView({ padding: 0.25, maxZoom: 1, duration: 350 }), 150)
+    const timer = window.setTimeout(() => {
+      const instance = flow.current
+      const nodes = instance?.getNodes() ?? []
+      void instance?.fitView({ nodes: nodes.filter(node => node.position.x <= Math.min(...nodes.map(item => item.position.x)) + 720), padding: 0.25, maxZoom: 1, duration: 350 })
+    }, 150)
     return () => window.clearTimeout(timer)
   }, [currentMap?.id])
 
@@ -211,10 +230,10 @@ function Workspace() {
       activate(next.id); focus(next.id)
     }
   }
-  const answer = async (id: string, value: string | string[]) => {
+  const answer = async (id: string, value: string | string[], extra: DiscoveryAnswer[] = []) => {
     let saved = false
     await perform('Cevabın kaydediliyor…', async () => {
-      await api.answer(projectId!, id, value)
+      await api.answer(projectId!, id, value, extra)
       await refresh()
       saved = true
     })
@@ -282,24 +301,26 @@ function Workspace() {
     <main className="fixed inset-0 z-50 flex items-center justify-center p-8"><div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl" role="dialog" aria-modal="true" aria-label="Proje keşfi">
       <Link to="/learn" className="inline-flex items-center gap-2 text-xs font-mono text-white/70 mb-4"><ArrowLeft size={14} />Projelerime dön</Link>{alerts}
       {bundle && !bundle.discovery.readyForRoadmap && <DiscoveryForm key={`${projectId}-${bundle.discovery.nextQuestion?.id}`} discovery={bundle.discovery} busy={!!busy} answer={answer} />}
-      {bundle?.discovery.readyForRoadmap && <section className={`${panel} p-8 text-center space-y-5`}><CheckCircle2 className="mx-auto text-[#75a94b]" size={36} /><h2 className="text-2xl font-semibold">Projeni artık daha iyi tanıyoruz.</h2><p className="text-sm leading-relaxed text-slate-500">Cevaplarınla en az 12 anlamlı durak içeren kapsamlı bir yol haritası hazırlanacak. Her durakta bildiklerini test ederek ilerleyebilir, eksiklerini ayrı öğrenme dallarında tamamlayabilirsin.</p><button className={primary} disabled={!!busy} onClick={generate}><Compass size={17} />Yol haritamı oluştur</button></section>}
+      {bundle?.discovery.readyForRoadmap && <section className={`${panel} p-8 text-center space-y-5`}><CheckCircle2 className="mx-auto text-[#75a94b]" size={36} /><h2 className="text-2xl font-semibold">Başlamak için hazırsın.</h2><p className="text-sm leading-relaxed text-slate-500">İlk çalışan sürüme giden yolu ve uygun teknolojileri önereceğiz. Bildiklerini ilerlerken kısa testlerle doğrulayabiliriz.</p><button className={primary} disabled={!!busy} onClick={generate}><Compass size={17} />Yol haritamı oluştur</button></section>}
       {projectId && !bundle && !busy && <button className={secondary} onClick={() => setParams({})}>Proje listesine dön</button>}
     </div></main></div>
 
   return <div className="relative h-dvh w-screen overflow-hidden bg-[#F7F8FA] dark:bg-[#0B0D10] text-[#111318] dark:text-[#E9EDF3]">
     {header}{alerts}
     <nav aria-label="Canvas bölümleri" className={`${panel} absolute top-20 left-6 z-30 flex gap-1 p-1 shadow-sm text-xs font-semibold`}>
-      <button aria-pressed={!memoryOpen} className={`px-4 py-2 rounded-xl cursor-pointer ${!memoryOpen ? 'bg-[#75a94b]/15 text-[#5C8738] dark:text-[#B7F36B]' : ''}`} onClick={() => setMemoryOpen(false)}>Harita</button>
+      <button aria-pressed={!memoryOpen && !knowledgeOpen} className={`px-4 py-2 rounded-xl cursor-pointer ${!memoryOpen && !knowledgeOpen ? 'bg-[#75a94b]/15 text-[#5C8738] dark:text-[#B7F36B]' : ''}`} onClick={() => { setMemoryOpen(false); setKnowledgeOpen(false) }}>Harita</button>
       <button aria-pressed={memoryOpen} className="px-4 py-2 rounded-xl cursor-pointer inline-flex items-center gap-2 hover:bg-[#75a94b]/10" onClick={openMemory}><History size={15} />Zaman Makinesi{!!memory?.dueCount && <span className="rounded-full bg-[#75a94b]/20 px-1.5 text-[10px]">{memory.dueCount}</span>}</button>
+      <button aria-pressed={knowledgeOpen} className="px-4 py-2 rounded-xl cursor-pointer inline-flex items-center gap-2 hover:bg-[#75a94b]/10" onClick={() => { setSelectedId(null); setKnowledgeOpen(value => !value) }}><BadgeCheck size={15} />Bildiklerim</button>
     </nav>
-    {currentMap?.parentMapId && <div className={`${panel} absolute top-20 left-[310px] z-30 px-3 py-2 flex items-center gap-3 text-xs`}><button className="inline-flex items-center gap-1 cursor-pointer text-[#5C8738] dark:text-[#B7F36B]" onClick={() => { const parent = bundle?.maps?.find(m => m.id === currentMap.parentMapId); setSelectedId(null); setParams({ project: projectId!, ...(parent?.parentMapId ? { map: parent.id } : {}) }) }}><ArrowLeft size={14} />Üst haritaya dön</button><span title={currentMap.description}>Alt öğrenme haritası</span></div>}
+    {currentMap?.parentMapId && <div className={`${panel} absolute top-20 left-[470px] z-30 px-3 py-2 flex items-center gap-3 text-xs`}><button className="inline-flex items-center gap-1 cursor-pointer text-[#5C8738] dark:text-[#B7F36B]" onClick={() => { const parent = bundle?.maps?.find(m => m.id === currentMap.parentMapId); setSelectedId(null); setParams({ project: projectId!, ...(parent?.parentMapId ? { map: parent.id } : {}) }) }}><ArrowLeft size={14} />Üst haritaya dön</button><span title={currentMap.description}>Alt öğrenme haritası</span></div>}
     {!!memory?.dueCount && !selected && !memoryOpen && <div className={`${panel} absolute top-20 right-6 z-30 max-w-xs p-4 shadow-lg`}><p className="text-sm font-semibold">Öğrendiklerin hâlâ seninle mi?</p><p className="text-xs text-[#68717D] mt-1">{memory.dueCount} konu için kısa hatırlama zamanı. İlerlemeni kaybetmeden 1–2 dakika ayırabilirsin.</p><button className="mt-3 text-xs font-semibold text-[#5C8738] dark:text-[#B7F36B] inline-flex gap-1 items-center" onClick={openMemory}>Kısa tekrarı aç<ArrowRight size={13} /></button></div>}
     <div className="absolute inset-0">
-      <ReactFlow nodes={graph.nodes} edges={graph.edges.filter(edge => showSupports || !edge.data?.optional)} nodeTypes={nodeTypes} edgeTypes={edgeTypes} nodesDraggable={false} nodesConnectable={false} deleteKeyCode={null} minZoom={0.15} maxZoom={1.6} onInit={instance => { flow.current = instance; window.setTimeout(() => void instance.fitView({ nodes: graph.nodes.filter(node => node.position.y <= Math.min(...graph.nodes.map(item => item.position.y)) + 468), padding: 0.2, maxZoom: 1 }), 100) }} onPaneClick={() => setSelectedId(null)}>
+      <ReactFlow nodes={graph.nodes} edges={graph.edges.filter(edge => showSupports || !edge.data?.optional)} nodeTypes={nodeTypes} edgeTypes={edgeTypes} nodesDraggable={false} nodesConnectable={false} deleteKeyCode={null} minZoom={0.15} maxZoom={1.6} onInit={instance => { flow.current = instance; window.setTimeout(() => void instance.fitView({ nodes: graph.nodes.filter(node => node.position.x <= Math.min(...graph.nodes.map(item => item.position.x)) + 720), padding: 0.2, maxZoom: 1 }), 100) }} onPaneClick={() => setSelectedId(null)}>
         <Background color={isDark ? '#222730' : '#CBD5E1'} gap={32} size={1.2} className="opacity-60" /><LiveCanvasControls showSupports={showSupports} toggleSupports={() => setShowSupports(value => !value)} locate={() => bundle && showRecommendation(bundle)} />
       </ReactFlow>
     </div>
-    {memoryOpen && <TimeMachinePanel data={memory} loadingError={memoryError} disabled={!!busy} close={() => setMemoryOpen(false)} refresh={refreshMemory} />}
+    <TimeMachinePanel open={memoryOpen} data={memory} loadingError={memoryError} disabled={!!busy} close={() => setMemoryOpen(false)} refresh={refreshMemory} />
+    <KnowledgePanel open={knowledgeOpen} bundle={bundle!} close={() => setKnowledgeOpen(false)} activate={activate} />
     {selected && <div className="fixed inset-0 z-50 flex items-center justify-center p-8">
       <button className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setSelectedId(null)} aria-label="Haritaya dön" />
       <aside className={`${panel} relative !rounded-3xl border-2 w-full max-w-4xl max-h-[88vh] shadow-2xl flex flex-col overflow-hidden`} role="dialog" aria-modal="true" aria-label="Öğrenme durağı">
@@ -322,8 +343,8 @@ function Workspace() {
         <Bibliography key={selected.id} nodeId={selected.id} title={selected.title} />
       </div>
     </aside></div>}
-    <button className="absolute bottom-6 right-6 z-40 cursor-pointer rounded-3xl" aria-label="Danışmanı aç" onClick={() => setAdvisorOpen(!advisorOpen)}><TeacherAdvisorFigure size="md" showBubble showCaption /></button>
-    {advisorOpen && <section className={`${panel} fixed z-[70] right-0 top-0 bottom-0 w-[420px] !rounded-none border-l shadow-2xl flex flex-col`} aria-label="Proje danışmanı"><header className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between"><span className="font-semibold">Proje danışmanın</span><button onClick={() => setAdvisorOpen(false)} aria-label="Danışmanı kapat"><X size={17} /></button></header><div className="flex-1 p-4 overflow-y-auto space-y-3 text-sm"><p className="text-xs text-slate-500">{selected ? `Seçili durak: ${selected.title}` : bundle?.project.title}. Sorunu gönderdiğinde ilgili proje ve öğrenme bağlamıyla yanıtlanır.</p>{messages.map((item, index) => <div key={index} className={`rounded-xl p-3 whitespace-pre-wrap ${item.role === 'user' ? 'bg-[#75a94b]/15 ml-7' : 'bg-slate-100 dark:bg-slate-800 mr-3'}`}>{item.text}</div>)}</div><form onSubmit={chat} className="p-3 flex gap-2"><input className={input} aria-label="Danışmana sorun" value={message} onChange={event => setMessage(event.target.value)} placeholder="Bu öğrenme dalı neden eklendi?" maxLength={4000} /><button className={primary + ' !p-3'} disabled={!!busy || !message.trim()} aria-label="Soruyu gönder"><Send size={17} /></button></form></section>}
+    <button className="absolute bottom-6 right-6 z-40 cursor-pointer rounded-3xl" aria-label="Danışmanı aç" onClick={() => { setSelectedId(null); setAdvisorOpen(!advisorOpen) }}><TeacherAdvisorFigure size="md" showBubble showCaption /></button>
+    <FloatingPanel open={advisorOpen} title="Proje danışmanı" icon={<Sparkles size={16} />} close={() => setAdvisorOpen(false)} width={360} height={400} anchor="advisor"><div className="min-h-0 flex-1 p-4 overflow-y-auto space-y-3 text-sm"><p className="text-xs text-slate-500">{selected ? `Seçili durak: ${selected.title}` : bundle?.project.title}. Sorunu gönderdiğinde ilgili proje ve öğrenme bağlamıyla yanıtlanır.</p>{messages.map((item, index) => <div key={index} className={`rounded-xl p-3 whitespace-pre-wrap ${item.role === 'user' ? 'bg-[#75a94b]/15 ml-7' : 'bg-slate-100 dark:bg-slate-800 mr-3'}`}>{item.text}</div>)}</div><form onSubmit={chat} className="p-3 flex gap-2"><input className={input} aria-label="Danışmana sorun" value={message} onChange={event => setMessage(event.target.value)} placeholder="Bu öğrenme dalı neden eklendi?" maxLength={4000} /><button className={primary + ' !p-3'} disabled={!!busy || !message.trim()} aria-label="Soruyu gönder"><Send size={17} /></button></form></FloatingPanel>
   </div>
 }
 
