@@ -7,13 +7,14 @@ def invalid(message):
     raise AppError("ROADMAP_VALIDATION_FAILED", message, 502, True)
 
 
-def validate_graph(nodes, edges):
+def validate_graph(nodes, edges, *, require_connected=False):
     ids = [n.key if hasattr(n, "key") else n.id for n in nodes]
     if len(set(ids)) != len(ids):
         invalid("Düğüm kimlikleri benzersiz olmalı.")
     incoming = dict.fromkeys(ids, 0)
     adjacency = {key: [] for key in ids}
     seen = set()
+    neighbors = {key: set() for key in ids}
     for edge in edges:
         source = edge.source if hasattr(edge, "source") else edge.source_node_id
         target = edge.target if hasattr(edge, "target") else edge.target_node_id
@@ -25,6 +26,8 @@ def validate_graph(nodes, edges):
         if identity in seen:
             invalid("Aynı bağlantı birden fazla tanımlanamaz.")
         seen.add(identity)
+        neighbors[source].add(target)
+        neighbors[target].add(source)
         if edge.kind == "requires":
             adjacency[source].append(target)
             incoming[target] += 1
@@ -39,6 +42,16 @@ def validate_graph(nodes, edges):
                 queue.append(target)
     if count != len(ids):
         invalid("Zorunlu bağımlılık grafında döngü var.")
+
+    if require_connected and ids:
+        reached, pending = set(), [ids[0]]
+        while pending:
+            key = pending.pop()
+            if key not in reached:
+                reached.add(key)
+                pending.extend(neighbors[key] - reached)
+        if len(reached) != len(ids):
+            invalid("Harita kopuk düğüm veya bağımsız parça içeriyor; gerçek entegrasyon bağlantıları gerekli.")
 
 
 def validate_bundle(bundle):

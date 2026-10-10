@@ -34,12 +34,15 @@ async function request<T>(path: string, method = 'GET', body?: unknown, signal?:
       ? 'İstek zaman aşımına uğradı. Yeniden deneyebilirsin.' : 'Backend bağlantısı kurulamadı. Sunucunun açık olduğundan emin ol.')
   } finally { window.clearTimeout(timeout); signal?.removeEventListener('abort', abort) }
 }
+export interface LearnerProgress { totalPoints: number; level: number; correctAnswers: number; completedSteps: number; practiceEnabled: boolean }
 export interface QuizResult {
+  practice: boolean; pointsAwarded: number; correctAnswers: number;
   attemptId: string; passed: boolean; score: number; weakSkills: string[];
   remediationCreated: boolean; adaptiveMap: MapView | null; map: MapView
   memoryReviewIds: string[]
 }
 export const api = {
+  progress: () => request<LearnerProgress>('/me/progress'),
   timeMachine: (projectId: string) => request<TimeMachine>(`/projects/${projectId}/time-machine`),
   prepareMemory: (reviewId: string) => request<MemoryChallenge>(`/memory/${reviewId}/prepare`, 'POST'),
   answerMemory: (reviewId: string, checkId: string, selectedIndex: number, submissionId: string) =>
@@ -51,11 +54,11 @@ export const api = {
   generate: (id: string) => request<MapView>(`/projects/${id}/roadmap/generate`, 'POST'),
   submap: (id: string) => request<MapView>(`/nodes/${id}/submap`, 'POST'),
   learn: (id: string) => request<MapView>(`/nodes/${id}/learn`, 'POST'),
-  node: (id: string) => request<NodeView>(`/nodes/${id}`),
+  node: (id: string, practice = false) => request<NodeView>(`/nodes/${id}?practice=${practice}`),
   references: (id: string, signal?: AbortSignal) => request<ReferenceView>(`/nodes/${id}/references`, 'GET', undefined, signal),
-  assessment: (id: string) => request<AssessmentView>(`/nodes/${id}/assessment`),
-  submit: (nodeId: string, quiz: AssessmentView, submissionId: string, answers: Record<string, number>) => request<QuizResult>(`/nodes/${nodeId}/assessment/submit`, 'POST', {
-    assessmentId: quiz.id, version: quiz.version, submissionId,
+  assessment: (id: string, practice = false) => request<AssessmentView>(`/nodes/${id}/assessment?practice=${practice}`),
+  submit: (nodeId: string, quiz: AssessmentView, submissionId: string, answers: Record<string, number>, practice = false) => request<QuizResult>(`/nodes/${nodeId}/assessment/submit`, 'POST', {
+    practice, assessmentId: quiz.id, version: quiz.version, submissionId,
     answers: quiz.questions.map(q => ({ questionId: q.id, selectedIndex: answers[q.id] })),
   }),
   completeTask: (id: string, expectedOutput: string) => request<MapView>(`/nodes/${id}`, 'PATCH', { action: 'complete_task', expectedOutput }),

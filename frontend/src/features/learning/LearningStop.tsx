@@ -4,7 +4,7 @@ import { STOP_HEIGHT, STOP_WIDTH, type LearningNodeData } from './layout'
 
 // The circular junction and rounded connectors share Mergen's logo geometry.
 export function LearningStop({ data }: NodeProps<Node<LearningNodeData>>) {
-  const { node, adaptive, recommended, activate, stepNumber } = data
+  const { node, adaptive, recommended, activate, stepNumber, celebrated } = data
   const completed = node.status === 'completed'
   const locked = node.status === 'locked'
   const active = recommended || node.status === 'in_progress'
@@ -17,8 +17,9 @@ export function LearningStop({ data }: NodeProps<Node<LearningNodeData>>) {
     <Handle id="out" type="source" position={Position.Right} style={{ left: 136, right: 'auto', top: 32, opacity: 0 }} />
     <button title={node.title} onClick={() => activate(node.id)} aria-label={`${node.title}${recommended ? ', önerilen durak' : ''}`}
       className="nodrag group flex w-full h-full flex-col items-center text-center cursor-pointer rounded-2xl focus-visible:outline-2 focus-visible:outline-[#6D9B4F]">
-      <span className={`relative mt-[6px] flex size-[52px] shrink-0 items-center justify-center rounded-full border-[5px] border-[#F6F7F9] dark:border-[#141B24] transition-transform group-hover:scale-110 ${marker} ${active ? 'shadow-[0_0_0_5px_#2b660e12]' : ''}`}>
-        {completed ? <Check size={19} strokeWidth={3} /> : locked ? <Lock size={15} /> : <span className="text-sm font-semibold tabular-nums">{stepNumber}</span>}
+      <span className={`relative mt-[6px] flex size-[52px] shrink-0 items-center justify-center rounded-full border-[5px] border-[#F6F7F9] dark:border-[#141B24] transition-transform group-hover:scale-110 ${marker} ${celebrated ? 'learning-pop' : ''} ${active ? 'shadow-[0_0_0_5px_#2b660e12]' : ''}`}>
+        <span className="text-sm font-semibold tabular-nums">{stepNumber}</span>
+        {(completed || locked) && <span className="absolute -right-1 -bottom-1 flex items-center justify-center size-4 rounded-full bg-[#F6F7F9] dark:bg-[#141B24]">{completed ? <Check size={11} className="text-[#2B660E] dark:text-[#B7F36B]" /> : <Lock size={10} />}</span>}
         {node.childMapId && <Layers size={13} className="absolute -right-3 -bottom-1 rounded-full bg-white text-[#5E8A3D] dark:bg-[#141B24]" />}
       </span>
       <span className={`mt-3 max-w-[204px] text-[13px] leading-[19px] font-medium line-clamp-2 ${active ? 'text-[#2B660E] dark:text-[#B7F36B]' : 'text-[#3B4552] dark:text-[#D1D8E1]'}`}>{node.title}</span>

@@ -85,7 +85,7 @@ class AIGateway:
                                 thinking_config=gemini_types.ThinkingConfig(thinking_level="low"),
                                 system_instruction=system_prompt,
                                 response_mime_type="application/json",
-                                response_json_schema=generation_schema(response_model),
+                                response_json_schema=generation_schema(response_model, payload),
                             ),
                         )
                         logger.info(

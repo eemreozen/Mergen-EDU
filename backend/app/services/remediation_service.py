@@ -81,7 +81,7 @@ async def add_remediation(db, node, weak_skills, gateway, trigger="knowledge_gap
             },
             AdaptiveRoadmapDraft,
         )
-        validate_graph(draft.nodes, draft.edges)
+        validate_graph(draft.nodes, draft.edges, require_connected=True)
         if any(n.type != "learning" or not set(n.skills) <= set(missing) for n in draft.nodes):
             raise AppError(
                 "AI_INVALID_OUTPUT", "Öğrenme dalı kapsam dışı beceri veya düğüm içeriyor.", 502, True

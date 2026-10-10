@@ -273,7 +273,7 @@ async def test_required_root_slots_decode_to_public_node_array():
     draft = fixture("roadmap", {"project": {"primary_domain": "web"}})
     expected = draft["nodes"][:12]
     draft["nodes"] = {f"stage{i:02d}": node for i, node in enumerate(expected, 1)}
-    draft["edges"] = [{"source": "stage01", "target": "stage02", "kind": "requires"}]
+    draft["edges"] = [{"source": f"stage{i:02d}", "target": f"stage{i+1:02d}", "kind": "requires"} for i in range(1, 12)]
     gateway = make_gateway(lambda _: reply(json.dumps(draft)), retries=0)
     try:
         result = await gateway.generate_structured("roadmap", "system", {}, RootRoadmapDraft)
@@ -283,3 +283,52 @@ async def test_required_root_slots_decode_to_public_node_array():
         assert result.edges[0].target == expected[1]['key']
     finally:
         await gateway.close()
+
+
+async def test_initial_assessment_enforces_three_slots_without_lesson():
+    from app.ai.prompts.assessment import SYSTEM
+    from app.schemas.assessment import AssessmentDraft
+
+    context = {
+        "locale": "tr",
+        "node": {"title": "Temel kavramlar", "summary": "Proje için gerekli temeller",
+                 "skills": ["topic.basics"], "content": None},
+    }
+    generated = fixture("assessment", context)
+    questions = generated["questions"]
+    generated["questions"] = {f"question{i:02d}": q for i, q in enumerate(questions, 1)}
+    requests = []
+
+    def handler(request):
+        requests.append(json.loads(request.content))
+        return reply(json.dumps(generated))
+
+    gateway = make_gateway(handler, retries=0)
+    try:
+        result = await gateway.generate_structured("assessment", SYSTEM, context, AssessmentDraft)
+        assert len(requests) == 1
+        schema = requests[0]["generationConfig"]["responseJsonSchema"]
+        assert schema["properties"]["questions"]["type"] == "object"
+        assert schema["properties"]["questions"]["required"] == ["question01", "question02", "question03"]
+        assert len(result.questions) == 3
+        assert isinstance(result.model_dump()["questions"], list)
+        assert {q.target_skill for q in result.questions} == {"topic.basics"}
+        assert AssessmentDraft.model_json_schema()["properties"]["questions"]["minItems"] == 3
+    finally:
+        await gateway.close()
+
+
+def test_short_assessment_still_rejected_without_padding():
+    from app.schemas.assessment import AssessmentDraft
+
+    generated = fixture("assessment", {"node": {"title": "Test", "skills": ["topic.basics"]}})
+    generated["questions"] = generated["questions"][:2]
+    with pytest.raises(ValidationError):
+        AssessmentDraft.model_validate(generated)
+
+
+def test_assessment_schema_requires_enough_questions_for_every_skill():
+    from app.schemas.assessment import AssessmentDraft
+
+    schema = generation_schema(AssessmentDraft, {"node": {"skills": [f"topic.{i}" for i in range(5)]}})
+    assert len(schema["properties"]["questions"]["required"]) == 5

@@ -19,7 +19,7 @@ function roundedPath(points: number[][]) {
 
 export function LearningRoute({ sourceX: sx, sourceY: sy, targetX: tx, targetY: ty, data }: EdgeProps) {
   const { isDark } = useTheme()
-  const route = data as { points?: number[][]; gutterX?: number; gutterY?: number; optional?: boolean; isCompleted?: boolean; isRemedial?: boolean; isActive?: boolean }
+  const route = data as { points?: number[][]; gutterX?: number; gutterY?: number; optional?: boolean; connectivity?: boolean; isCompleted?: boolean; isRemedial?: boolean; isActive?: boolean }
   const exit = sx + 104, entry = tx - 104
   const points = route.gutterX !== undefined
     ? [[sx, sy], [route.gutterX, sy], [route.gutterX, ty], [tx, ty]]
@@ -30,7 +30,7 @@ export function LearningRoute({ sourceX: sx, sourceY: sy, targetX: tx, targetY: 
     ? isDark ? '#B7F36B' : '#2B660E' : isDark ? '#485361' : '#BEC6D0'
   const routed = route.points ?? points
   if (!routed.length) return null
-  return <BaseEdge path={roundedPath(routed)} style={{ stroke: color, strokeWidth: route.optional ? 2 : 4,
+  return <BaseEdge path={roundedPath(routed)} style={{ stroke: color, strokeWidth: route.optional ? route.connectivity ? 3 : 2 : 4,
     strokeLinecap: 'round', strokeLinejoin: 'round', strokeDasharray: route.optional ? '4 8' : undefined,
-    opacity: route.optional ? 0.45 : 0.85 }} />
+    opacity: route.optional && !route.connectivity ? 0.45 : 0.85 }} />
 }

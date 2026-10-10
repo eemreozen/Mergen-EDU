@@ -70,3 +70,18 @@ doğrulama hatasında o projenin mevcut haritası korunur. Eski sürümler sonra
 `--all` çalışmalarına dahil edilmez. Yeni alt haritalar ilgili düğüm açıldığında
 yeni ana haritanın bağlamıyla üretilir. Her AI düğümündeki `resourceQuery`,
 konuya özel doküman/video araması içindir; arama sonuçları ayrıca filtrelenir.
+
+### Danışman ve öğrenme puanı
+
+Ana sayfadaki Mergen maskotu sayfanın alt sınırında yürür ve tıklanınca selamlaşır.
+Fikir analizi ve harita hazırlığında yerel danışman mesajları gösterilir; bu etkileşimler ek LLM çağrısı yapmaz.
+Canvas puanı kullanıcıya aittir: ilk kez doğru cevaplanan her test sorusu +10, tamamlanan her durak +25 puan getirir.
+Başarılı Zaman Makinesi hatırlamaları da +10 puandır. Aynı gönderimin tekrarı puanı artırmaz.
+`GET /api/v1/me/progress` kayıtlı başarılardan toplamı ve seviyeyi hesaplar; her 200 puanda bir seviye artar.
+
+Demo ortamında kilitli duraklar `practice=true` ile içerik/test incelemesine açılabilir.
+Deneme gönderimleri sonuç döndürür fakat ilerleme, test geçmişi, beceri profili, hatırlamalar, puan veya telafi dallarını değiştirmez.
+İçerik ve soruların üretim önbelleği tutulur. Normal ilerleme için ön koşullar hâlâ zorunludur.
+Deneme erişimi production ortamında kapalıdır. Görünen durakların numaraları 1'den başlayarak ardışıktır;
+yeni pekiştirme dalları ana yolun mevcut numaralarını değiştirmeden numaralandırılır.
+Animasyonlar sistemin azaltılmış hareket tercihine uyar.

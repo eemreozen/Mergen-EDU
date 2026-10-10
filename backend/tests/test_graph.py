@@ -1,6 +1,6 @@
 import pytest
+from pydantic import ValidationError
 
-from app.errors import AppError
 from app.graph.validator import validate_graph
 from app.schemas.roadmap import RoadmapDraft
 
@@ -29,9 +29,8 @@ def draft(edges):
     ],
 )
 def test_invalid_graph(edges):
-    graph = draft(edges)
-    with pytest.raises(AppError):
-        validate_graph(graph.nodes, graph.edges)
+    with pytest.raises(ValidationError):
+        draft(edges)
 
 
 def test_supports_do_not_cycle_gate():
@@ -42,3 +41,22 @@ def test_supports_do_not_cycle_gate():
         ]
     )
     validate_graph(graph.nodes, graph.edges)
+
+
+def test_generated_draft_rejects_disconnected_components():
+    with pytest.raises(ValidationError, match="kopuk"):
+        draft([])
+    connected = draft([{"source": "a", "target": "b", "kind": "supports"}])
+    # Optional integration is sufficient; it must not lock independent lessons.
+    validate_graph(connected.nodes, connected.edges, require_connected=True)
+
+
+def test_legacy_graph_can_still_be_read():
+    from types import SimpleNamespace
+
+    nodes = [SimpleNamespace(id="old-a"), SimpleNamespace(id="old-b")]
+    validate_graph(nodes, [])
+    from app.errors import AppError
+
+    with pytest.raises(AppError):
+        validate_graph(nodes, [], require_connected=True)

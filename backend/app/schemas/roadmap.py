@@ -43,6 +43,19 @@ class RoadmapDraft(Schema):
     nodes: list[NodeDraft] = Field(min_length=2, max_length=24)
     edges: list[EdgeDraft] = Field(max_length=80)
 
+    @model_validator(mode="after")
+    def connected_learning_graph(self):
+        # Provider validation participates in the gateway's bounded retry policy.
+        # Saved legacy exports remain readable; only new drafts are strict.
+        from app.errors import AppError
+        from app.graph.validator import validate_graph
+
+        try:
+            validate_graph(self.nodes, self.edges, require_connected=True)
+        except AppError as exc:
+            raise ValueError(exc.message) from exc
+        return self
+
 
 class RootRoadmapDraft(RoadmapDraft):
     @model_validator(mode="before")

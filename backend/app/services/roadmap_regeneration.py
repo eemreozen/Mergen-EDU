@@ -42,7 +42,7 @@ async def regenerate_root(db, project_id, user_id, gateway):
     # Never hold a database write lock while waiting for Gemini.
     await db.commit()
     draft = await gateway.generate_structured("roadmap", SYSTEM, payload, RootRoadmapDraft)
-    validate_graph(draft.nodes, draft.edges)
+    validate_graph(draft.nodes, draft.edges, require_connected=True)
     if not gateway.is_demo and any(not n.resource_query.strip() for n in draft.nodes):
         raise AppError("ROADMAP_VALIDATION_FAILED", "Kaynak arama ifadeleri eksik.", 502, True)
     if db.bind.dialect.name == "sqlite":

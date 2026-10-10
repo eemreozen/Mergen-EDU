@@ -3,7 +3,9 @@ import { Background, ReactFlow, ReactFlowProvider, type ReactFlowInstance, type 
 import { ArrowLeft, ArrowRight, BadgeCheck, BookOpen, BrainCircuit, CheckCircle2, Compass, History, LoaderCircle, Send, Sparkles, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
-import { api } from '@/api/client'
+import { AdvisorWelcome } from '@/components/landing/AdvisorWelcome'
+import { LearningReward, type Reward } from './LearningReward'
+import { api, type LearnerProgress } from '@/api/client'
 import type { AssessmentView, DiscoveryAnswer, DiscoveryView, ExportBundle, NodeView } from '@/api/types'
 import type { TimeMachine } from '@/api/memory-types'
 import { HeroSection } from '@/features/landing/HeroSection'
@@ -13,7 +15,7 @@ import { LearningRoute } from './LearningRoute'
 import { LiveCanvasHeader, LiveCanvasControls } from './LiveCanvasChrome'
 import { useTheme } from '@/hooks/useTheme'
 import { LearningStop } from './LearningStop'
-import { layoutMaps, recommendedNode, type LearningNodeData } from './layout'
+import { layoutMaps, recommendedNode, visibleEdges, type LearningNodeData } from './layout'
 import { TimeMachinePanel } from './TimeMachinePanel'
 import { Bibliography } from './Bibliography'
 import { FloatingPanel } from './FloatingPanel'
@@ -123,6 +125,8 @@ function Workspace() {
   const working = useRef(false)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+  const [progress, setProgress] = useState<LearnerProgress | null>(null)
+  const [reward, setReward] = useState<Reward | null>(null)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [showSupports, setShowSupports] = useState(false)
   const [memoryOpen, setMemoryOpen] = useState(false)
@@ -148,9 +152,13 @@ function Workspace() {
   const activate = useCallback((id: string) => { setSelectedId(id); setLesson(null); setQuiz(null); setTaskEvidence('') }, [])
   const root = bundle?.maps?.find(m => !m.parentMapId)
   const currentMap = bundle?.maps?.find(m => m.id === params.get('map') && m.kind !== 'adaptive') || root
-  const graph = useMemo(() => bundle ? layoutMaps(bundle, activate, currentMap?.id) : { nodes: [], edges: [] }, [bundle, activate, currentMap?.id])
+  const graph = useMemo(() => {
+    const result = bundle ? layoutMaps(bundle, activate, currentMap?.id) : { nodes: [], edges: [] }
+    return { ...result, nodes: result.nodes.map((node): Node<LearningNodeData> => ({ ...node, data: { ...node.data, celebrated: reward?.kind === 'success' && reward.nodeId === node.id } })) }
+  }, [bundle, activate, currentMap?.id, reward])
   const allNodes = bundle?.maps?.flatMap(m => m.nodes) || []
   const selected = allNodes.find(n => n.id === selectedId)
+  const practice = selected?.status === 'locked' && !!progress?.practiceEnabled
   const selectedMap = bundle?.maps?.find(m => m.id === selected?.mapId)
   const recommendation = bundle ? recommendedNode(bundle, currentMap?.id) : undefined
   const branch = bundle?.maps?.find(m => m.targetNodeId === selected?.id && m.kind === 'adaptive')
@@ -160,6 +168,9 @@ function Workspace() {
     const node = flow.current?.getNode(id)
     if (node) void flow.current?.setCenter(node.position.x + 300, node.position.y + 100, { zoom: 0.95, duration: 450 })
   }, [])
+
+  useEffect(() => { let cancelled = false; api.progress().then(data => { if (!cancelled) setProgress(data) }).catch(() => {}); return () => { cancelled = true } }, [])
+  useEffect(() => { if (!reward) return; const timer = window.setTimeout(() => setReward(null), 3800); return () => window.clearTimeout(timer) }, [reward])
 
   useEffect(() => {
     let cancelled = false
@@ -227,6 +238,7 @@ function Workspace() {
   const refresh = async () => {
     const next = await api.exportProject(projectId!)
     setBundle(next)
+    setProgress(await api.progress())
     return next
   }
   const showRecommendation = (data: ExportBundle) => {
@@ -260,10 +272,11 @@ function Workspace() {
     setNotice('Bu alt haritayı tamamladığında ana durak da tamamlanır. İlerlemen kaydedilir.')
   })
   const testKnowledge = () => selected && void perform('Bilgi testi hazırlanıyor…', async () => {
-    const assessment = await api.assessment(selected.id)
+    const assessment = await api.assessment(selected.id, practice)
     setQuiz(assessment); setAnswers({}); setSubmissionId(crypto.randomUUID()); setLesson(null)
   })
   const teach = () => selected && void perform('Öğrenme yolun hazırlanıyor…', async () => {
+    if (practice) { setLesson(await api.node(selected.id, true)); setQuiz(null); return }
     if (selectedMap?.kind === 'adaptive') { setLesson(await api.node(selected.id)); setQuiz(null); return }
     const newBranch = await api.learn(selected.id)
     await refresh()
@@ -272,7 +285,15 @@ function Workspace() {
     setNotice('Sıfırdan öğrenme dalın ana haritanın yanında açıldı. Dalı tamamlayıp asıl durağın testine döneceksin.')
   })
   const submit = () => selected && quiz && void perform('Yanıtların değerlendiriliyor…', async () => {
-    const result = await api.submit(selected.id, quiz, submissionId, answers)
+    const result = await api.submit(selected.id, quiz, submissionId, answers, practice)
+    if (result.practice) {
+      setQuiz(null)
+      setReward({id: Date.now(), kind: result.passed ? 'practice' : 'retry', points: 0, message: `%${result.score} doğru. Bu bir denemeydi; puanın ve gerçek ilerlemen değişmedi.`})
+      setNotice(result.passed ? 'Denemeyi geçtin. Gerçek ilerleme için ön koşulları tamamlayıp bu durağa sırayla gelmelisin.' : `Denemede pekiştirilecek konular: ${result.weakSkills.join(', ')}. İlerlemen değişmedi.`)
+      return
+    }
+    setReward({id: Date.now(), kind: result.passed ? 'success' : 'retry', points: result.pointsAwarded, nodeId: selected.id,
+      message: result.passed ? 'Harika, bu bilgiyi artık projende kullanabilirsin.' : `${result.correctAnswers} doğru cevabın var. Eksik kalanları birlikte çalışabiliriz.`})
     const next = await refresh()
     setQuiz(null); showRecommendation(next)
     setNotice(result.passed ? `%${result.score}: Bilgin doğrulandı. ${selected.type === 'development_task' ? 'Şimdi proje görevinin çıktısını tamamla.' : 'Sıradaki durak vurgulandı.'}`
@@ -295,7 +316,7 @@ function Workspace() {
     })
   }
 
-  const header = <LiveCanvasHeader title={currentMap?.parentMapId ? currentMap.title : bundle?.project.title || 'Proje keşfi'} completed={completed} total={root?.nodes.length || 0} download={exportJson} submap={!!currentMap?.parentMapId} />
+  const header = <LiveCanvasHeader title={currentMap?.parentMapId ? currentMap.title : bundle?.project.title || 'Proje keşfi'} completed={completed} total={root?.nodes.length || 0} download={exportJson} submap={!!currentMap?.parentMapId} points={progress?.totalPoints} level={progress?.level} />
   const alerts = <div className={`${root ? 'absolute top-36 left-6 z-[60] max-w-lg' : 'w-full mb-5'} space-y-2`} aria-live="polite">
     {busy && <div className={`${panel} p-3 flex items-center gap-2 text-sm`}><LoaderCircle size={16} className="animate-spin shrink-0" />{busy}</div>}
     {error && <div role="alert" className="rounded-xl border border-rose-400/50 bg-rose-50 dark:bg-[#301b23] p-3 text-sm flex justify-between gap-3"><span>{error}</span><button onClick={() => setError('')} aria-label="Hatayı kapat"><X size={15} /></button></div>}
@@ -309,12 +330,12 @@ function Workspace() {
     <main className="fixed inset-0 z-50 flex items-center justify-center p-8"><div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl" role="dialog" aria-modal="true" aria-label="Proje keşfi">
       <Link to="/learn" className="inline-flex items-center gap-2 text-xs font-mono text-white/70 mb-4"><ArrowLeft size={14} />Projelerime dön</Link>{alerts}
       {bundle && !bundle.discovery.readyForRoadmap && <DiscoveryForm key={`${projectId}-${bundle.discovery.nextQuestion?.id}`} discovery={bundle.discovery} busy={!!busy} answer={answer} />}
-      {bundle?.discovery.readyForRoadmap && <section className={`${panel} p-8 text-center space-y-5`}><CheckCircle2 className="mx-auto text-[#75a94b]" size={36} /><h2 className="text-2xl font-semibold">Başlamak için hazırsın.</h2><p className="text-sm leading-relaxed text-slate-500">İlk çalışan sürüme giden yolu ve uygun teknolojileri önereceğiz. Bildiklerini ilerlerken kısa testlerle doğrulayabiliriz.</p><button className={primary} disabled={!!busy} onClick={generate}><Compass size={17} />Yol haritamı oluştur</button></section>}
+      {busy && bundle?.discovery.readyForRoadmap ? <AdvisorWelcome roadmap en={bundle.project.locale === 'en'} /> : bundle?.discovery.readyForRoadmap && <section className={`${panel} p-8 text-center space-y-5`}><CheckCircle2 className="mx-auto text-[#75a94b]" size={36} /><h2 className="text-2xl font-semibold">Başlamak için hazırsın.</h2><p className="text-sm leading-relaxed text-slate-500">İlk çalışan sürüme giden yolu ve uygun teknolojileri önereceğiz. Bildiklerini ilerlerken kısa testlerle doğrulayabiliriz.</p><button className={primary} disabled={!!busy} onClick={generate}><Compass size={17} />Yol haritamı oluştur</button></section>}
       {projectId && !bundle && !busy && <button className={secondary} onClick={() => setParams({})}>Proje listesine dön</button>}
     </div></main></div>
 
   return <div className="relative h-dvh w-screen overflow-hidden bg-[#F7F8FA] dark:bg-[#0B0D10] text-[#111318] dark:text-[#E9EDF3]">
-    {header}{alerts}
+    {header}{alerts}<LearningReward reward={reward} />
     <nav aria-label="Canvas bölümleri" className={`${panel} absolute top-20 left-6 z-30 flex gap-1 p-1 shadow-sm text-xs font-semibold`}>
       <button aria-pressed={!memoryOpen && !knowledgeOpen} className={`px-4 py-2 rounded-xl cursor-pointer ${!memoryOpen && !knowledgeOpen ? 'bg-[#75a94b]/15 text-[#5C8738] dark:text-[#B7F36B]' : ''}`} onClick={() => { setMemoryOpen(false); setKnowledgeOpen(false) }}>Harita</button>
       <button aria-pressed={memoryOpen} className="px-4 py-2 rounded-xl cursor-pointer inline-flex items-center gap-2 hover:bg-[#75a94b]/10" onClick={openMemory}><History size={15} />Zaman Makinesi{!!memory?.dueCount && <span className="rounded-full bg-[#75a94b]/20 px-1.5 text-[10px]">{memory.dueCount}</span>}</button>
@@ -323,29 +344,30 @@ function Workspace() {
     {currentMap?.parentMapId && <div className={`${panel} absolute top-20 left-[470px] z-30 px-3 py-2 flex items-center gap-3 text-xs`}><button className="inline-flex items-center gap-1 cursor-pointer text-[#5C8738] dark:text-[#B7F36B]" onClick={() => { const parent = bundle?.maps?.find(m => m.id === currentMap.parentMapId); setSelectedId(null); setParams({ project: projectId!, ...(parent?.parentMapId ? { map: parent.id } : {}) }) }}><ArrowLeft size={14} />Üst haritaya dön</button><span title={currentMap.description}>Alt öğrenme haritası</span></div>}
     {!!memory?.dueCount && !selected && !memoryOpen && <div className={`${panel} absolute top-20 right-6 z-30 max-w-xs p-4 shadow-lg`}><p className="text-sm font-semibold">Öğrendiklerin hâlâ seninle mi?</p><p className="text-xs text-[#68717D] mt-1">{memory.dueCount} konu için kısa hatırlama zamanı. İlerlemeni kaybetmeden 1–2 dakika ayırabilirsin.</p><button className="mt-3 text-xs font-semibold text-[#5C8738] dark:text-[#B7F36B] inline-flex gap-1 items-center" onClick={openMemory}>Kısa tekrarı aç<ArrowRight size={13} /></button></div>}
     <div className="absolute inset-0">
-      <ReactFlow nodes={graph.nodes} edges={graph.edges.filter(edge => showSupports || !edge.data?.optional)} nodeTypes={nodeTypes} edgeTypes={edgeTypes} nodesDraggable={false} nodesConnectable={false} deleteKeyCode={null} minZoom={0.15} maxZoom={1.6} onInit={instance => { flow.current = instance; window.setTimeout(() => void instance.fitView({ nodes: graph.nodes.filter(node => node.position.x <= Math.min(...graph.nodes.map(item => item.position.x)) + 720), padding: 0.2, maxZoom: 1 }), 100) }} onPaneClick={() => setSelectedId(null)}>
+      <ReactFlow nodes={graph.nodes} edges={visibleEdges(graph.edges, showSupports)} nodeTypes={nodeTypes} edgeTypes={edgeTypes} nodesDraggable={false} nodesConnectable={false} deleteKeyCode={null} minZoom={0.15} maxZoom={1.6} onInit={instance => { flow.current = instance; window.setTimeout(() => void instance.fitView({ nodes: graph.nodes.filter(node => node.position.x <= Math.min(...graph.nodes.map(item => item.position.x)) + 720), padding: 0.2, maxZoom: 1 }), 100) }} onPaneClick={() => setSelectedId(null)}>
         <Background color={isDark ? '#222730' : '#CBD5E1'} gap={32} size={1.2} className="opacity-60" /><LiveCanvasControls showSupports={showSupports} toggleSupports={() => setShowSupports(value => !value)} locate={() => bundle && showRecommendation(bundle)} />
       </ReactFlow>
     </div>
-    <TimeMachinePanel open={memoryOpen} data={memory} loadingError={memoryError} disabled={!!busy} close={() => setMemoryOpen(false)} refresh={refreshMemory} />
+    <TimeMachinePanel open={memoryOpen} data={memory} loadingError={memoryError} disabled={!!busy} close={() => setMemoryOpen(false)} refresh={refreshMemory} onAnswered={async correct => { const latest = await api.progress(); setReward({id: Date.now(), kind: correct ? 'success' : 'retry', points: Math.max(0,latest.totalPoints-(progress?.totalPoints || 0)), message: correct ? 'Öğrendiklerin hâlâ seninle. Yola devam!' : 'Kısa bir hatırlama yeterli. İlerlemen güvende.'}); setProgress(latest) }} />
     <KnowledgePanel open={knowledgeOpen} bundle={bundle!} close={() => setKnowledgeOpen(false)} activate={activate} />
     {selected && <div className="fixed inset-0 z-50 flex items-center justify-center p-8">
       <button className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setSelectedId(null)} aria-label="Haritaya dön" />
-      <aside className={`${panel} relative !rounded-3xl border-2 w-full max-w-4xl max-h-[88vh] shadow-2xl flex flex-col overflow-hidden`} role="dialog" aria-modal="true" aria-label="Öğrenme durağı">
+      <aside className={`${panel} ${reward?.kind === 'retry' ? 'learning-shake' : ''} relative !rounded-3xl border-2 w-full max-w-4xl max-h-[88vh] shadow-2xl flex flex-col overflow-hidden`} role="dialog" aria-modal="true" aria-label="Öğrenme durağı">
       <div className="p-6 border-b border-[#E3E7EC] dark:border-[#2A3038] bg-[#F7F8FA] dark:bg-[#111318] flex items-start justify-between gap-3"><div><p className="text-[10px] font-mono uppercase tracking-wider text-[#68717D] dark:text-[#9CA3AF] mb-2">{selectedMap?.kind === 'adaptive' ? 'ÖĞRENME DALI' : selectedMap?.kind === 'submap' ? 'ALT ÖĞRENME HARİTASI' : 'ANA ÖĞRENME YOLU'}</p><h2 className="font-extrabold text-3xl tracking-tight leading-snug">{selected.title}</h2></div><button className="p-1" onClick={() => setSelectedId(null)} aria-label="Durağı kapat"><X size={19} /></button></div>
       <div className="p-10 overflow-y-auto space-y-6 text-sm">
         <p className="leading-relaxed text-slate-500 dark:text-slate-400">{selected.summary}</p>
-        {selected.status === 'locked' ? <div className="space-y-2"><p>Önce şu durakları tamamla:</p><ul className="list-disc pl-5 text-slate-500">{(selected.prerequisites ?? []).map(id => <li key={id}>{allNodes.find(n => n.id === id)?.title || id}</li>)}</ul></div>
-          : selected.type === 'submap' ? <div className="space-y-4"><p className="text-sm text-slate-500">Bu kapsamlı alanı küçük adımlara ayırarak çalış. Projene uygun teknolojiler, ön koşullar ve paralel öğrenme yolları ayrı bir haritada gösterilir.</p><button className={primary} disabled={!!busy} onClick={openSubmap}><Compass size={17} />{selected.childMapId ? 'Alt haritaya devam et' : 'Alt öğrenme haritamı aç'}</button>{selected.status === 'completed' && <p className="text-[#557440]">Bu durak tamamlandı; alt haritayı yeniden inceleyebilirsin.</p>}</div> : <>
+        {practice && <div className="rounded-xl border border-amber-300/60 bg-amber-50 dark:bg-amber-900/15 px-4 py-3 text-xs leading-relaxed"><strong>Demo denemesi</strong> · Bu durağın içeriğini ve testini inceleyebilirsin. Sonucun puan, tamamlanma veya kilit açma olarak kaydedilmez.</div>}
+        {selected.status === 'locked' && !practice ? <div className="space-y-2"><p>Önce şu durakları tamamla:</p><ul className="list-disc pl-5 text-slate-500">{(selected.prerequisites ?? []).map(id => <li key={id}>{allNodes.find(n => n.id === id)?.title || id}</li>)}</ul></div>
+          : selected.type === 'submap' && !practice ? <div className="space-y-4"><p className="text-sm text-slate-500">Bu kapsamlı alanı küçük adımlara ayırarak çalış. Projene uygun teknolojiler, ön koşullar ve paralel öğrenme yolları ayrı bir haritada gösterilir.</p><button className={primary} disabled={!!busy} onClick={openSubmap}><Compass size={17} />{selected.childMapId ? 'Alt haritaya devam et' : 'Alt öğrenme haritamı aç'}</button>{selected.status === 'completed' && <p className="text-[#557440]">Bu durak tamamlandı; alt haritayı yeniden inceleyebilirsin.</p>}</div> : <>
             {selected.status === 'completed' ? <p className="flex items-center gap-2 text-[#557440] dark:text-[#B7F36B]"><CheckCircle2 size={17} />Bu durak tamamlandı.</p> : !quiz && <div className="grid grid-cols-2 gap-4">
               {branchPending ? <button className={primary + ' w-full'} onClick={() => { const next = branch?.nodes.find(n => ['available', 'in_progress', 'needs_review'].includes(n.status)); if (next) { activate(next.id); focus(next.id) } }}><Sparkles size={17} />Öğrenme dalıma devam et</button>
                 : <button className={primary + ' w-full'} disabled={!!busy} onClick={testKnowledge}><BrainCircuit size={17} />{selected.status === 'needs_review' ? 'Bilgimi yeniden test et' : 'Bilgimi test et'}</button>}
-              {!branchPending && <button className={secondary + ' w-full'} disabled={!!busy} onClick={teach}><BookOpen size={17} />{selectedMap?.kind === 'adaptive' ? 'Hiç bilmiyorum, öğret' : branch ? 'Öğrenme dalımı tekrar incele' : 'Hiç bilmiyorum, öğret'}</button>}
-              <p className="col-span-2 text-xs font-mono text-[#9CA3AF]">{selectedMap?.kind === 'adaptive' ? 'Konuyu öğrenip kısa testi geçerek bu dalda ilerle.' : 'Bildiklerini doğrula ve ilerle. Bilmediklerin için ana yolun yanında sana özel bir dal açılır.'}</p>
+              {!branchPending && <button className={secondary + ' w-full'} disabled={!!busy} onClick={teach}><BookOpen size={17} />{practice ? 'İçeriği incele' : selectedMap?.kind === 'adaptive' ? 'Hiç bilmiyorum, öğret' : branch ? 'Öğrenme dalımı tekrar incele' : 'Hiç bilmiyorum, öğret'}</button>}
+              <p className="col-span-2 text-xs font-mono text-[#9CA3AF]">{practice ? 'Bu deneme gerçek yolculuğundan bağımsızdır; öğrenme dalı veya tamamlanma oluşturmaz.' : selectedMap?.kind === 'adaptive' ? 'Konuyu öğrenip kısa testi geçerek bu dalda ilerle.' : 'Bildiklerini doğrula ve ilerle. Bilmediklerin için ana yolun yanında sana özel bir dal açılır.'}</p>
             </div>}
-            {quiz && <section className="space-y-5"><div><h3 className="font-semibold">{quiz.title}</h3><p className="text-xs text-slate-500 mt-1">{quiz.questions.length} soru · Eksik beceriler için özel öğrenme dalı</p></div>{quiz.questions.map((question, index) => <fieldset key={question.id} className="space-y-2"><legend className="font-medium mb-2">{index + 1}. {question.prompt}</legend>{(question.options ?? []).map((option, optionIndex) => <label key={optionIndex} className={`flex gap-2 items-start p-3 rounded-xl border cursor-pointer ${answers[question.id] === optionIndex ? 'border-[#75a94b] bg-[#75a94b]/10' : 'border-slate-200 dark:border-slate-700'}`}><input type="radio" name={question.id} disabled={!!busy} checked={answers[question.id] === optionIndex} onChange={() => setAnswers(previous => ({ ...previous, [question.id]: optionIndex }))} className="mt-1" /><span>{option}</span></label>)}</fieldset>)}<button className={primary + ' w-full'} disabled={!!busy || quiz.questions.some(q => answers[q.id] === undefined)} onClick={submit}>Yanıtlarımı değerlendir</button><button className="text-xs underline" disabled={!!busy} onClick={() => setQuiz(null)}>Teste sonra devam et</button></section>}
+            {quiz && <section className="space-y-5"><div><h3 className="font-semibold">{quiz.title}</h3><p className="text-xs text-slate-500 mt-1">{quiz.questions.length} soru · {practice ? 'Demo denemesi; ilerleme kaydedilmez' : 'Her yeni doğru cevap +10 puan'}</p></div>{quiz.questions.map((question, index) => <fieldset key={question.id} className="space-y-2"><legend className="font-medium mb-2">{index + 1}. {question.prompt}</legend>{(question.options ?? []).map((option, optionIndex) => <label key={optionIndex} className={`flex gap-2 items-start p-3 rounded-xl border cursor-pointer ${answers[question.id] === optionIndex ? 'border-[#75a94b] bg-[#75a94b]/10' : 'border-slate-200 dark:border-slate-700'}`}><input type="radio" name={question.id} disabled={!!busy} checked={answers[question.id] === optionIndex} onChange={() => setAnswers(previous => ({ ...previous, [question.id]: optionIndex }))} className="mt-1" /><span>{option}</span></label>)}</fieldset>)}<button className={primary + ' w-full'} disabled={!!busy || quiz.questions.some(q => answers[q.id] === undefined)} onClick={submit}>Yanıtlarımı değerlendir</button><button className="text-xs underline" disabled={!!busy} onClick={() => setQuiz(null)}>Teste sonra devam et</button></section>}
             {lesson?.id === selected.id && !quiz && <section className="space-y-4 border-t border-slate-200 dark:border-slate-700 pt-4"><h3 className="font-semibold">Birlikte öğrenelim</h3><p className="leading-relaxed whitespace-pre-wrap">{lesson.lesson}</p><h3 className="font-semibold">Bu konu neden gerekli?</h3><p className="leading-relaxed whitespace-pre-wrap">{lesson.whyNeeded}</p><h3 className="font-semibold">Neler öğreneceksin?</h3><ul className="list-disc pl-5 space-y-2">{(lesson.learningObjectives ?? []).map(text => <li key={text}>{text}</li>)}</ul>{(lesson.subtopics ?? []).length > 0 && <><h3 className="font-semibold">Çalışma başlıkları</h3><ul className="list-disc pl-5 space-y-1">{(lesson.subtopics ?? []).map(text => <li key={text}>{text}</li>)}</ul></>}{lesson.practicalTask && <div className="rounded-xl bg-[#75a94b]/10 p-4 space-y-2"><h3 className="font-semibold">Uygula</h3><p>{lesson.practicalTask.description}</p><p className="text-xs text-slate-500">Beklenen çıktı: {lesson.practicalTask.expectedOutput}</p></div>}<button className={primary + ' w-full'} disabled={!!busy} onClick={testKnowledge}>Öğrendim, bilgimi test et</button></section>}
-            {selected.type === 'development_task' && !quiz && !branchPending && selected.status !== 'completed' && <form className="space-y-3 border-t pt-4 border-slate-200 dark:border-slate-700" onSubmit={event => { event.preventDefault(); void perform('Görev çıktın kaydediliyor…', async () => { await api.completeTask(selected.id, taskEvidence); const next = await refresh(); showRecommendation(next); setNotice('Proje görevin tamamlandı. Sıradaki durak vurgulandı.') }) }}><label className="block font-medium" htmlFor="task-evidence">Proje görevinin çıktısı</label><textarea id="task-evidence" className={input} value={taskEvidence} onChange={e => setTaskEvidence(e.target.value)} placeholder="Çalışan çıktını veya bağlantısını açıkla…" required /><button className={secondary + ' w-full'} disabled={!!busy || !taskEvidence.trim()}>Görevi tamamla</button></form>}
+            {selected.type === 'development_task' && !practice && !quiz && !branchPending && selected.status !== 'completed' && <form className="space-y-3 border-t pt-4 border-slate-200 dark:border-slate-700" onSubmit={event => { event.preventDefault(); void perform('Görev çıktın kaydediliyor…', async () => { const oldPoints = progress?.totalPoints || 0; await api.completeTask(selected.id, taskEvidence); const next = await refresh(); const latest = await api.progress(); setReward({id: Date.now(), kind: 'success', points: Math.max(0, latest.totalPoints-oldPoints), nodeId: selected.id, message: 'Projen için çalışan bir çıktı daha hazırladın!'}); showRecommendation(next); setNotice('Proje görevin tamamlandı. Sıradaki durak vurgulandı.') }) }}><label className="block font-medium" htmlFor="task-evidence">Proje görevinin çıktısı</label><textarea id="task-evidence" className={input} value={taskEvidence} onChange={e => setTaskEvidence(e.target.value)} placeholder="Çalışan çıktını veya bağlantısını açıkla…" required /><button className={secondary + ' w-full'} disabled={!!busy || !taskEvidence.trim()}>Görevi tamamla</button></form>}
             {selectedMap?.kind === 'adaptive' && <button className="text-xs underline" onClick={() => { const target = selectedMap.targetNodeId; if (target) { activate(target); focus(target) } }}>Ana duraktaki hedefime dön</button>}
           </>}
         <Bibliography key={selected.id} nodeId={selected.id} title={selected.title} />

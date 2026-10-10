@@ -3,6 +3,7 @@ This is a separate adaptive map, never a replacement for the main roadmap. For l
 teach foundations then practice; for knowledge_gap address the failed questions and misunderstandings.
 Return 2-10 actionable learning nodes in project locale with meaningful English local keys and skill
 slugs. Every node must be type learning, every skill must be in weakSkills, cover every weak skill.
+Every lesson must belong to one connected branch; connect foundations to their exercises.
 Use requires edges for ordering, no cycles, no submaps, URLs or coordinates. Include useful summaries
 and practical project context. branchScope.anchor.summary and weakSkills define the scope;
 the project goal is motivation only. branchScope.otherRoadmapTopics are reserved for other stages:

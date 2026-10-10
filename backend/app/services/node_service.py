@@ -5,9 +5,14 @@ from app.schemas.roadmap import NodeContent
 from app.services.roadmap_service import map_view, owned_map, owned_node
 
 
-async def get_node(db, node_id, user_id, gateway):
+async def get_node(db, node_id, user_id, gateway, practice=False):
     node = await owned_node(db, node_id, user_id, lock=True)
-    await require_access(db, node)
+    if practice:
+        from app.services.gamification_service import require_practice
+
+        require_practice(gateway.settings)
+    else:
+        await require_access(db, node)
     if node.content is None:
         from app.services.project_service import ensure_ai_source, owned_project
 

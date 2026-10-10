@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { layoutMaps, recommendedNode } from '../src/features/learning/layout.ts'
+import { layoutMaps, recommendedNode, visibleEdges, learningSequence } from '../src/features/learning/layout.ts'
 
 const bundle = JSON.parse(readFileSync(new URL('../../backend/contracts/examples/roadmap.json', import.meta.url)))
 const root = bundle.maps.find(map => !map.parentMapId)
@@ -178,3 +178,62 @@ const childPosition = mergeGraph.nodes.find(n=>n.id==='hazard-basics').position
 assert.ok(childPosition.y < anchorPosition.y,'Use the open upper side of a descending main path')
 assert.ok(Math.abs(childPosition.y-anchorPosition.y) < 400,'Keep the branch close to its actual anchor')
 console.log('Local branch lanes avoid crossing the main merge — passed')
+
+assert.deepEqual(after.nodes.map(n=>n.data.stepNumber).sort((a,b)=>a-b), Array.from({length:after.nodes.length},(_,i)=>i+1), 'Every visible stop, including branches, has a unique consecutive number')
+const anchorStep = after.nodes.find(n=>n.id===target.id).data.stepNumber
+assert.equal(after.nodes.find(n=>n.id==='gap-1').data.stepNumber,anchorStep+1)
+assert.equal(after.nodes.find(n=>n.id==='gap-2').data.stepNumber,anchorStep+2)
+for (const edge of after.edges.filter(e=>!e.data.branch && !e.data.optional)) {
+ assert.ok(after.nodes.find(n=>n.id===edge.source).data.stepNumber < after.nodes.find(n=>n.id===edge.target).data.stepNumber)
+}
+console.log('Learning order inserts remediation after its anchor and before subsequent main steps — passed')
+
+// A supporting-only workstream must stay connected even with detail hidden.
+const supportOnly = structuredClone(redundant)
+supportOnly.maps[0].nodes.push({...rm.nodes[0],id:'optional-stream'})
+supportOnly.maps[0].edges.push({id:'optional-bridge',source:'optional-stream',target:'simple-4',kind:'supports'})
+const supportGraph = layoutMaps(supportOnly,activate)
+assert.ok(visibleEdges(supportGraph.edges,false).some(e=>e.id==='optional-bridge'))
+checkRoutes(supportGraph)
+
+// Root edges must survive adding, extending and removing remediation branches.
+const baseIds = new Set(before.edges.map(e=>e.id))
+for (const graph of [after,legacy,crowdedGraph]) {
+ for (const id of baseIds) assert.ok(graph.edges.find(e=>e.id===id)?.data.points.length >= 2, `Main route ${id} disappeared`)
+ for (const edge of before.edges) assert.deepEqual(graph.edges.find(e=>e.id===edge.id).data.points,edge.data.points, `Main route ${edge.id} moved after branch insertion`)
+}
+const nestedRemediation = structuredClone(mergeBranch)
+nestedRemediation.maps.push({...nestedRemediation.maps[1],id:'nestedRemediation',parentMapId:'hazard-gap',targetNodeId:'hazard-basics',
+ nodes:[{...nestedRemediation.maps[1].nodes[0],id:'nestedRemediation-lesson',mapId:'nestedRemediation'}],edges:[]})
+assert.deepEqual(learningSequence(nestedRemediation.maps).map(n=>n.id),['hazard','hazard-basics','nestedRemediation-lesson','hazard-practice','save','test','publish'])
+if (process.argv[2]) {
+ const saved = JSON.parse(readFileSync(process.argv[2]))
+ const main = saved.maps.find(m=>!m.parentMapId)
+ const withoutBranches = layoutMaps({...saved,maps:[main]},activate,main.id)
+ const withBranches = layoutMaps(saved,activate,main.id)
+ const visible = visibleEdges(withBranches.edges,false)
+ checkRoutes(withBranches)
+ for (const edge of withoutBranches.edges) assert.deepEqual(withBranches.edges.find(e=>e.id===edge.id)?.data.points,edge.data.points)
+ for (const node of withBranches.nodes) assert.ok(visible.some(e=>e.source===node.id || e.target===node.id), `Saved node ${node.id} became isolated`)
+ console.log('Saved project: all main routes survive remediation and no node floats — passed')
+}
+
+// Use React Flow's actual store adoption code: geometry-only tests cannot catch
+// handle bounds being cleared by a controlled refresh without a DOM resize.
+const {adoptUserNodes,getEdgePosition,ConnectionMode} = await import('@xyflow/system')
+const lookup = new Map(), parents = new Map()
+const positionFor = edge => getEdgePosition({id:edge.id,sourceNode:lookup.get(edge.source),targetNode:lookup.get(edge.target),sourceHandle:edge.sourceHandle,targetHandle:edge.targetHandle,connectionMode:ConnectionMode.Strict})
+adoptUserNodes(before.nodes,lookup,parents)
+const unmeasured = before.nodes.map(({handles:_handles,...node})=>({...node,data:{...node.data}}))
+adoptUserNodes(unmeasured,lookup,parents)
+assert.equal(positionFor(before.edges[0]),null,'Reproduce lost handles on an unmeasured controlled refresh')
+for (const graph of [before,after,legacy,after,before]) {
+ adoptUserNodes(graph.nodes.map(n=>({...n,data:{...n.data}})),lookup,parents)
+ for (const edge of graph.edges) {
+  const position = positionFor(edge)
+  assert.ok(position,`React Flow cannot render ${edge.id} after refresh`)
+  assert.equal(position.sourceX,lookup.get(edge.source).position.x+136)
+  assert.equal(position.targetX,lookup.get(edge.target).position.x+84)
+ }
+}
+console.log('React Flow handle bounds survive quiz, reward and branch refresh without remeasurement — passed')

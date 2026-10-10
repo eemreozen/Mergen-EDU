@@ -23,6 +23,13 @@ class AssessmentQuestion(Schema):
 
 
 class AssessmentDraft(Schema):
+    @model_validator(mode="before")
+    @classmethod
+    def decode_generation_slots(cls, value):
+        if isinstance(value, dict) and isinstance(value.get("questions"), dict):
+            return {**value, "questions": [q for _, q in sorted(value["questions"].items())]}
+        return value
+
     title: str
     questions: list[AssessmentQuestion] = Field(min_length=3, max_length=10)
 
@@ -61,6 +68,7 @@ class AnswerSubmission(Schema):
 
 
 class AssessmentSubmit(Schema):
+    practice: bool = False
     assessment_id: str
     version: int = Field(ge=1)
     submission_id: UUID
@@ -68,6 +76,9 @@ class AssessmentSubmit(Schema):
 
 
 class AssessmentResult(Schema):
+    practice: bool = False
+    points_awarded: int = 0
+    correct_answers: int = 0
     attempt_id: str
     passed: bool
     score: float

@@ -110,7 +110,7 @@ async def map_view(db, roadmap):
 
 
 async def persist_draft(db, project, draft, parent_map=None, parent_node=None):
-    validate_graph(draft.nodes, draft.edges)
+    validate_graph(draft.nodes, draft.edges, require_connected=True)
     if any(n.type == "remedial" for n in draft.nodes):
         raise AppError(
             "ROADMAP_VALIDATION_FAILED",

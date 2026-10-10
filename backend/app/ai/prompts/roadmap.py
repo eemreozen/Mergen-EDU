@@ -25,6 +25,11 @@ Dependency quality: connect only true prerequisites. Keep a fork's independent b
 independent until a concrete integration step; do not make UI work depend on networking
 without a specific technical reason. Do not add A->C if A->B->C already captures that
 prerequisite. Do not add speculative dependencies or duplicate lessons to decorate the graph.
+Graph integrity: every stage must participate in one connected project graph. Independent
+workstreams remain independently learnable but must connect to a concrete integration/delivery
+stage. No isolated stages or disconnected components. Use supports for genuinely optional
+contributions; never invent requires links merely to connect the drawing. Check all nodes,
+edge endpoints and prerequisite cycles before returning the JSON.
 Every node must include resourceQuery: a short English search phrase (3-8 words) naming
 its precise teachable topic and relevant technology, for finding educational documents and
 videos. Avoid internal skill slugs, acronyms without context, product/project names, whole

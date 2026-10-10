@@ -1,7 +1,7 @@
 """Keep constrained decoding small; enforce full constraints after generation."""
 
 
-def generation_schema(response_model):
+def generation_schema(response_model, payload=None):
     schema = response_model.model_json_schema(by_alias=True)
     bounds = {
         "minItems": "Minimum items",
@@ -51,5 +51,17 @@ def generation_schema(response_model):
             "type": "object", "properties": slots,
             "required": list(slots)[:12], "additionalProperties": False,
             "description": "Produce stages 01-12; stages 13-20 are optional for a larger project.",
+        }
+    if response_model.__name__ == "AssessmentDraft":
+        # Required slots enforce a real minimum without extra provider calls.
+        # Described array bounds alone were ignored for initial diagnostic tests.
+        item = result["properties"]["questions"]["items"]
+        slots = {f"question{i:02d}": item.copy() for i in range(1, 6)}
+        skill_count = len(set((payload or {}).get("node", {}).get("skills", [])))
+        required_count = max(3, min(5, skill_count))
+        result["properties"]["questions"] = {
+            "type": "object", "properties": slots,
+            "required": list(slots)[:required_count], "additionalProperties": False,
+            "description": f"Fill the first {required_count} questions with distinct questions covering every listed node skill.",
         }
     return result

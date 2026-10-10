@@ -32,9 +32,14 @@ def assessment_view(assessment, demo=False):
     )
 
 
-async def get_assessment(db, node_id, user_id, gateway):
+async def get_assessment(db, node_id, user_id, gateway, practice=False):
     node = await owned_node(db, node_id, user_id, lock=True)
-    await require_access(db, node)
+    if practice:
+        from app.services.gamification_service import require_practice
+
+        require_practice(gateway.settings)
+    else:
+        await require_access(db, node)
     if node.type not in {"learning", "remedial", "submap", "development_task"}:
         raise AppError("ASSESSMENT_NOT_APPLICABLE", "Bu düğüm testle tamamlanmaz.", 409)
     assessment = await db.scalar(select(Assessment).where(Assessment.node_id == node.id))
@@ -85,6 +90,28 @@ async def submit_assessment(db, node_id, user_id, body, gateway):
     )
     if not assessment:
         raise AppError("ASSESSMENT_NOT_FOUND", "Değerlendirme bu düğüme ait değil.", 404)
+    if body.practice:
+        from app.services.gamification_service import require_practice
+
+        require_practice(gateway.settings)
+        if body.version != assessment.version:
+            raise AppError("ASSESSMENT_VERSION_MISMATCH", "Değerlendirme sürümü güncel değil.", 409)
+        score, passed, weak = evaluate(assessment.questions, body.answers, assessment.passing_score)
+        roadmap = await owned_map(db, node.map_id, user_id)
+        return AssessmentResult(
+            attempt_id=new_id(),
+            practice=True,
+            passed=passed,
+            score=score,
+            weak_skills=weak,
+            remediation_created=False,
+            map=await map_view(db, roadmap),
+            correct_answers=sum(
+                a.selected_index
+                == next(q["correct_index"] for q in assessment.questions if q["id"] == a.question_id)
+                for a in body.answers
+            ),
+        )
     previous = await db.scalar(
         select(AssessmentAttempt).where(
             AssessmentAttempt.assessment_id == assessment.id,
@@ -114,6 +141,9 @@ async def submit_assessment(db, node_id, user_id, body, gateway):
         raise AppError(
             "REMEDIATION_REQUIRED", "Ana testi tekrar denemeden önce telafi düğümlerini tamamlayın.", 409
         )
+    from app.services.gamification_service import learner_progress
+
+    before = await learner_progress(db, user_id, gateway.settings)
     score, passed, weak = evaluate(assessment.questions, body.answers, assessment.passing_score)
     passed = passed and not weak
     node.status = (
@@ -157,6 +187,11 @@ async def submit_assessment(db, node_id, user_id, body, gateway):
     attempt_id = new_id()
     result = AssessmentResult(
         attempt_id=attempt_id,
+        correct_answers=sum(
+            a.selected_index
+            == next(q["correct_index"] for q in assessment.questions if q["id"] == a.question_id)
+            for a in body.answers
+        ),
         passed=passed,
         score=score,
         weak_skills=weak,
@@ -165,18 +200,21 @@ async def submit_assessment(db, node_id, user_id, body, gateway):
         memory_review_ids=[r.id for r in memory_reviews],
         map=roadmap,
     )
-    db.add(
-        AssessmentAttempt(
-            id=attempt_id,
-            assessment_id=assessment.id,
-            user_id=user_id,
-            submission_id=str(body.submission_id),
-            answers=[a.model_dump() for a in body.answers],
-            score=score,
-            passed=passed,
-            weak_skills=weak,
-            result=result.model_dump(mode="json"),
-        )
+    attempt = AssessmentAttempt(
+        id=attempt_id,
+        assessment_id=assessment.id,
+        user_id=user_id,
+        submission_id=str(body.submission_id),
+        answers=[a.model_dump() for a in body.answers],
+        score=score,
+        passed=passed,
+        weak_skills=weak,
+        result=result.model_dump(mode="json"),
     )
+    db.add(attempt)
+    await db.flush()
+    after = await learner_progress(db, user_id, gateway.settings)
+    result.points_awarded = max(0, after.total_points - before.total_points)
+    attempt.result = result.model_dump(mode="json")
     await db.flush()
     return result

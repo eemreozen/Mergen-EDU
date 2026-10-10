@@ -1,8 +1,8 @@
-import type { Edge, Node } from '@xyflow/react'
-import { createRouter, routeCrossings, type Point } from './routing.ts'
+import { Position, type Edge, type Node } from '@xyflow/react'
+import { createRouter, crossesBox, routeCrossings, type Point } from './routing.ts'
 import type { ExportBundle, MapView, NodeView } from '@/api/types'
 
-export type LearningNodeData = { node: NodeView; stepNumber: number; mapTitle: string; adaptive: boolean; recommended: boolean; activate: (id: string) => void }
+export type LearningNodeData = { node: NodeView; stepNumber: number; mapTitle: string; adaptive: boolean; recommended: boolean; activate: (id: string) => void; celebrated?: boolean }
 
 export function recommendedNode(bundle: ExportBundle, mapId?: string): NodeView | undefined {
   if (mapId) {
@@ -14,12 +14,10 @@ export function recommendedNode(bundle: ExportBundle, mapId?: string): NodeView 
     }
     bundle = { ...bundle, maps: bundle.maps?.filter(m => scope.has(m.id)) }
   }
-  const ordered = (map: MapView) => {
-    const { steps } = arrange(map)
-    return [...map.nodes].sort((a, b) => steps.get(a.id)! - steps.get(b.id)!)
-  }
-  const all = (bundle.maps ?? []).flatMap(ordered)
+  const ordered = (map: MapView) => learningSequence([map])
+  const all = learningSequence(bundle.maps ?? [])
   const branches = (bundle.maps ?? []).filter(m => m.kind === 'adaptive')
+    .sort((a,b) => all.findIndex(n => n.id === a.targetNodeId) - all.findIndex(n => n.id === b.targetNodeId))
   for (const branch of branches) {
     const target = all.find(n => n.id === branch.targetNodeId)
     if (target?.status === 'completed') continue
@@ -34,6 +32,45 @@ export function recommendedNode(bundle: ExportBundle, mapId?: string): NodeView 
     || candidates.find(n => !activeTargets.has(n.id) && n.status === 'needs_review')
 }
 
+// Stable topological learning order, independent of visual lane compaction.
+// Insert each remediation immediately after its anchor, including nested maps.
+export function learningSequence(maps: MapView[]): NodeView[] {
+  const result: NodeView[] = [], visited = new Set<string>()
+  const visit = (map: MapView) => {
+    if (visited.has(map.id)) return
+    visited.add(map.id)
+    const remaining = new Set(map.nodes.map(n => n.id))
+    while (remaining.size) {
+      const node = map.nodes.find(n => remaining.has(n.id) && !map.edges.some(e =>
+        e.kind === 'requires' && e.target === n.id && remaining.has(e.source)))
+        || map.nodes.find(n => remaining.has(n.id))!
+      remaining.delete(node.id)
+      result.push(node)
+      for (const child of maps.filter(m => m.parentMapId === map.id && (m.targetNodeId || m.parentNodeId) === node.id)) visit(child)
+    }
+  }
+  for (const map of maps.filter(m => !maps.some(parent => parent.id === m.parentMapId))) visit(map)
+  for (const map of maps) visit(map)
+  return result
+}
+
+// Keep supports that join otherwise separate required-work components visible.
+// Hiding optional detail must never leave an entire workstream floating.
+export function visibleEdges(edges: Edge[], showSupports: boolean) {
+  const parent = new Map<string,string>()
+  const find = (id: string): string => {
+    const next = parent.get(id)
+    if (!next) { parent.set(id,id); return id }
+    if (next === id) return id
+    const root = find(next); parent.set(id,root); return root
+  }
+  const join = (edge: Edge) => { const a=find(edge.source), b=find(edge.target); parent.set(a,b); return a !== b }
+  for (const edge of edges.filter(e => !e.data?.optional)) join(edge)
+  const bridges = new Set(edges.filter(e => e.data?.optional && join(e)).map(e => e.id))
+  return edges.filter(e => showSupports || !e.data?.optional || bridges.has(e.id))
+    .map(e => bridges.has(e.id) ? {...e,data:{...e.data,connectivity:true}} : e)
+}
+
 // Deterministic layered DAG layout. Progress and additional maps never move the root.
 const COLUMN = 360
 const ROW = 210
@@ -46,8 +83,18 @@ function arrange(map: MapView) {
   const ids = new Set(map.nodes.map(n => n.id))
   const incoming = new Map(map.nodes.map(n => [n.id, [] as string[]]))
   const outgoing = new Map(map.nodes.map(n => [n.id, [] as string[]]))
-  for (const edge of map.edges) {
-    if (edge.kind !== 'requires' || !ids.has(edge.source) || !ids.has(edge.target)) continue
+  for (const edge of [...map.edges].sort((a,b) => Number(a.kind !== 'requires')-Number(b.kind !== 'requires'))) {
+    if (!ids.has(edge.source) || !ids.has(edge.target)) continue
+    if (edge.kind === 'supports') {
+      const seen = new Set<string>(), queue = [edge.target]
+      while (queue.length) {
+        const id = queue.pop()!
+        if (seen.has(id)) continue
+        seen.add(id); queue.push(...outgoing.get(id)!)
+      }
+      if (seen.has(edge.source)) continue // optional links may legally point backward
+    }
+    if (outgoing.get(edge.source)!.includes(edge.target)) continue
     incoming.get(edge.target)!.push(edge.source)
     outgoing.get(edge.source)!.push(edge.target)
   }
@@ -143,6 +190,7 @@ export function layoutMaps(bundle: ExportBundle, activate: (id: string) => void,
     maps.push(...remaining.splice(next < 0 ? 0 : next, 1))
   }
   let branchIndex = 0
+  const steps = new Map(learningSequence(maps).map((node,i) => [node.id,i+1]))
   const positioned = new Map<string, { x: number; y: number }>()
   for (const map of maps) {
     const layout = arrange(map)
@@ -165,11 +213,15 @@ export function layoutMaps(bundle: ExportBundle, activate: (id: string) => void,
         { above: false, y: low + 72 - localTop },
         { above: true, y: high - 72 - layout.height },
       ]
-      const occupied = edges.filter(e => !e.data?.branch).map(e => {
-        const source = positioned.get(e.source)!, target = positioned.get(e.target)!
-        return [[source.x+136,source.y+32],[source.x+240,source.y+32],
-          [target.x-20,target.y+32],[target.x+84,target.y+32]] as Point[]
-      })
+      const occupied = edges.filter(e => !e.data?.branch).map(e => e.data!.points as Point[])
+      // Reserve existing routes as well as node bounds. Later branches must
+      // not force an already visible main connection to reroute or disappear.
+      for (const candidate of candidates) {
+        while (localPoints.some(p => occupied.some(points => points.some((point,i) => i > 0 &&
+          crossesBox(points[i-1],point,{x:offsetX+p.x,y:candidate.y+p.y,width:WIDTH,height:HEIGHT},28))))) {
+          candidate.y += candidate.above ? -ROW : ROW
+        }
+      }
       const first = localPoints[0]
       const score = (candidate: typeof candidates[number]) => {
         if (!anchor || !first) return candidate.above === preferAbove ? 0 : 1
@@ -187,7 +239,14 @@ export function layoutMaps(bundle: ExportBundle, activate: (id: string) => void,
       const position = { x: offsetX + local.x, y: offsetY + local.y }
       positioned.set(node.id, position)
       nodes.push({ id: node.id, type: 'learningStop', position, width: WIDTH, height: HEIGHT,
-        data: { node, stepNumber: layout.steps.get(node.id)!, mapTitle: map.title,
+        // Controlled refreshes replace node objects without measured dimensions.
+        // Explicit ports keep React Flow's handle bounds initialized on every
+        // quiz/reward update, even when ResizeObserver has no size change to report.
+        handles: [
+          {id:'in',type:'target',position:Position.Left,x:84,y:32,width:0,height:0},
+          {id:'out',type:'source',position:Position.Right,x:136,y:32,width:0,height:0},
+        ],
+        data: { node, stepNumber: steps.get(node.id)!, mapTitle: map.title,
           adaptive: map.kind === 'adaptive', recommended: node.id === recommendation, activate } })
     }
     for (const edge of map.edges) {
@@ -216,6 +275,14 @@ export function layoutMaps(bundle: ExportBundle, activate: (id: string) => void,
         },
       })
     }
+    // Freeze ordinary routes before placing descendants, whose lanes reserve
+    // these paths. Routing the full root again after adding a branch was fragile.
+    const mapRoute = createRouter(nodes.map(n => ({...n.position,width:WIDTH,height:HEIGHT})))
+    for (const edge of edges.filter(e => map.edges.some(saved => saved.id === e.id))) {
+      const source = positioned.get(edge.source)!, target = positioned.get(edge.target)!
+      const start: Point = [source.x+136,source.y+32], end: Point = [target.x+84,target.y+32]
+      edge.data!.points = mapRoute(start,end,[start,[start[0]+104,start[1]],[end[0]-104,end[1]],end])
+    }
     if (anchor) {
       // Attach every entry, including disconnected components in older saved maps.
       const requiredTargets = new Set(map.edges.filter(edge => edge.kind === 'requires').map(edge => edge.target))
@@ -225,7 +292,8 @@ export function layoutMaps(bundle: ExportBundle, activate: (id: string) => void,
         data: { isRemedial: true, branch: true, gutterX: anchor.x + WIDTH + 28 } })
     }
   }
-  // Route only after every map has been placed: later branches are obstacles too.
+  // Route cross-map connectors after all branches have been placed.
+  // Ordinary routes were reserved during placement and remain unchanged.
   const obstacles = nodes.map(n => ({ ...n.position, width: WIDTH, height: HEIGHT }))
   const occupied: Point[][] = []
   const route = createRouter(obstacles)
@@ -241,7 +309,7 @@ export function layoutMaps(bundle: ExportBundle, activate: (id: string) => void,
       : data.gutterY !== undefined
         ? [start, [exit, start[1]], [exit, data.gutterY], [entry, data.gutterY], [entry, end[1]], end]
         : [start, [exit, start[1]], [entry, end[1]], end]
-    data.points = edge.data?.branch ? branchRoute(start, end, preferred) : route(start, end, preferred)
+    data.points ??= edge.data?.branch ? branchRoute(start, end, preferred) : route(start, end, preferred)
     occupied.push(data.points)
   }
   return { nodes, edges }

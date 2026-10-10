@@ -1,3 +1,4 @@
+import { AdvisorWelcome } from '@/components/landing/AdvisorWelcome'
 import { motion } from 'motion/react'
 import { ArrowRight, Compass, Wand2 } from 'lucide-react'
 import { useState } from 'react'
@@ -245,6 +246,7 @@ export function HeroSection({
         </div>
       </section>
 
+      {creating && <div className="fixed inset-0 z-[80] bg-[#F7F8FA]/85 dark:bg-[#0B0D10]/85 backdrop-blur-sm flex items-center justify-center p-6" role="dialog" aria-modal="true" aria-label={isEn ? 'Meet your mentor' : 'Danışmanınla tanış'}><div className="max-w-lg w-full"><AdvisorWelcome en={isEn} /></div></div>}
       {/* Auth Modal */}
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
 

@@ -12,8 +12,8 @@ router = APIRouter()
 
 
 @router.get("/nodes/{node_id}", response_model=NodeView)
-async def read_node(node_id: str, db: Db, user: UserId, ai: Gateway):
-    return await get_node(db, node_id, user, ai)
+async def read_node(node_id: str, db: Db, user: UserId, ai: Gateway, practice: bool = False):
+    return await get_node(db, node_id, user, ai, practice)
 
 
 @router.patch("/nodes/{node_id}", response_model=MapView)

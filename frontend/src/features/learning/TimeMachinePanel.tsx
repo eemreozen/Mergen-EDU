@@ -7,8 +7,8 @@ import type { MemoryChallenge, MemoryResult, TimeMachine } from '@/api/memory-ty
 const primary = 'rounded-xl bg-[#2B660E] dark:bg-[#B7F36B] text-white dark:text-[#0B0D10] px-4 py-3 text-sm font-semibold disabled:opacity-40 inline-flex items-center justify-center gap-2 cursor-pointer'
 const card = 'rounded-2xl border border-[#E3E7EC] dark:border-[#2A3038] p-5'
 
-export function TimeMachinePanel({ open, data, loadingError, disabled, close, refresh }: {
-  open: boolean; data: TimeMachine | null; loadingError: string; disabled: boolean; close: () => void; refresh: () => Promise<void>
+export function TimeMachinePanel({ open, data, loadingError, disabled, close, refresh, onAnswered }: {
+  open: boolean; data: TimeMachine | null; loadingError: string; disabled: boolean; close: () => void; refresh: () => Promise<void>; onAnswered?: (correct: boolean) => Promise<void>
 }) {
   const [tab, setTab] = useState<'practice' | 'history'>('practice')
   const [challenge, setChallenge] = useState<MemoryChallenge | null>(null)
@@ -31,6 +31,7 @@ export function TimeMachinePanel({ open, data, loadingError, disabled, close, re
     const next = await api.answerMemory(challenge.reviewId, challenge.id, selection, submissionId)
     setResult(next)
     await refresh()
+    await onAnswered?.(next.correct)
   })
   const back = () => { setChallenge(null); setResult(null); setError('') }
   const blocked = busy || disabled
